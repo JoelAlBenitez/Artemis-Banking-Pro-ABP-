@@ -1,0 +1,16 @@
+name: Bloquear PR entre Features
+
+on:
+  pull_request:
+    branches:
+      - 'feature/*'
+      - 'Feature/*'
+
+jobs:
+  block-merge:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Rechazar PR
+      run: |
+        echo "🛑 ERROR CRÍTICO: Está estrictamente prohibido hacer merge hacia una rama de feature. Los features solo viajan hacia 'development'."
+        exit 1

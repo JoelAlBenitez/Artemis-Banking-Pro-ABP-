@@ -1,0 +1,29 @@
+name: Validar y Compilar PR hacia Main
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Validar que el origen sea development
+      if: github.head_ref != 'development'
+      run: |
+        echo "🛑 ERROR CRÍTICO: Los PRs hacia 'main' SOLO pueden venir de la rama 'development'."
+        exit 1
+
+    - name: Checkout del código
+      uses: actions/checkout@v4
+
+    - name: Configurar .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x' 
+
+    - name: Restaurar dependencias
+      run: dotnet restore
+
+    - name: Compilar el proyecto
+      run: dotnet build --no-restore --configuration Release
