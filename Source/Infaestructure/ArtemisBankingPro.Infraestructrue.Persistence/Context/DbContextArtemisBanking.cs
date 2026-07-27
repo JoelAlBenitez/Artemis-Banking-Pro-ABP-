@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace ArtemisBankingPro.Infraestructrue.Persistence.Context
 {
