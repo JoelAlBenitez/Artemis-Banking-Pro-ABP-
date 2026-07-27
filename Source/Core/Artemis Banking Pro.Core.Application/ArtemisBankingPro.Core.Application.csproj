@@ -11,4 +11,14 @@
     <PackageReference Include="AutoMapper" Version="16.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mappings\DtoToViewModelsAndReverse\" />
+    <Folder Include="Mappings\EntitieToDtosAndReverse\" />
+    <Folder Include="ViewModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ArtemisBankingPro.Core.Domain\ArtemisBankingPro.Core.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
