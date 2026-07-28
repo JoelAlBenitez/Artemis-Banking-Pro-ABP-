@@ -3,7 +3,7 @@
     public abstract class BaseEntitie <Tkey>
     {
         public Tkey? Id { get; set; }
-        public required DateTimeOffset CreatedAt { get; set; } 
+        public required DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         public required string CreateByUserId { get; set; }
         public string? LastModifiedByIdUser { get; set; }   
         public DateTimeOffset? ModifiedAt { get; set; }
