@@ -27,7 +27,7 @@ namespace ArtemisBankingPro.Core.Domain.Interfaces.Generic
 
         Task<TEntity?> GetFirstAsync(
             Expression<Func<TEntity, bool>> predicate, 
-            params Expression<Func<TEntity, object>>[] includes);
+            params Expression<Func<TEntity, object>>[] includes );
 
         //Exists Consults
         Task<bool> ExistElementByConsult(Expression<Func<TEntity, bool>> predicate);

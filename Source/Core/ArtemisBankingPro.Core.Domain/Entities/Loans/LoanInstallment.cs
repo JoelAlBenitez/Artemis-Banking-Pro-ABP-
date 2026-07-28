@@ -1,10 +1,10 @@
 ﻿using ArtemisBankingPro.Core.Domain.Common.Enum;
+using ArtemisBankingPro.Core.Domain.Entities.Base;
 
 namespace ArtemisBankingPro.Core.Domain.Entities.Loans
 {
-    public sealed class LoanInstallment 
+    public sealed class LoanInstallment  : BaseEntitie<int>
     {
-        public int Id { get; set; }
         public required int LoandId { get; set; }
         public required int InstallmentNumber { get; set; }
         public required DateTimeOffset DueDate { get; set; }
