@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="DTOs\Loans\" />
     <Folder Include="Mappings\DtoToViewModelsAndReverse\" />
     <Folder Include="Mappings\EntitieToDtosAndReverse\" />
   </ItemGroup>

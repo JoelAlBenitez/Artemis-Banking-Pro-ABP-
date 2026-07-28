@@ -3,7 +3,7 @@ using ArtemisBankingPro.Core.Domain.Interfaces.Generic;
 
 namespace ArtemisBankingPro.Core.Domain.Interfaces.Loans
 {
-    public interface ILoanInstallment :
+    public interface ILoanInstallmentRepository :
         IGenericRepository<LoanInstallment, int>
     {
     }

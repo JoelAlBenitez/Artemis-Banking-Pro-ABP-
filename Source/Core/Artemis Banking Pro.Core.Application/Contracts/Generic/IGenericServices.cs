@@ -1,6 +1,4 @@
 ﻿using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
-using ArtemisBankingPro.Core.Domain.Entities.Base;
-
 namespace Artemis_Banking_Pro.Core.Application.Contracts.Generic
 {
     public interface IGenericServices<TDto, Tkey>
