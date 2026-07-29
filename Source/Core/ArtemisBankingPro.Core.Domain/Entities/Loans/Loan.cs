@@ -10,6 +10,7 @@ namespace ArtemisBankingPro.Core.Domain.Entities.Loans
         public required  decimal ApprovedCapital { get; set; }
         public required TermMonths termMonths { get; set; }
         public required decimal AnnualInterestRate { get; set; }
+
         public required bool State = true;
         public  decimal TotalPayable {  get; set; }
         public  decimal PendingAmount { get; set; }

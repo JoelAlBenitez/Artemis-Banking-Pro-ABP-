@@ -4,7 +4,7 @@ namespace Artemis_Banking_Pro.Core.Application.DTOs.Loans
 {
     public sealed class LoansDto : BaseDto<int>
     {
-        public required string LoandNumber { get; set; }
+        public required string LoanNumber { get; set; }
         public required string FullNameCustomer { get; set; }
         public required decimal AprovechedCapital { get; set; }
         public required int QuantityInstallment { get; set; }
