@@ -2,6 +2,7 @@ using Artemis_Banking_Pro.Core.Application.Contracts.EmailSerives;
 using Artemis_Banking_Pro.Core.Application.Contracts.Loans;
 using Artemis_Banking_Pro.Core.Application.DTOs.Loans;
 using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
+using Artemis_Banking_Pro.Core.Application.Services.Generic;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.CodeErrors.LoansErros;
 using ArtemisBankingPro.Core.Domain.Common.Constants;
@@ -14,28 +15,33 @@ using AutoMapper;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 {
-    public sealed class LoansServices : ILoansServices
+ 
+    //Integrar ILogger con serilog
+    public sealed class LoansServices :
+        GenericServices<LoansAssignmentDto, LoansDto, int, Loan>,
+        ILoansServices
     {
         private readonly ILoansRepository _loansRepository;
         private readonly ILoanInstallmentRepository _loanInstallmentRepository;
         private readonly IAmortizationCalculator _amortizationCalculator;
         private readonly IEmailServices _emailServices;
-        private readonly IMapper _mapper;
 
         public LoansServices(
             ILoansRepository loansRepository,
             ILoanInstallmentRepository loanInstallmentRepository,
             IAmortizationCalculator amortizationCalculator,
             IEmailServices emailServices,
-            IMapper mapper)
+            IMapper mapper
+           ) : base(loansRepository, mapper)
         {
             _loansRepository = loansRepository;
             _loanInstallmentRepository = loanInstallmentRepository;
             _amortizationCalculator = amortizationCalculator;
             _emailServices = emailServices;
-            _mapper = mapper;
         }
 
+
+        #region query methods
         public async Task<ValidationResult<PagedResult<LoansDto>>> GetPagedLoansAsync(
             LoansFilterDto filter, string? customerId)
         {
@@ -111,6 +117,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             }
         }
 
+        #endregion
         public async Task<ValidationResult<LoanRateUpdatedDto>> EditAnnualInterestRateAsync(
             EditAnnualInterestRateDto dto, string adminUserId)
         {
@@ -186,6 +193,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             }
         }
 
+        //este metodo debe ser privado
         public async Task<ValidationResult> SendRateUpdateNotificationAsync(
             LoanRateUpdatedDto rateUpdated, string customerEmail, string customerFullName)
         {
@@ -203,6 +211,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 : ValidationResult.Failure(LoandError.RateUpdatedWithoutNotification);
         }
 
+        #region private methods
         private static string BuildRateUpdateBody(LoanRateUpdatedDto rateUpdated, string customerFullName)
             => $"<p>Hola {customerFullName},</p>" +
                $"<p>La tasa de interés de su préstamo {rateUpdated.LoanNumber} ha sido actualizada.</p>" +
@@ -210,7 +219,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                $"Nuevo valor de la próxima cuota: RD${rateUpdated.NextInstallmentValue:N2}<br/>" +
                $"Fecha de vencimiento de la próxima cuota: {rateUpdated.NextInstallmentDueDate:dd/MM/yyyy}</p>" +
                "<p>Esta modificación aplica únicamente a las cuotas futuras pendientes.</p>";
-
         private static LoanStatus? ToLoanStatus(LoanStatusFilter filter)
             => filter switch
             {
@@ -218,5 +226,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 LoanStatusFilter.Completados => LoanStatus.Completado,
                 _ => null
             };
+        #endregion
     }
 }

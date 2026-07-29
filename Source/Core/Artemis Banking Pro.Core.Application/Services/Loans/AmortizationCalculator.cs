@@ -8,6 +8,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
     {
         private const int MoneyDecimals = 2;
 
+        //agregar ILogger
         public decimal CalculateMonthlyInstallment(decimal capital, decimal annualInterestRate, int totalInstallments)
         {
             if (totalInstallments <= 0) return 0m;
@@ -110,6 +111,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             return futureInstallments;
         }
 
+        #region private methos
         private static decimal MonthlyRate(decimal annualInterestRate)
             => annualInterestRate <= 0m ? 0m : annualInterestRate / 100m / 12m;
 
@@ -122,5 +124,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
         private static decimal Money(decimal value)
             => Math.Round(value, MoneyDecimals, MidpointRounding.AwayFromZero);
+        #endregion
     }
 }
