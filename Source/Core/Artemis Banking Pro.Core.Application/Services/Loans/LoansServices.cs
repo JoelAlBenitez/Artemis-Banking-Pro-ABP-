@@ -47,7 +47,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     ToLoanStatus(filter.Status),
                     customerId);
 
-                //Cliente existente sin préstamos registrados
                 if (!string.IsNullOrWhiteSpace(customerId) && result.TotalRecords == 0)
                 {
                     return ValidationResult<PagedResult<LoansDto>>.Failure(LoandError.NonExistsLoans);
@@ -98,7 +97,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     return ValidationResult<EditAnnualInterestRateDto>.Failure(LoandError.LoanIsNotActive);
                 }
 
-                //El formulario se precarga con la tasa actual del préstamo
                 var dto = new EditAnnualInterestRateDto
                 {
                     Id = loan.Id,
@@ -116,7 +114,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
         public async Task<ValidationResult<LoanRateUpdatedDto>> EditAnnualInterestRateAsync(
             EditAnnualInterestRateDto dto, string adminUserId)
         {
-            //Las validaciones de negocio van antes de tocar la base de datos
             if (dto.AnnualInterestRate < 0m)
             {
                 return ValidationResult<LoanRateUpdatedDto>.Failure(LoandError.NegativeAnnualInterestRate);
@@ -201,7 +198,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
             var sent = await _emailServices.SendNotification(message);
 
-            //El fallo de correo no revierte la modificación de la tasa
             return sent
                 ? ValidationResult.Success()
                 : ValidationResult.Failure(LoandError.RateUpdatedWithoutNotification);
