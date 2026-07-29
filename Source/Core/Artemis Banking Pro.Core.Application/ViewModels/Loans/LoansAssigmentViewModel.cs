@@ -6,8 +6,8 @@ namespace Artemis_Banking_Pro.Core.Application.ViewModels.Loans
     public sealed class LoansAssigmentViewModel
     {
 
-        [Required(ErrorMessage = "Debe seleccionar un cliente valido.")]
-        public required int CustomerId { get; set; }
+        [Required(ErrorMessage = "Debe seleccionar un cliente para continuar.")]
+        public required string CustomerId { get; set; }
 
         [Required(ErrorMessage = "Debe seleccionar un plazo valido.")]
         [Range(6, 60, ErrorMessage = "El plazo debe encontrarse en valor de 6 a 60 meses, en plazos distribuidos en rangos de 6 meses.")]
