@@ -1,4 +1,4 @@
-﻿using ArtemisBankingPro.Core.Domain.Entities.Base;
+using ArtemisBankingPro.Core.Domain.Entities.Base;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 
 namespace ArtemisBankingPro.Core.Domain.Entities.Loans
@@ -10,10 +10,13 @@ namespace ArtemisBankingPro.Core.Domain.Entities.Loans
         public required  decimal ApprovedCapital { get; set; }
         public required TermMonths termMonths { get; set; }
         public required decimal AnnualInterestRate { get; set; }
-
-        public required bool State = true;
+        public decimal MonthlyInstallment { get; set; }
         public  decimal TotalPayable {  get; set; }
         public  decimal PendingAmount { get; set; }
+        public required LoanStatus Status { get; set; }
+
+        //Fecha en que todas las cuotas quedaron pagadas
+        public DateTimeOffset? CompletedAt { get; set; }
 
         //Collections
 

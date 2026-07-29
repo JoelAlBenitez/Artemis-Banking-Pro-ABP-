@@ -10,7 +10,7 @@
         Meses36 = 36,
         Meses42 = 42,
         Meses48 = 48,
-        Meses54 = 52,
+        Meses54 = 54,
         Meses60 = 60
     }
 }

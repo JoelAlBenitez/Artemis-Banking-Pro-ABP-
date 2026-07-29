@@ -5,5 +5,16 @@ namespace ArtemisBankingPro.Core.Domain.Common.Constants
         //Paginación obligatoria en todos los listados administrativos
         public const int DefaultPageSize = 20;
         public const int MaxPageSize = 20;
+
+        //Número de préstamo: 9 dígitos como texto, no repetible como préstamo ni como cuenta
+        public const int LoanNumberLength = 9;
+
+        //Precisión decimal de todo valor monetario
+        public const int MoneyPrecision = 18;
+        public const int MoneyScale = 2;
+
+        //Precisión de la tasa de interés anual
+        public const int RatePrecision = 9;
+        public const int RateScale = 4;
     }
 }

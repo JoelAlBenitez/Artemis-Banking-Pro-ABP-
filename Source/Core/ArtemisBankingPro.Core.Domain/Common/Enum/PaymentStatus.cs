@@ -2,8 +2,8 @@
 {
     public enum PaymentStatus
     {
-        Pagada = 1,
-        Pendiente = 2,
-        ParcialmentePagada = 3
+        Pendiente = 1,
+        ParcialmentePagada = 2,
+        Pagada = 3
     }
 }
