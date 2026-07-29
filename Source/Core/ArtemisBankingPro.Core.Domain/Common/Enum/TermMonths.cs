@@ -2,15 +2,15 @@
 {
     public  enum TermMonths
     {
-        Months6 = 6,
-        Months12 = 12,
-        Months18 = 18,
-        Months24 = 24,
-        Months30 = 30,
-        Months36 = 36,
-        Months42 = 42,
-        Months48 = 48,
-        Months54 = 52,
-        Months60 = 60
+        Meses6 = 6,
+        Meses12 = 12,
+        Meses18 = 18,
+        Meses24 = 24,
+        Meses30 = 30,
+        Meses36 = 36,
+        Meses42 = 42,
+        Meses48 = 48,
+        Meses54 = 52,
+        Meses60 = 60
     }
 }
