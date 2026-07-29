@@ -1,4 +1,6 @@
-﻿using ArtemisBankingPro.Core.Domain.Entities.Base;
+using ArtemisBankingPro.Core.Domain.Common.Constants;
+using ArtemisBankingPro.Core.Domain.Common.Pagination;
+using ArtemisBankingPro.Core.Domain.Entities.Base;
 using ArtemisBankingPro.Core.Domain.Interfaces.Generic;
 using ArtemisBankingPro.Infraestructrue.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -19,16 +21,19 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Generic
             _context = context;
         }
 
+        //No persiste: la confirmación la ejecuta el servicio con un único SaveChangesAsync
         public virtual async Task<TEntity> AddAsync(TEntity entity)
         {
-             _context.Set<TEntity>().Add(entity);
+            await _context.Set<TEntity>().AddAsync(entity);
             return entity;
         }
 
         public virtual async Task<int> CountAsync(Expression<
-            Func<TEntity, bool>> predicate = null!)
+            Func<TEntity, bool>>? predicate = null)
         {
-           return await _context.Set<TEntity>().CountAsync(predicate);
+            return predicate is null
+                ? await _context.Set<TEntity>().CountAsync()
+                : await _context.Set<TEntity>().CountAsync(predicate);
         }
 
         public virtual async Task<bool> ExistElementByConsult(Expression<Func<TEntity, bool>> predicate)
@@ -36,25 +41,34 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Generic
               return await _context.Set<TEntity>().AnyAsync(predicate);
         }
 
-        public virtual async Task<IReadOnlyCollection<TEntity>> GetAllAsync(int page, int pageSize,
-            Expression<Func<TEntity, bool>>? filter = null, 
+        public virtual async Task<PagedResult<TEntity>> GetAllAsync(int page, int pageSize,
+            Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>,
             IOrderedQueryable<TEntity>>? orderBy = null,
             params Expression<Func<TEntity, object>>[] includes)
         {
             page = page < 1 ? 1 : page;
-            pageSize = Math.Clamp(pageSize, 1, 20);
+            pageSize = Math.Clamp(pageSize, 1, DomainConstants.MaxPageSize);
 
-            IQueryable<TEntity> query = 
+            IQueryable<TEntity> query =
                   _context.Set<TEntity>().AsNoTracking();
-            foreach (var include in includes) query = query.Include(include);
-            if (filter is not null) query.Where(filter);
-            if (orderBy is not null) query = orderBy(query);
-            else query = query.OrderBy(x => x.CreatedAt);
-                query = query.Skip((page - 1) * pageSize)
-                    .Take(pageSize);
 
-            return  await query.ToListAsync();
+            foreach (var include in includes) query = query.Include(include);
+            if (filter is not null) query = query.Where(filter);
+
+            var totalRecords = await query.CountAsync();
+
+            //Orden por defecto: del más reciente al más antiguo
+            query = orderBy is not null
+                ? orderBy(query)
+                : query.OrderByDescending(x => x.CreatedAt);
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<TEntity>(items, page, pageSize, totalRecords);
         }
 
         public async Task<IReadOnlyList<TEntity>> GetAllFindAsync(
@@ -70,7 +84,7 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Generic
                 query = query.Include(include);
             }
 
-            return  await query.ToListAsync();    
+            return  await query.ToListAsync();
         }
 
         public virtual async Task<TEntity> GetByIdAsync(TKey key)
@@ -90,9 +104,9 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Generic
 
             foreach(var include in includes)
             {
-                query.Include(include);
+                query = query.Include(include);
             }
-               
+
             return await query.FirstOrDefaultAsync(predicate);
             }
 
@@ -109,13 +123,14 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Generic
                 .Where(predicate)
                 .SumAsync(selector);
 
-            
+
         }
 
-        public virtual async Task<bool> UpdateAsync(TEntity entity)
+        //No persiste: la confirmación la ejecuta el servicio con un único SaveChangesAsync
+        public virtual Task<bool> UpdateAsync(TEntity entity)
         {
             _context.Set<TEntity>().Update(entity);
-            return await _context.SaveChangesAsync() > 0;
+            return Task.FromResult(true);
         }
     }
 }
