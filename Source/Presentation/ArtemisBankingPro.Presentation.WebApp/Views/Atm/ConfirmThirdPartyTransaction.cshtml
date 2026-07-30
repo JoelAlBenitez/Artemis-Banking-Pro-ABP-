@@ -1,0 +1,36 @@
+@model ArtemisBankingPro.Core.Application.ViewModels.Atm.ConfirmThirdPartyTransactionViewModel
+@{
+    ViewData["Title"] = "Confirmar Transacción";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">Confirmar Operación</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p class="lead mb-4">¿Está seguro de que desea realizar esta transacción?</p>
+                    
+                    <ul class="list-group list-group-flush text-start mb-4">
+                        <li class="list-group-item"><strong>Titular de la cuenta origen:</strong> @Model.SourceAccountOwnerName</li>
+                        <li class="list-group-item"><strong>Número de cuenta origen:</strong> @Model.SourceAccountNumber</li>
+                        <li class="list-group-item"><strong>Titular de la cuenta destino:</strong> @Model.DestinationAccountOwnerName</li>
+                        <li class="list-group-item"><strong>Número de cuenta destino:</strong> @Model.DestinationAccountNumber</li>
+                        <li class="list-group-item"><strong>Monto de la transacción:</strong> RD$ @Model.Amount</li>
+                    </ul>
+
+                    <form asp-action="ExecuteThirdPartyTransaction" method="post" class="d-flex justify-content-between">
+                        <input type="hidden" asp-for="SourceAccountNumber" />
+                        <input type="hidden" asp-for="DestinationAccountNumber" />
+                        <input type="hidden" asp-for="Amount" />
+                        
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-success px-4">Confirmar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
