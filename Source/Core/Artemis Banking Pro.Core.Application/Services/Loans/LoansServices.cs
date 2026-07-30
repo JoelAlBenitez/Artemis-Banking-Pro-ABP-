@@ -13,6 +13,7 @@ using ArtemisBankingPro.Core.Domain.Entities.Loans;
 using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using static Artemis_Banking_Pro.Core.Application.Common.LogEvents;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 {
@@ -49,30 +50,62 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
         #region query methods
         public async Task<ValidationResult<PagedResult<LoansDto>>> GetPagedLoansAsync(
-            LoansFilterDto filter, string? customerId)
+            LoansFilterDto filter)
         {
             try
             {
-                ////arreglar este metodo quitar el customerId
-                var result = await _loansRepository.GetPagedLoansAsync(
-                    filter.Page,
-                    DomainConstants.DefaultPageSize,
-                    ToLoanStatus(filter.Status),
-                    customerId);
-
-                if (!string.IsNullOrWhiteSpace(customerId) && result.TotalRecords == 0)
+                #region consulta de prestamos de un determinado cliente
+                if (!string.IsNullOrWhiteSpace(filter.IdCard))
                 {
-                    return ValidationResult<PagedResult<LoansDto>>.Failure(LoansError.NonExistsLoans);
+                    _logger.LogInformation("Recuperando resultado de la validaciones de los filtros ingresados" +
+                        " por el usuario para consulta del cliente con cédula {idCard}", filter.IdCard);
+                    var resultV = await _loansValidateServices.GetLoansByCustomerValidateAsync(filter);
+                    if (!resultV.IsValid) return (ValidationResult<PagedResult<LoansDto>>)resultV;
+
+                    //agregar aqui obtencion del usuario de la cedula ingresada en el filtro | en espera de adrian
+
+                    ////
+                    ///
+                    
+                    _logger.LogInformation("Recuperando datos del cliente con Id {ID}", 0); //por cambiar
+                    var result = await _loansRepository.GetPagedLoansAsync(
+                        filter.Page,
+                        DomainConstants.DefaultPageSize,
+                         ToLoanStatus(filter.Status),
+                        "");
+
+                    //agregar mapeo extra para pasar al dto el full name del customer 
+                    _logger.LogInformation("Mapeando entidad al dto con ID {ID}", 0); //por cambiar
+                    var items = _mapper.Map<IReadOnlyCollection<LoansDto>>(result.Items);
+
+                    _logger.LogInformation("Retornando prestamos del cliente consultado con paginación.");
+                    var paged = new PagedResult<LoansDto>(
+                        items, result.Page, result.PageSize, result.TotalRecords);
+                    return ValidationResult<PagedResult<LoansDto>>.Success(paged);
                 }
+                #endregion
+                #region consulta de todos los prestamos sin importar estado
+                _logger.LogInformation("Recuperando todos los prestamos segun el estado seleccionado. Indepedencia del cliente indicado.");
+                var resultAll = await _loansRepository.GetAllAsync(
+                    filter.Page, DomainConstants.DefaultPageSize,
+                    x => x.Status == ToLoanStatus(filter.Status), 
+                    orderBy: x => x.OrderBy(q => q.Status),
+                    x => x.loanInstallments
+                    );
+                //falta pasar el name full del customer
+                _logger.LogInformation("Mapeando los datos recuperados");
+                var itemsAll = _mapper.Map<IReadOnlyCollection<LoansDto>>(resultAll.Items);
 
-                var items = _mapper.Map<IReadOnlyCollection<LoansDto>>(result.Items);
-                var paged = new PagedResult<LoansDto>(
-                    items, result.Page, result.PageSize, result.TotalRecords);
+                _logger.LogInformation("Retornanado el listado de prestamo según el estado {Status}", filter.Status.ToString());
+                var pagedAll = new PagedResult<LoansDto>(
+                        itemsAll, resultAll.Page, resultAll.PageSize, resultAll.TotalRecords);
+                return ValidationResult<PagedResult<LoansDto>>.Success(pagedAll);
+                #endregion
 
-                return ValidationResult<PagedResult<LoansDto>>.Success(paged);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error al recuperar el listado de prestamos del cliente con ID {ID}", 0); //por cambiar
                 return ValidationResult<PagedResult<LoansDto>>.Failure(GeneralError.UnexpectedError);
             }
         }
@@ -124,24 +157,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             }
         }
 
-        public async Task<ValidationResult<PagedResult<LoansDto>>> GetPagedLoansByIdCardCustomer(ConsultClientByIdCardDto dto)
-        {
-            try
-            {
-                _logger.LogInformation("Consulta de validaciones de los datos de entrada para el cliente con cédula {IDCARD}", dto.IdCard);
-                var result = await _loansValidateServices.GetLoansByCustomerValidateAsync(dto);
-                if (!result.IsValid) return (ValidationResult<PagedResult<LoansDto>>)result;
-
-                // return ValidationResult<PagedResult<LoansDto>>.Success();
-                return null!;
-            }catch(Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener los prestamos del cliente con cédula {ID}", dto.IdCard);
-                return ValidationResult<PagedResult<LoansDto>>.Failure(GeneralError.UnexpectedError);
-            }
-
-        }
-
+    
         #endregion
 
         #region write methos
@@ -277,14 +293,14 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 ? ValidationResult.Success()
                 : ValidationResult.Failure(LoansError.RateUpdatedWithoutNotification);
         }
-        private static LoanStatus? ToLoanStatus(LoanStatusFilter filter)
+
+        private static LoanStatus ToLoanStatus(LoanStatusFilter filter)
             => filter switch
             {
                 LoanStatusFilter.Activos => LoanStatus.Activo,
-                LoanStatusFilter.Completados => LoanStatus.Completado,
-                _ => null
-            };
-
+                LoanStatusFilter.Todos => LoanStatus.Activo,
+                _ => LoanStatus.Completado
+                };
         #endregion
 
     }

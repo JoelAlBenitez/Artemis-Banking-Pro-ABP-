@@ -6,7 +6,7 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.Loans
 {
     public interface ILoansServices
     {
-        Task<ValidationResult<PagedResult<LoansDto>>> GetPagedLoansAsync(LoansFilterDto filter, string? customerId);
+        Task<ValidationResult<PagedResult<LoansDto>>> GetPagedLoansAsync(LoansFilterDto filter);
         Task<ValidationResult<DetailLoansDto>> GetDetailLoanAsync(int loanId);
         Task<ValidationResult<EditAnnualInterestRateDto>> GetLoanForEditRateAsync(int loanId);
         Task<ValidationResult> EditAnnualInterestRateAsync(EditAnnualInterestRateDto dto);

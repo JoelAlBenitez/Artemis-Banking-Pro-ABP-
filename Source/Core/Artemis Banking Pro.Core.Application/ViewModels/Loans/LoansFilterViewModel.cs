@@ -5,9 +5,7 @@ namespace Artemis_Banking_Pro.Core.Application.ViewModels.Loans
 {
     public sealed class LoansFilterViewModel
     {
-     
-
-        [EnumDataType(typeof(LoanStatusFilter), ErrorMessage = "Debe seleccionar un estado valido.")]
+        public string? IdCard { get; set; } 
         public LoanStatusFilter Status { get; set; } = LoanStatusFilter.Todos;
 
         [Range(1, int.MaxValue, ErrorMessage = "Debe indicar una página valida.")]

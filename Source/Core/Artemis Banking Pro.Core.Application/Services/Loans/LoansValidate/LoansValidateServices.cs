@@ -74,58 +74,49 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans.LoansValidate
             return ValidationResult.Success();
         }
 
-        public async Task<ValidationResult> GetLoansByCustomerValidateAsync(ConsultClientByIdCardDto customer)
+        public async Task<ValidationResult> GetLoansByCustomerValidateAsync(LoansFilterDto dto)
         {
-            if (customer is null) {
 
-                _logger.LogWarning("Datos de consulta invalidos5");
-                return ValidationResult.Failure(GeneralError.DataInvalid);
-            }
-            //agregar aqui consulta de existencia de un cliente por su cedula
-            //services creado por adrian en espera de creacion
-
-            //agregar aqui exitencia de prestamos de dicho usuario consultado por cedula
-            //obtener datos del mismo con el return by id card de adrian, en espera de creacion
-                
-            return ValidationResult.Success();
-        }
-
-        public async Task<ValidationResult> GetLoansByStatusInCustomerValidateAsync(
-            string customerId,
-            LoanStatusFilter loanStatusFilter)
-        {
-            //agregar verificacion de existencia del cliente
-            //con el exist del metodo de adrian, en espera de creacion
-
-            _logger.LogInformation("Verificando existencia de prestamos del cliente con ID {ID}", customerId);
-            var existLoansByUser = await _loansRepository.ExistElementByConsult(x => x.CustomerId == customerId);
-            if (!existLoansByUser)
+            if (!string.IsNullOrWhiteSpace(dto.IdCard))
             {
-                _logger.LogWarning("Existencia de prestamos del cliente con ID {ID} es inexistente", customerId);
-                return ValidationResult.Failure(LoansError.NonExistsLoans);
-            }
+                //modificar cuando se integre el ICurrentUserServices por parte de adrian 
+                //agregar aqui obtencion de cliente por su cedula obtener cliente y proceder con las consultas por su id asociado
 
-            _logger.LogInformation("Verificando existencia de prestamos del cliente con ID {ID}" +
-                " por parte del estado indicado, estado {Status}", customerId, loanStatusFilter.ToString());
-            if (loanStatusFilter != LoanStatusFilter.Todos) {
-                LoanStatus value = 
-                    loanStatusFilter == LoanStatusFilter.Activos
-                    ? LoanStatus.Activo : LoanStatus.Completado;
-
-                _logger.LogInformation("Consulta de la existencia de prestamos con el estado" +
-                    " {Status} del cliente con ID {ID}", loanStatusFilter.ToString(), customerId);
-                var existLoansByUserInByStatus = await
-                    _loansRepository.ExistElementByConsult(x => x.CustomerId == customerId && x.Status == value);
-                if (!existLoansByUserInByStatus)
+                _logger.LogInformation("Verificando existencia de prestamos del cliente con la cédula {ID}", 0);
+                var existLoansByUser = await _loansRepository.ExistElementByConsult(x => x.CustomerId == "");
+                if (!existLoansByUser)
                 {
-                    _logger.LogWarning("Inexistencia de prestamos con el estado {Status} para el cliente con ID {ID}",
-                        loanStatusFilter.ToString(), customerId);
-                    return ValidationResult.Failure(LoansError.NonExistLoansByIndicateState);
+                    _logger.LogWarning("Existencia de prestamos del cliente con ID {ID} es inexistente", 0);
+                    return ValidationResult.Failure(LoansError.NonExistsLoans);
+                }
+
+                //por modificar ICurrentUserServices pendiente | en espera
+                _logger.LogInformation("Verificando existencia de prestamos del cliente con ID {ID}" +
+                    " por parte del estado indicado, estado {Status}", 0, "");
+                if (dto.Status != LoanStatusFilter.Todos)
+                {
+                    LoanStatus value =
+                        dto.Status == LoanStatusFilter.Activos
+                        ? LoanStatus.Activo : LoanStatus.Completado;
+
+                    _logger.LogInformation("Consulta de la existencia de prestamos con el estado" +
+                        " {Status} del cliente con ID {ID}", dto.Status.ToString(), 0); //por modificar
+                    var existLoansByUserInByStatus = await
+                        _loansRepository.ExistElementByConsult(x => x.CustomerId == "" && x.Status == value); //por modificar 
+                    if (!existLoansByUserInByStatus)
+                    {
+                        _logger.LogWarning("Inexistencia de prestamos con el estado {Status} para el cliente con ID {ID}",
+                            dto.Status.ToString(), 0); //por modificar
+                        return ValidationResult.Failure(LoansError.NonExistLoansByIndicateState);
+                    }
+
                 }
             }
 
             return ValidationResult.Success();
         }
+
+      
 
         //agregar private metodo que determine si el current user tiene Role -> Administrador
     }
