@@ -9,5 +9,9 @@ namespace ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors
 
         public static readonly Error NonExistence =
             new("Error", "El registro seleccionado no existe");
+
+        public static readonly Error DataInvalid
+          = new("Error", "Datos invalidos. Favor intentar de nuevo más tarde.");
+
     }
 }

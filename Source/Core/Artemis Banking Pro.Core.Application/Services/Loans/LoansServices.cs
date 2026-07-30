@@ -62,7 +62,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
                 if (!string.IsNullOrWhiteSpace(customerId) && result.TotalRecords == 0)
                 {
-                    return ValidationResult<PagedResult<LoansDto>>.Failure(LoandError.NonExistsLoans);
+                    return ValidationResult<PagedResult<LoansDto>>.Failure(LoansError.NonExistsLoans);
                 }
 
                 var items = _mapper.Map<IReadOnlyCollection<LoansDto>>(result.Items);
@@ -86,7 +86,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 if (loan is null)
                 {
                     _logger.LogWarning("Detalles del prestamo con ID {ID} no fueron encontrados", loanId);
-                    return ValidationResult<DetailLoansDto>.Failure(LoandError.NonExistsLoan);
+                    return ValidationResult<DetailLoansDto>.Failure(LoansError.NonExistsLoan);
                 }
                 _logger.LogInformation("Retornando los detalles del prestamo con ID {ID}", loanId);
                 return ValidationResult<DetailLoansDto>.Success(_mapper.Map<DetailLoansDto>(loan));
@@ -147,7 +147,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
         {
             if (dto.AnnualInterestRate < 0m)
             {
-                return ValidationResult<LoanRateUpdatedDto>.Failure(LoandError.NegativeAnnualInterestRate);
+                return ValidationResult<LoanRateUpdatedDto>.Failure(LoansError.NegativeAnnualInterestRate);
             }
 
             try
@@ -155,12 +155,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 var loan = await _loansRepository.GetLoanWithInstallmentsAsync(dto.Id);
                 if (loan is null)
                 {
-                    return ValidationResult<LoanRateUpdatedDto>.Failure(LoandError.NonExistsLoan);
+                    return ValidationResult<LoanRateUpdatedDto>.Failure(LoansError.NonExistsLoan);
                 }
 
                 if (loan.Status != LoanStatus.Activo)
                 {
-                    return ValidationResult<LoanRateUpdatedDto>.Failure(LoandError.LoanIsNotActive);
+                    return ValidationResult<LoanRateUpdatedDto>.Failure(LoansError.LoanIsNotActive);
                 }
 
                 var today = DateTimeOffset.UtcNow;
@@ -170,7 +170,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
                 if (futureInstallments.Count == 0)
                 {
-                    return ValidationResult<LoanRateUpdatedDto>.Failure(LoandError.NonExistsFutureInstallments);
+                    return ValidationResult<LoanRateUpdatedDto>.Failure(LoansError.NonExistsFutureInstallments);
                 }
 
                 //Solo se redistribuye el capital que aún no ha sido amortizado
@@ -222,7 +222,14 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
         {
             try
             {
+                _logger.LogInformation("Verificando los datos de la asignación del prestamo al cliente con ID {ID}", dto.CustomerId);
+                var result = await  _loansValidateServices.AssigmentLoansValidateAsync(dto);
+                if (!result.IsValid) return result;
 
+                //agregar aqui validaciones de alto riesgo crear metodo privado
+                
+
+                //agregar creacion de la entidad de loans, loans installment, envio de email pertinente 
                 //return base.CreateAsync(dto);
                 return ValidationResult.Success();
             }
@@ -265,7 +272,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
             return sent
                 ? ValidationResult.Success()
-                : ValidationResult.Failure(LoandError.RateUpdatedWithoutNotification);
+                : ValidationResult.Failure(LoansError.RateUpdatedWithoutNotification);
         }
         private static LoanStatus? ToLoanStatus(LoanStatusFilter filter)
             => filter switch
