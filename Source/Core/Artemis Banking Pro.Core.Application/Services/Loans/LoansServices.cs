@@ -49,8 +49,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
 
         #region query methods
-        public async Task<ValidationResult<PagedResult<LoansDto>>> GetPagedLoansAsync(
-            LoansFilterDto filter)
+        public async Task<ValidationResult<PagedResult<LoansDto>>> GetPagedLoansAsync(LoansFilterDto filter)
         {
             try
             {
@@ -115,7 +114,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             try
             {
                 _logger.LogInformation("Recuperando los detalles del prestamo con el ID {ID}", loanId);
-                var loan = await _loansRepository.GetLoanWithInstallmentsAsync(loanId);
+                var loan = await _loansRepository.GetFirstAsync(x => x.Id == loanId);
                 if (loan is null)
                 {
                     _logger.LogWarning("Detalles del prestamo con ID {ID} no fueron encontrados", loanId);
@@ -157,51 +156,45 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             }
         }
 
-    
+        public override Task<ValidationResult<PagedResult<LoansDto>>> GetAllAsync(int page, int pageSize)
+        {
+
+            return base.GetAllAsync(page, pageSize);
+        }
+        
         #endregion
 
         #region write methos
-        public async Task<ValidationResult> EditAnnualInterestRateAsync(
-            EditAnnualInterestRateDto dto)
+        public async Task<ValidationResult> EditAnnualInterestRateAsync(EditAnnualInterestRateDto dto)
         {
             if (dto.AnnualInterestRate < 0m)
             {
-                return ValidationResult<LoanRateUpdatedDto>.Failure(LoansError.NegativeAnnualInterestRate);
+                return ValidationResult.Failure(LoansError.NegativeAnnualInterestRate);
             }
 
             try
             {
-                var loan = await _loansRepository.GetLoanWithInstallmentsAsync(dto.Id);
-                if (loan is null)
-                {
-                    return ValidationResult<LoanRateUpdatedDto>.Failure(LoansError.NonExistsLoan);
-                }
+                #region validacion de logica y obtencion de recalculo de cuotas
+                _logger.LogInformation("Validando las reglas del negocio del prestamo con ID {ID}", dto.Id);
+                var validate = await _loansValidateServices.EditValidateAnnualInterestRateAsync(dto.Id);
+                if (!validate.IsValid) return validate;
 
-                if (loan.Status != LoanStatus.Activo)
-                {
-                    return ValidationResult<LoanRateUpdatedDto>.Failure(LoansError.LoanIsNotActive);
-                }
-
+                _logger.LogInformation("Recuperando los datos del prestamo con ID {ID}", dto.Id);
+                var loan = await _loansRepository.GetFirstAsync(x => x.Id == dto.Id);
                 var today = DateTimeOffset.UtcNow;
-                var futureInstallments = loan.loanInstallments
+                var futureInstallments = loan!.loanInstallments
                     .Where(i => i.paymentStatus == PaymentStatus.Pendiente && i.DueDate > today)
                     .ToList();
 
-                if (futureInstallments.Count == 0)
-                {
-                    return ValidationResult<LoanRateUpdatedDto>.Failure(LoansError.NonExistsFutureInstallments);
-                }
-
                 //Solo se redistribuye el capital que aún no ha sido amortizado
+                _logger.LogInformation("Recalculando las cuotas futuras pendientes del prestamo con ID {ID}", loan.Id);
                 var pendingCapital = futureInstallments.Sum(i => i.CapitalAmount);
+                var recalculated = _amortizationCalculator.RecalculateFutureInstallments(loan.loanInstallments.ToList(), pendingCapital, dto.AnnualInterestRate, today);
+                #endregion
 
-                var recalculated = _amortizationCalculator.RecalculateFutureInstallments(
-                    loan.loanInstallments.ToList(),
-                    pendingCapital,
-                    dto.AnnualInterestRate,
-                    today
-                    );
-
+                #region mapeo de datos 
+                _logger.LogInformation("Mapeo de datos del dto a la entidad de prestamos con ID {ID}", loan.Id);
+                //cambiando campos especificos del prestamo
                 loan.AnnualInterestRate = dto.AnnualInterestRate;
                 loan.MonthlyInstallment = recalculated[0].InstallmentValue;
                 loan.TotalPayable = loan.loanInstallments.Sum(i => i.InstallmentValue);
@@ -209,31 +202,29 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     .Where(i => i.paymentStatus != PaymentStatus.Pagada)
                     .Sum(i => i.PendingBalance);
                 loan.ModifiedAt = today;
-                
-              //loan.LastModifiedByIdUser = adminUserId;
 
-                await _loansRepository.UpdateAsync(loan);
-                await _loanInstallmentRepository.UpdateRangeLoansInstallmentAsync(recalculated.ToList());
+                //loan.LastModifiedByIdUser = adminUserId; // cambiar por el ICurrentUserServices | en espera por parte de adrian
+                #endregion
 
-                //Tasa y cuotas futuras se confirman juntas o no se confirma ninguna
-                await _loansRepository.SaveChangesAsync();
+               _logger.LogInformation("Intento de modificacion de los datos del prestamo y sus cuotas con ID {ID}", loan.Id);
+               await _loansRepository.UpdateAsync(loan);
+               await _loanInstallmentRepository.UpdateRangeLoansInstallmentAsync(recalculated.ToList());
+               var result = await _loansRepository.SaveChangesAsync();
+               if(result  < 0)
+               {
+                    _logger.LogError("Fallo al intentar modificar el prestamo y sus cuotas futuras con ID {ID}, registros modificados {r}", loan.Id, result);
+                    return ValidationResult.Failure(GeneralError.UnexpectedError);
+                }
 
+               //agregar aqui llamada al envio del correo electronico con la actualizacion de cuotas
+               //cuando se integre el ICurrentUserServices para obtener email, full name....del cliente de este prestamo 
 
-                //var nextInstallment = recalculated[0];
-                //var rateUpdated = new LoanRateUpdatedDto
-                //{
-                //    CustomerId = loan.CustomerId,
-                //    LoanNumber = loan.LoanNumber,
-                //    AnnualInterestRate = loan.AnnualInterestRate,
-                //    NextInstallmentValue = nextInstallment.InstallmentValue,
-                //    NextInstallmentDueDate = nextInstallment.DueDate
-                //};
-
-                return ValidationResult.Success();
+               return ValidationResult.Success();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return ValidationResult<LoanRateUpdatedDto>.Failure(GeneralError.UnexpectedError);
+                _logger.LogError(ex, "Error al editar la tarifa del prestamo con ID {ID} ", dto.Id);
+                return ValidationResult.Failure(GeneralError.UnexpectedError);
             }
         }
 
@@ -263,12 +254,10 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
         #endregion
 
 
-
         //modificar el metodo de envio de actualizacion de cuotas por tarifa
 
         //agregar el envio de correo electronico de una asignacion de prestamo
         #region private methods
-
         private static string BuildRateUpdateBody(LoanRateUpdatedDto rateUpdated, string customerFullName)
             => $"<p>Hola {customerFullName},</p>" +
                $"<p>La tasa de interés de su préstamo {rateUpdated.LoanNumber} ha sido actualizada.</p>" +

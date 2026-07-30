@@ -41,6 +41,6 @@ namespace ArtemisBankingPro.Core.Domain.CodeErrors.LoansErros
             = new("Advertencia", "La tasa fue modificada correctamente, pero no fue posible enviar el correo de notificación.");
 
         public static readonly Error NonExistLoansByIndicateState
-            = new("Advertencia", "No existen prestamos para el estado indicado");
+            = new("Advertencia", "No existen prestamos para el estado indicado.");
     }
 }

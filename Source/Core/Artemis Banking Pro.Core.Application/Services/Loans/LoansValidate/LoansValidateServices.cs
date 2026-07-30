@@ -56,19 +56,29 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans.LoansValidate
 
         public async Task<ValidationResult> EditValidateAnnualInterestRateAsync(int Id)
         {
-            var loan = await _loansRepository.GetByIdAsync(Id);
+            var loan = await _loansRepository.GetFirstAsync(x => x.Id == Id);
             if (loan is null)
             {
                 _logger.LogWarning("Prestamo con el ID {ID} no encontrado", Id);
                 return ValidationResult<EditAnnualInterestRateDto>.Failure(LoansError.NonExistsLoan);
             }
-
             if (loan.Status != LoanStatus.Activo)
             {
                 _logger.LogWarning("Prestamo con el ID {ID} no posee un estado de consulta valido {Estado}",
                     loan.Id, loan.Status.ToString()
                   );
                 return ValidationResult<EditAnnualInterestRateDto>.Failure(LoansError.LoanIsNotActive);
+            }
+
+            _logger.LogInformation("Recuperando las cuotas futuros del prestamo con ID {ID}", Id);
+            var today = DateTimeOffset.UtcNow;
+            var futureInstallments = loan.loanInstallments
+                .Where(i => i.paymentStatus == PaymentStatus.Pendiente && i.DueDate > today)
+                .ToList();
+            if (futureInstallments.Count == 0)
+            {
+                _logger.LogWarning("Inexistencia de cutoas futurass del prestamo con ID {ID} ", Id);
+                return ValidationResult<LoanRateUpdatedDto>.Failure(LoansError.NonExistsFutureInstallments);
             }
             _logger.LogInformation("Prestamo con ID {ID} encontrado y valido para ser operado", loan.Id);
             return ValidationResult.Success();
