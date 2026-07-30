@@ -22,7 +22,6 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.Loans
             IReadOnlyCollection<LoanInstallment> installments,
             decimal pendingCapital,
             decimal newAnnualInterestRate,
-            DateTimeOffset today,
-            string modifiedByUserId);
+            DateTimeOffset today);
     }
 }

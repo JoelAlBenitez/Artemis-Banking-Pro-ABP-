@@ -7,6 +7,9 @@ namespace ArtemisBankingPro.Core.Domain.CodeErrors.LoansErros
         public static readonly Error NonExistsLoans
             = new("Error", "Este cliente no tiene préstamos registrados.");
 
+        public static readonly Error DataInvalid
+            = new("Error", "Datos invalidos. Favor intentar de nuevo más tarde.");
+
         public static readonly Error CustomerWithLoanExist =
             new("Error", "Este cliente ya tiene un préstamo activo asignado.");
 

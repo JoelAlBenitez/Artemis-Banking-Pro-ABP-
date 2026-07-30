@@ -8,7 +8,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
     {
         private const int MoneyDecimals = 2;
 
-        //agregar ILogger
+        //agregar ILogger, ICurrent User Services
 
         public decimal CalculateMonthlyInstallment(decimal capital, decimal annualInterestRate, int totalInstallments)
         {
@@ -71,8 +71,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             IReadOnlyCollection<LoanInstallment> installments,
             decimal pendingCapital,
             decimal newAnnualInterestRate,
-            DateTimeOffset today,
-            string modifiedByUserId)
+            DateTimeOffset today
+           )
         {
             var futureInstallments = installments
                 .Where(i => i.paymentStatus == PaymentStatus.Pendiente && i.DueDate > today)
@@ -106,7 +106,9 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 installment.CapitalAmount = capitalAmount;
                 installment.PendingBalance = installmentValue;
                 installment.ModifiedAt = today;
-                installment.LastModifiedByIdUser = modifiedByUserId;
+
+                
+               // installment.LastModifiedByIdUser = modifiedByUserId;
             }
 
             return futureInstallments;
