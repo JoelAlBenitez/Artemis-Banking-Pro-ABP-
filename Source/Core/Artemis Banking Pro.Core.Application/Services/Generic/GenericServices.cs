@@ -6,9 +6,9 @@ using ArtemisBankingPro.Core.Domain.Entities.Base;
 using ArtemisBankingPro.Core.Domain.Interfaces.Generic;
 using AutoMapper;
 
-
 namespace Artemis_Banking_Pro.Core.Application.Services.Generic
 {
+
     //Integrar ILogger
    public abstract class GenericServices<TSaveDto, TDto, Tkey, TEntity>
        : IGenericServices<TSaveDto, TDto, Tkey>

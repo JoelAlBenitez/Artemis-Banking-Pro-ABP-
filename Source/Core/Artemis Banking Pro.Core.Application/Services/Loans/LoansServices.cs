@@ -15,6 +15,7 @@ using AutoMapper;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 {
+
  
     //Integrar ILogger con serilog
     public sealed class LoansServices :
@@ -33,6 +34,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             IEmailServices emailServices,
             IMapper mapper
            ) : base(loansRepository, mapper)
+
         {
             _loansRepository = loansRepository;
             _loanInstallmentRepository = loanInstallmentRepository;
@@ -42,6 +44,9 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
 
         #region query methods
+
+         
+
         public async Task<ValidationResult<PagedResult<LoansDto>>> GetPagedLoansAsync(
             LoansFilterDto filter, string? customerId)
         {
@@ -194,6 +199,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
         }
 
         //este metodo debe ser privado
+
         public async Task<ValidationResult> SendRateUpdateNotificationAsync(
             LoanRateUpdatedDto rateUpdated, string customerEmail, string customerFullName)
         {
@@ -212,6 +218,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
         }
 
         #region private methods
+
         private static string BuildRateUpdateBody(LoanRateUpdatedDto rateUpdated, string customerFullName)
             => $"<p>Hola {customerFullName},</p>" +
                $"<p>La tasa de interés de su préstamo {rateUpdated.LoanNumber} ha sido actualizada.</p>" +
@@ -219,6 +226,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                $"Nuevo valor de la próxima cuota: RD${rateUpdated.NextInstallmentValue:N2}<br/>" +
                $"Fecha de vencimiento de la próxima cuota: {rateUpdated.NextInstallmentDueDate:dd/MM/yyyy}</p>" +
                "<p>Esta modificación aplica únicamente a las cuotas futuras pendientes.</p>";
+
+
         private static LoanStatus? ToLoanStatus(LoanStatusFilter filter)
             => filter switch
             {
@@ -226,6 +235,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 LoanStatusFilter.Completados => LoanStatus.Completado,
                 _ => null
             };
+
         #endregion
+
     }
 }

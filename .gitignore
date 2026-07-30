@@ -3,4 +3,9 @@ docs/
 bin/
 obj/
 .claudes/
+<<<<<<< HEAD
 .claude/
+=======
+.claude/
+Logs/
+>>>>>>> origin/development
