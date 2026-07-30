@@ -35,8 +35,6 @@ try
     // Pendiente: habilitar cuando exista ICurrentUserService (proyecto Identity).
     //app.UseUserContextLogging();
 
-    app.MapGet("/prueba-error", void () => throw new InvalidOperationException("prueba de error no controlado"));
-
     app.MapControllers();
 
     app.Run();

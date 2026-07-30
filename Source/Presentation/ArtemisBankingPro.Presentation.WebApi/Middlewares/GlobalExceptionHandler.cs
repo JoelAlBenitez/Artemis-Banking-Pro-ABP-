@@ -3,6 +3,7 @@ using Artemis_Banking_Pro.Core.Application.Exceptions;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Serilog.Context;
 
 namespace ArtemisBankingPro.Presentation.WebApi.Middlewares
 {
@@ -25,7 +26,7 @@ namespace ArtemisBankingPro.Presentation.WebApi.Middlewares
             var statusCode = GetStatusCode(exception);
             var action = $"{httpContext.Request.Method} {httpContext.Request.Path}";
 
-            LogException(exception, action, statusCode);
+            LogException(httpContext, exception, action, statusCode);
 
             httpContext.Response.StatusCode = statusCode;
 
@@ -60,16 +61,22 @@ namespace ArtemisBankingPro.Presentation.WebApi.Middlewares
             _ => StatusCodes.Status500InternalServerError
         };
 
-        private void LogException(Exception exception, string action, int statusCode)
+      
+        private void LogException(HttpContext httpContext, Exception exception, string action, int statusCode)
         {
-            if (statusCode >= StatusCodes.Status500InternalServerError)
-            {
-                _logger.LogError(exception, LogEvents.Templates.UnhandledError, action, LogEvents.Results.Failed);
-                return;
-            }
+            var correlationId = httpContext.Items[CorrelationIdMiddleware.LogPropertyName];
 
-            _logger.LogWarning(exception, "Solicitud {Accion} finalizada con estado {StatusCode}. Resultado: {Resultado}",
-                action, statusCode, LogEvents.Results.Rejected);
+            using (LogContext.PushProperty(CorrelationIdMiddleware.LogPropertyName, correlationId))
+            {
+                if (statusCode >= StatusCodes.Status500InternalServerError)
+                {
+                    _logger.LogError(exception, LogEvents.Templates.UnhandledError, action, LogEvents.Results.Failed);
+                    return;
+                }
+
+                _logger.LogWarning(exception, "Solicitud {Accion} finalizada con estado {StatusCode}. Resultado: {Resultado}",
+                    action, statusCode, LogEvents.Results.Rejected);
+            }
         }
 
         private static string GetTitle(int statusCode) => statusCode switch
