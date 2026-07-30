@@ -4,9 +4,9 @@ using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ArtemisBankingPro.Presentation.WebApi.Middlewares
+namespace ArtemisBankingPro.Presentation.WebApp.Middlewares
 {
-    
+   
     public sealed class GlobalExceptionHandler : IExceptionHandler
     {
         private readonly IProblemDetailsService _problemDetailsService;
