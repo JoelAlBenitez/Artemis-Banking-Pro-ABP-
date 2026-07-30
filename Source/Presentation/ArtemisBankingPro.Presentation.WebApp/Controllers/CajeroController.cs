@@ -1,8 +1,10 @@
 using ArtemisBankingPro.Core.Application.Interfaces.Services;
 using ArtemisBankingPro.Core.Application.ViewModels.Cajero;
 using ArtemisBankingPro.Core.Application.DTOs.Cajero;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -15,15 +17,21 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
         private readonly ICuentaAhorroService _cuentaAhorroService;
         private readonly ITransaccionService _transaccionService;
         private readonly IEmailService _emailService;
+        private readonly IMapper _mapper;
+        private readonly ILogger<CajeroController> _logger;
 
         public CajeroController(
             ICuentaAhorroService cuentaAhorroService,
             ITransaccionService transaccionService,
-            IEmailService emailService)
+            IEmailService emailService,
+            IMapper mapper,
+            ILogger<CajeroController> logger)
         {
             _cuentaAhorroService = cuentaAhorroService;
             _transaccionService = transaccionService;
             _emailService = emailService;
+            _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -77,19 +85,17 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             
+            _logger.LogInformation("Iniciando proceso de depósito. Cajero: {UserId}, Cuenta Destino: {Cuenta}, Monto: {Monto}", userId, model.NumeroCuentaDestino, model.Monto);
+            
             await _cuentaAhorroService.ActualizarBalanceAsync(model.NumeroCuentaDestino, model.Monto);
 
-            var transaccion = new TransaccionDto
-            {
-                TipoTransaccion = "CRÉDITO",
-                Monto = model.Monto,
-                Origen = "DEPÓSITO",
-                Beneficiario = model.NumeroCuentaDestino,
-                Estado = "APROBADA",
-                UsuarioResponsable = userId,
-                Fecha = DateTime.Now
-            };
+            var transaccion = _mapper.Map<TransaccionDto>(model);
+            transaccion.UsuarioResponsable = userId;
+            transaccion.Fecha = DateTime.Now;
+
             await _transaccionService.RegistrarTransaccionAsync(transaccion);
+
+            _logger.LogInformation("Depósito procesado exitosamente en base de datos. Cajero: {UserId}, Cuenta Destino: {Cuenta}", userId, model.NumeroCuentaDestino);
 
             try
             {
@@ -105,9 +111,11 @@ Fecha y hora: {DateTime.Now}
 Si usted no reconoce esta operación, comuníquese con la entidad bancaria.";
 
                 await _emailService.EnviarCorreoAsync("cliente@example.com", asunto, cuerpo);
+                _logger.LogInformation("Correo de notificación de depósito enviado. Cuenta: {Cuenta}", model.NumeroCuentaDestino);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "El depósito se procesó, pero ocurrió un error al enviar el correo al cliente. Cuenta: {Cuenta}", model.NumeroCuentaDestino);
                 TempData["InfoMessage"] = "El depósito fue realizado correctamente, pero no fue posible enviar el correo de notificación.";
                 return RedirectToAction("Index");
             }
