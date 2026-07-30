@@ -1,4 +1,4 @@
-﻿namespace Artemis_Banking_Pro.Core.Application.Helpers
+﻿namespace Artemis_Banking_Pro.Core.Application.Contracts.Loans
 {
     public interface IGenerateUniqueNumberLoans
     {

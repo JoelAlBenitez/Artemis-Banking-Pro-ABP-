@@ -128,6 +128,9 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
         {
             try
             {
+                _logger.LogInformation("Consulta de validaciones de los datos de entrada para el cliente con cédula {IDCARD}", dto.IdCard);
+                var result = await _loansValidateServices.GetLoansByCustomerValidateAsync(dto);
+                if (!result.IsValid) return (ValidationResult<PagedResult<LoansDto>>)result;
 
                 // return ValidationResult<PagedResult<LoansDto>>.Success();
                 return null!;
