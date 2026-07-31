@@ -21,5 +21,8 @@ namespace ArtemisBankingPro.Core.Domain.Common.Constants
         //esto esta asi para ser usado en las configuraciones puesto que identity genera un guid.toString()
         // se debe tener exactamente la longitud exacta de dicho id pq sino dara error en la asignacion de dicho id
         public const int IdentityUserIdLength = 450;
+
+        //Tasa de interés de avance de efectivo (6.25 %)
+        public const decimal CashAdvanceInterestRate = 0.0625m;
     }
 }
