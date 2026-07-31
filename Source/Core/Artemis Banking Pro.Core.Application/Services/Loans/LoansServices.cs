@@ -13,7 +13,6 @@ using ArtemisBankingPro.Core.Domain.Entities.Loans;
 using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
-using static Artemis_Banking_Pro.Core.Application.Common.LogEvents;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 {
@@ -289,6 +288,17 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                $"Nuevo valor de la próxima cuota: RD${rateUpdated.NextInstallmentValue:N2}<br/>" +
                $"Fecha de vencimiento de la próxima cuota: {rateUpdated.NextInstallmentDueDate:dd/MM/yyyy}</p>" +
                "<p>Esta modificación aplica únicamente a las cuotas futuras pendientes.</p>";
+
+
+        private static string BuildAssigmentLoansBody(string customerFullName,
+            string numberLoan, decimal AmountAproveched, int term, decimal rate, decimal rateMonlty)
+            => $"<p>Hola {customerFullName}, </p>" +
+            "<p>Su préstamo ha sido aprobado correctamente.</p>"
+            + $"<p>Número de prestamo: {numberLoan}</p>" +
+            $"<p>Plazo: {term} </p>" +
+            $"<p>Tasa de interés anual: {rate}</p>"
+            + $"<p>Cuota mensual: {rateMonlty} </p>"
+            ;
 
         private async Task<ValidationResult> SendRateUpdateNotificationAsync(
             LoanRateUpdatedDto rateUpdated, string customerEmail, string customerFullName)
