@@ -44,34 +44,28 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
         {
             try
             {
-                // 1. Obtener cuentas de ahorro activas del cliente
                 var accounts = await _savingsAccountRepository.GetAllFindAsync(
                     a => a.ClientId == clientId && a.Status == SavingsAccountStatus.Activa
                 );
 
-                // Regla: La cuenta principal siempre primero; secundarias ordenadas de mayor a menor balance
                 var sortedAccounts = accounts
                     .OrderByDescending(a => a.Type == SavingsAccountType.Principal)
                     .ThenByDescending(a => a.Balance)
                     .ToList();
 
-                // 2. Obtener préstamos activos del cliente
                 var loans = await _loansRepository.GetAllFindAsync(
                     l => l.CustomerId == clientId && l.Status == LoanStatus.Activo,
                     l => l.loanInstallments
                 );
 
-                // 3. Obtener tarjetas de crédito activas del cliente
                 var cards = await _creditCardRepository.GetAllFindAsync(
                     c => c.ClientId == clientId && c.Status == CreditCardStatus.Activa
                 );
 
-                // Mapear a DTOs correspondientes
                 var accountsMapped = _mapper.Map<IReadOnlyCollection<SavingsAccountDto>>(sortedAccounts);
                 var loansMapped = _mapper.Map<IReadOnlyCollection<LoansDto>>(loans);
                 var cardsMapped = _mapper.Map<IReadOnlyCollection<CreditCardDto>>(cards);
 
-                // Construir el ViewModel para el dashboard
                 var dashboardViewModel = new ClientDashboardViewModel
                 {
                     SavingsAccounts = accountsMapped,
@@ -93,14 +87,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
         {
             try
             {
-                // Validar la cuenta y propiedad del cliente
                 var account = await _savingsAccountRepository.GetFirstAsync(a => a.Id == accountId);
                 if (account == null || account.ClientId != clientId)
                 {
                     return ValidationResult<IReadOnlyCollection<TransactionResultDto>>.Failure(DashboardError.AccountNotFound);
                 }
 
-                // Obtener el historial de transacciones (ordenadas por fecha de creación desc)
                 var transactions = await _transactionRepository.GetAllFindAsync(t => t.SavingsAccountId == accountId);
                 var sortedTransactions = transactions.OrderByDescending(t => t.CreatedAt).ToList();
 
@@ -119,14 +111,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
         {
             try
             {
-                // Validar la tarjeta y propiedad del cliente
                 var card = await _creditCardRepository.GetFirstAsync(c => c.Id == cardId);
                 if (card == null || card.ClientId != clientId)
                 {
                     return ValidationResult<IReadOnlyCollection<CardConsumptionDto>>.Failure(DashboardError.CardNotFound);
                 }
 
-                // Obtener historial de consumos de la tarjeta (ordenadas por fecha desc)
                 var consumptions = await _cardConsumptionRepository.GetAllFindAsync(c => c.CreditCardId == cardId);
                 var sortedConsumptions = consumptions.OrderByDescending(c => c.Date).ToList();
 
@@ -145,7 +135,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
         {
             try
             {
-                // Validar el préstamo y propiedad del cliente cargando sus cuotas de amortización
                 var loan = await _loansRepository.GetFirstAsync(
                     l => l.Id == loanId && l.CustomerId == clientId,
                     l => l.loanInstallments
