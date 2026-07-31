@@ -75,16 +75,21 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Generic
         {
             try
             {
+                _logger.LogInformation("Recuperando la entidad con ID {ID}", tkey);
                 var entitie = await _genericRepository.GetByIdAsync(tkey);
                 if(entitie is null)
                 {
+                    _logger.LogWarning("Entidad con ID {ID} inexistente", tkey);
                     return ValidationResult<TDto>.Failure(GeneralError.NonExistence);
                 }
+                _logger.LogInformation("Mapeando la entidad {entity} obtenida con ID {id} al dto {dto}",
+                    typeof(TEntity).Name, tkey, typeof(TDto).Name);
                 var map = _mapper.Map<TDto>(entitie);
                 return ValidationResult<TDto>.Success(map);
 
-            } catch (Exception)
+            } catch (Exception ex)
             {
+                _logger.LogError(ex, "Error al obtener  los registros  de la entidad {entity}", typeof(TEntity).Name);
                 return ValidationResult<TDto>.Failure(GeneralError.UnexpectedError);
             }
         }
@@ -93,20 +98,28 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Generic
         {
             try
             {
+                _logger.LogInformation("Recuperando la entidad con ID {ID}", tkey);
                 var entitie = await _genericRepository.GetByIdAsync(tkey);
                 if (entitie is null)
                 {
+                    _logger.LogWarning("Inexistencia de la entidad con ID {ID}", tkey);
                     return ValidationResult.Failure(GeneralError.NonExistence);
                 }
 
+                _logger.LogInformation("Mapeo del dto {dto} a la entidad {entitie}",
+                    typeof(TSaveDto).Name, typeof(TEntity).Name);
                 _mapper.Map(dto, entitie);
+
+                _logger.LogInformation("Edición del registro de la entidad {entitie} con ID {ID}", typeof(TEntity).Name,
+                    tkey);
                 await _genericRepository.UpdateAsync(entitie);
                 await _genericRepository.SaveChangesAsync();
 
                 return ValidationResult.Success();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error al modificar el registro  de la entidad {entity}", typeof(TEntity).Name);
                 return ValidationResult.Failure(GeneralError.UnexpectedError);
             }
         }

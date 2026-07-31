@@ -35,8 +35,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             IEmailServices emailServices,
             IMapper mapper,
             ILoansValidateServices loansValidateServices,
-            ILogger<LoansServices>  logger
-           ) : base(loansRepository, mapper)
+            ILoggerFactory  logger
+           ) : base(loansRepository, mapper, logger.CreateLogger<LoansServices>())
 
         {
             _loansRepository = loansRepository;
@@ -44,7 +44,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             _amortizationCalculator = amortizationCalculator;
             _emailServices = emailServices;
             _loansValidateServices = loansValidateServices;
-            _logger = logger;
+            _logger = logger.CreateLogger<LoansServices>(); 
         }
 
 
@@ -91,6 +91,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     orderBy: x => x.OrderBy(q => q.Status),
                     x => x.loanInstallments
                     );
+
                 //falta pasar el name full del customer
                 _logger.LogInformation("Mapeando los datos recuperados");
                 var itemsAll = _mapper.Map<IReadOnlyCollection<LoansDto>>(resultAll.Items);
@@ -156,10 +157,34 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             }
         }
 
-        public override Task<ValidationResult<PagedResult<LoansDto>>> GetAllAsync(int page, int pageSize)
+        public override async Task<ValidationResult<PagedResult<LoansDto>>> GetAllAsync(int page, int pageSize)
         {
+            try
+            {
+                _logger.LogInformation("Recuperando los registro de los prestamos");
+                var result = await _loansRepository.GetAllAsync(page, pageSize,
+                    null,
+                    orderBy: x => x.OrderBy(q => q.Status),
+                    x => x.loanInstallments
+                    );
 
-            return base.GetAllAsync(page, pageSize);
+                //agregar mapeo del full name de los clientes pertinentes 
+                _logger.LogInformation("Mapeando los datos recuperados");
+                var itemsAll = _mapper.Map<IReadOnlyCollection<LoansDto>>(result.Items);
+
+                _logger.LogInformation("Retornanado el listado de prestamos ");
+                var pagedAll = new PagedResult<LoansDto>(
+                        itemsAll, result.Page, result.PageSize, result.TotalRecords);
+                return ValidationResult<PagedResult<LoansDto>>.Success(pagedAll);
+
+            }
+            catch (Exception ex) {
+
+                _logger.LogError(ex, "Error al recuperar los registro de los prestamos");
+                return ValidationResult<PagedResult<LoansDto>>.Failure(GeneralError.UnexpectedError);
+
+            }
+
         }
         
         #endregion
@@ -252,7 +277,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
            
         }
         #endregion
-
 
         //modificar el metodo de envio de actualizacion de cuotas por tarifa
 
