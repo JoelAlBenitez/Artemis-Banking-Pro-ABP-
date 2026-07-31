@@ -16,9 +16,9 @@ namespace ArtemisBankingPro.Core.Domain.Entities.Transactions
         public required int TransactionId { get; set; }
 
         // Navigation properties
-        public CreditCard? CreditCard { get; set; }
-        public SavingsAccount? SavingsAccount { get; set; }
-        public CardConsumption? CardConsumption { get; set; }
-        public Transaction? Transaction { get; set; }
+        public CreditCard? CreditCard { get; set; } = null;
+        public SavingsAccount? SavingsAccount { get; set; } = null;
+        public CardConsumption? CardConsumption { get; set; } = null;
+        public Transaction? Transaction { get; set; } = null;
     }
 }

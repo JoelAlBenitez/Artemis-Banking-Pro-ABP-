@@ -12,6 +12,6 @@ namespace ArtemisBankingPro.Core.Domain.Entities.Beneficiaries
         public DateTimeOffset? DeactivatedAt { get; set; }
 
         // Navigation properties
-        public SavingsAccount? BeneficiarySavingsAccount { get; set; }
+        public SavingsAccount? BeneficiarySavingsAccount { get; set; } = null;
     }
 }

@@ -13,6 +13,6 @@ namespace ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts
         public required SavingsAccountStatus Status { get; set; }
 
         // Navigation properties
-        public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+        public IReadOnlyCollection<Transaction>? Transactions { get; set; } = null;
     }
 }

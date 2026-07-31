@@ -13,6 +13,6 @@ namespace ArtemisBankingPro.Core.Domain.Entities.CreditCards
         public string? RejectionReason { get; set; }
 
         // Navigation properties
-        public CreditCard? CreditCard { get; set; }
+        public CreditCard? CreditCard { get; set; } = null;
     }
 }

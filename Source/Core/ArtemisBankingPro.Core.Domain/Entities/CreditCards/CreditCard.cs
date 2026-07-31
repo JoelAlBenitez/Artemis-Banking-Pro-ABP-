@@ -14,6 +14,6 @@ namespace ArtemisBankingPro.Core.Domain.Entities.CreditCards
         public required CreditCardStatus Status { get; set; }
 
         // Navigation properties
-        public ICollection<CardConsumption> Consumptions { get; set; } = new List<CardConsumption>();
+        public IReadOnlyCollection<CardConsumption>? Consumptions { get; set; } = null;
     }
 }

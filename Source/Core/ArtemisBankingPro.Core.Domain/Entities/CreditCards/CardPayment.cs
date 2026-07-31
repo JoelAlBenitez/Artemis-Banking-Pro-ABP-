@@ -14,7 +14,7 @@ namespace ArtemisBankingPro.Core.Domain.Entities.CreditCards
         public required string PerformedByUserId { get; set; }
 
         // Navigation properties
-        public CreditCard? CreditCard { get; set; }
-        public Transaction? Transaction { get; set; }
+        public CreditCard? CreditCard { get; set; } = null;
+        public Transaction? Transaction { get; set; } = null;
     }
 }

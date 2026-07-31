@@ -19,7 +19,7 @@ namespace ArtemisBankingPro.Core.Domain.Entities.Transactions
         public int? RelatedTransactionId { get; set; }
 
         // Navigation properties
-        public SavingsAccount? SavingsAccount { get; set; }
-        public Transaction? RelatedTransaction { get; set; }
+        public SavingsAccount? SavingsAccount { get; set; } = null;
+        public Transaction? RelatedTransaction { get; set; } = null;
     }
 }
