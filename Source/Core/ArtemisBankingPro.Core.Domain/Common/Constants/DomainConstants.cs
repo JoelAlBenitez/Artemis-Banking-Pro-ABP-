@@ -9,6 +9,22 @@ namespace ArtemisBankingPro.Core.Domain.Common.Constants
         //Número de préstamo: 9 dígitos como texto, no repetible como préstamo ni como cuenta
         public const int LoanNumberLength = 9;
 
+        //Número de tarjeta: 16 dígitos como texto, único en el sistema
+        public const int CardNumberLength = 16;
+
+        //Copia desnormalizada usada en listados, correos y logs
+        public const int LastFourDigitsLength = 4;
+
+        //CVC de 3 dígitos persistido como hash SHA-256 de 64 caracteres hexadecimales
+        public const int CvcLength = 3;
+        public const int CvcHashLength = 64;
+
+        //Expiración de la tarjeta: fecha actual + 3 años
+        public const int CardExpirationYears = 3;
+
+        //Nombre del comercio mostrado en el historial de consumos
+        public const int CommerceNameLength = 120;
+
         //Precisión decimal de todo valor monetario
         public const int MoneyPrecision = 18;
         public const int MoneyScale = 2;
