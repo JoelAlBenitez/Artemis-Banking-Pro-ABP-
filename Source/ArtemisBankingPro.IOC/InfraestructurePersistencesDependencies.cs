@@ -1,5 +1,6 @@
-﻿using ArtemisBankingPro.Core.Domain.Interfaces.Generic;
+using ArtemisBankingPro.Core.Domain.Interfaces.CreditCards;
 using ArtemisBankingPro.Infraestructrue.Persistence.Context;
+using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.CreditCards;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,9 @@ namespace ArtemisBankingPro.IOC
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")
             ));*/
 
+            //Gestión de tarjetas de crédito
+            services.AddScoped<ICreditCardsRepository, CreditCardsRepository>();
+            services.AddScoped<ICardConsumptionRepository, CardConsumptionRepository>();
 
             return services;
         }

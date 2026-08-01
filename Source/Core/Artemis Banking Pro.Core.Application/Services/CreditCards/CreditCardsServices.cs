@@ -188,8 +188,13 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
                 creditCard.CreateByUserId = adminUserId;
 
                 await _creditCardsRepository.AddAsync(creditCard);
-                await _creditCardsRepository.SaveChangesAsync();
-
+                var result = await _creditCardsRepository.SaveChangesAsync();
+                if(result <= 0)
+                {
+                    _logger.LogWarning("La tarjeta de credito terminada {LastFourDigits} en el intento de " +
+                        " asignación al cliente {CustomerId}, fallo en su asignación", creditCard.LastFourDigits, creditCard.CustomerId);
+                    return ValidationResult<CreditCardAssignedDto>.Failure(GeneralError.UnexpectedError) ;
+                }
                 _logger.LogInformation("Tarjeta de crédito terminada en {LastFourDigits} asignada al cliente {CustomerId}",
                     creditCard.LastFourDigits, creditCard.CustomerId);
 
