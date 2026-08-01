@@ -13,7 +13,5 @@ namespace ArtemisBankingPro.Core.Domain.Interfaces.CreditCards
             int pageSize,
             CreditCardStatus? status,
             string? customerId);
-
-        Task<CreditCard?> GetCreditCardWithConsumptionsAsync(int creditCardId);
     }
 }
