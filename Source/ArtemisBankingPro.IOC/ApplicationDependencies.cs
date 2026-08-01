@@ -1,5 +1,4 @@
 ﻿using Artemis_Banking_Pro.Core.Application.Contracts.Loans;
-using Artemis_Banking_Pro.Core.Application.Helpers;
 using Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndReverse.Loans;
 using Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.Loans;
 using Artemis_Banking_Pro.Core.Application.Services.Loans;
@@ -28,7 +27,6 @@ namespace ArtemisBankingPro.IOC
             services.AddScoped<ILoansServices, LoansServices>();
             services.AddScoped<ILoansValidateServices, LoansValidateServices>();
             services.AddScoped<IAmortizationCalculator, AmortizationCalculator>();
-            services.AddScoped<IGenerateUniqueNumberLoans, GenerateUniqueNumberLoans>();
             #endregion
 
 
