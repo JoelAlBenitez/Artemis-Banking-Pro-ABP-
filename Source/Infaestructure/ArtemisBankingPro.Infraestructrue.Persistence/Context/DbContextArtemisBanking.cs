@@ -1,4 +1,5 @@
-﻿using ArtemisBankingPro.Core.Domain.Entities.CreditCards;
+﻿using ArtemisBankingPro.Core.Domain.Common.Constants;
+using ArtemisBankingPro.Core.Domain.Entities.CreditCards;
 using ArtemisBankingPro.Core.Domain.Entities.Loans;
 using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
 using Microsoft.EntityFrameworkCore;
@@ -31,15 +32,21 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //Préstamos y cuentas de ahorro comparten el espacio de 9 dígitos. Cada producto emite
+            //su número desde su propia secuencia y los rangos son disjuntos: la base de datos
+            //garantiza que un número de préstamo nunca pueda repetirse como número de cuenta,
+            //sin recorrer un solo registro.
+
             //El genérico es el tipo de valor que emite la secuencia, no la entidad
             modelBuilder.HasSequence<int>("LoanNumberSequence")
-                .StartsAt(100000000)
-                .IncrementsBy(1);
-            
-            //Las cuentas de ahorro no usan secuencia: su número de 9 dígitos se genera con
-            //reintento acotado verificando simultáneamente cuentas y préstamos, porque ambos
-            //comparten el mismo espacio de numeración y una secuencia propia colisionaría
-            //con LoanNumberSequence. Ver IAccountNumberGenerator.
+                .StartsAt(DomainConstants.LoanNumberSequenceStart)
+                .IncrementsBy(1)
+                .HasMax(DomainConstants.LoanNumberSequenceMax);
+
+            modelBuilder.HasSequence<int>("SavingsAccountNumberSequence")
+                .StartsAt(DomainConstants.AccountNumberSequenceStart)
+                .IncrementsBy(1)
+                .HasMax(DomainConstants.AccountNumberSequenceMax);
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

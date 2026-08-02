@@ -48,9 +48,14 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts.SavingsA
                 //if (customer is null) return ValidationResult.Failure(SavingsAccountError.NonExistsCustomerByIdCard);
                 //if (!customer.IsActive) return ValidationResult.Failure(SavingsAccountError.CustomerIsNotActive);
 
-                //La cuenta principal activa sí pertenece a este módulo y se verifica aquí
-                var primaryAccount = await _savingsAccountsRepository.GetActivePrimaryAccountAsync(customerId);
-                if (primaryAccount is null)
+                //La cuenta principal activa sí pertenece a este módulo y se verifica aquí.
+                //Basta con saber si existe: no se materializa la fila.
+                var hasActivePrimaryAccount = await _savingsAccountsRepository.ExistElementByConsult(
+                    account => account.CustomerId == customerId
+                        && account.AccountType == SavingsAccountType.Principal
+                        && account.Status == SavingsAccountStatus.Activa);
+
+                if (!hasActivePrimaryAccount)
                 {
                     _logger.LogWarning("El cliente {CustomerId} no posee una cuenta de ahorro principal activa",
                         customerId);
@@ -162,10 +167,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts.SavingsA
             try
             {
                 //Debe existir una principal activa que reciba el balance remanente
-                var primaryAccount = await _savingsAccountsRepository
-                    .GetActivePrimaryAccountAsync(savingsAccount.CustomerId);
+                var hasActivePrimaryAccount = await _savingsAccountsRepository.ExistElementByConsult(
+                    account => account.CustomerId == savingsAccount.CustomerId
+                        && account.AccountType == SavingsAccountType.Principal
+                        && account.Status == SavingsAccountStatus.Activa);
 
-                if (primaryAccount is null)
+                if (!hasActivePrimaryAccount)
                 {
                     _logger.LogWarning("Cancelación rechazada: el cliente {CustomerId} no tiene una cuenta principal activa receptora",
                         savingsAccount.CustomerId);

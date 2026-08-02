@@ -6,6 +6,7 @@ using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
 using ArtemisBankingPro.Infraestructrue.Persistence.Context;
 using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Generic;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.SavingsAccounts
 {
@@ -13,36 +14,21 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.SavingsAcco
         GenericRepository<SavingsAccount, int>,
         ISavingsAccountsRepository
     {
+        private const string AccountNumberSequence = "SavingsAccountNumberSequence";
+
         public SavingsAccountsRepository(DbContextArtemisBanking context) : base(context) { }
 
-        //Último resguardo de la unicidad del número de 9 dígitos dentro de las cuentas.
-        //La verificación cruzada contra los préstamos vive en el generador del número.
-        public override async Task<SavingsAccount> AddAsync(SavingsAccount entity)
+        //El rango de la secuencia arranca en 9 dígitos, así que el valor emitido ya tiene el
+        //largo exigido. El PadLeft solo protege el formato de texto del contrato.
+        public async Task<string> GetNextAccountNumberAsync()
         {
-            var accountNumberInUse = await ExistsAccountNumberAsync(entity.AccountNumber);
-            if (accountNumberInUse)
-            {
-                throw new InvalidOperationException(
-                    "El número generado para la cuenta de ahorro ya se encuentra registrado.");
-            }
+            var nextValue = await _context.Database
+                .SqlQueryRaw<int>($"SELECT NEXT VALUE FOR [{AccountNumberSequence}] AS [Value]")
+                .FirstAsync();
 
-            return await base.AddAsync(entity);
-        }
-
-        public async Task<bool> ExistsAccountNumberAsync(string accountNumber)
-            => await ExistElementByConsult(account => account.AccountNumber == accountNumber);
-
-        public async Task<SavingsAccount?> GetActivePrimaryAccountAsync(
-            string customerId, bool asNoTracking = true)
-        {
-            IQueryable<SavingsAccount> query = _context.SavingsAccounts;
-
-            if (asNoTracking) query = query.AsNoTracking();
-
-            return await query.FirstOrDefaultAsync(account =>
-                account.CustomerId == customerId &&
-                account.AccountType == SavingsAccountType.Principal &&
-                account.Status == SavingsAccountStatus.Activa);
+            return nextValue
+                .ToString(CultureInfo.InvariantCulture)
+                .PadLeft(DomainConstants.AccountNumberLength, '0');
         }
 
         public async Task<PagedResult<SavingsAccount>> GetPagedSavingsAccountsAsync(

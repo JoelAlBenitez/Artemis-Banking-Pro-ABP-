@@ -22,14 +22,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
     {
         private readonly ISavingsAccountsRepository _savingsAccountsRepository;
         private readonly ISavingsAccountsValidateServices _savingsAccountsValidateServices;
-        private readonly IAccountNumberGenerator _accountNumberGenerator;
         private readonly IEmailServices _emailServices;
         private readonly ILogger<SavingsAccountsServices> _logger;
 
         public SavingsAccountsServices(
             ISavingsAccountsRepository savingsAccountsRepository,
             ISavingsAccountsValidateServices savingsAccountsValidateServices,
-            IAccountNumberGenerator accountNumberGenerator,
             IEmailServices emailServices,
             IMapper mapper,
             ILogger<SavingsAccountsServices> logger)
@@ -37,7 +35,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
         {
             _savingsAccountsRepository = savingsAccountsRepository;
             _savingsAccountsValidateServices = savingsAccountsValidateServices;
-            _accountNumberGenerator = accountNumberGenerator;
             _emailServices = emailServices;
             _logger = logger;
         }
@@ -143,11 +140,13 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
 
             try
             {
-                //9 dígitos libres verificando simultáneamente cuentas de ahorro y préstamos
-                var accountNumber = await _accountNumberGenerator.GenerateUniqueAccountNumberAsync();
-                if (accountNumber is null)
+                //Número de 9 dígitos emitido por SavingsAccountNumberSequence. Su rango es
+                //disjunto del de los préstamos, así que la unicidad entre ambos productos está
+                //garantizada por la base de datos sin consultar registros.
+                var accountNumber = await _savingsAccountsRepository.GetNextAccountNumberAsync();
+                if (string.IsNullOrWhiteSpace(accountNumber))
                 {
-                    _logger.LogError("No fue posible generar un número de cuenta único para el cliente {CustomerId}",
+                    _logger.LogError("No fue posible generar un número de cuenta para el cliente {CustomerId}",
                         dto.CustomerId);
 
                     return ValidationResult.Failure(SavingsAccountError.FailedGenerateAccountNumber);
@@ -221,9 +220,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                 var cancelledAt = DateTimeOffset.UtcNow;
                 var transferredAmount = savingsAccount.Balance;
 
-                //Rastreada: su balance se modifica dentro de la misma unidad de guardado
-                var primaryAccount = await _savingsAccountsRepository
-                    .GetActivePrimaryAccountAsync(savingsAccount.CustomerId, asNoTracking: false);
+                //Receptora del balance remanente. UpdateAsync la adjunta al contexto, así que no
+                //necesita venir rastreada de la consulta.
+                var primaryAccount = await _savingsAccountsRepository.GetFirstAsync(
+                    account => account.CustomerId == savingsAccount.CustomerId
+                        && account.AccountType == SavingsAccountType.Principal
+                        && account.Status == SavingsAccountStatus.Activa);
 
                 if (primaryAccount is null)
                 {

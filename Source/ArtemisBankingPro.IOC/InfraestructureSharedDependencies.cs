@@ -1,6 +1,5 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.CreditCards;
 using Artemis_Banking_Pro.Core.Application.Contracts.EmailSerives;
-using Artemis_Banking_Pro.Core.Application.Contracts.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Settings.Email;
 using ArtemisBankingPro.Infraestructrue.Shared.Services.Email;
 using ArtemisBankingPro.Infraestructrue.Shared.Services.Generators;
@@ -23,8 +22,8 @@ namespace ArtemisBankingPro.IOC
             services.AddScoped<ICardNumberGenerator, CardNumberGenerator>();
             services.AddSingleton<ICvcHasher, CvcHasher>();
 
-            //Número de 9 dígitos único entre cuentas de ahorro y préstamos
-            services.AddScoped<IAccountNumberGenerator, AccountNumberGenerator>();
+            //Las cuentas de ahorro no registran generador: su número de 9 dígitos lo emite
+            //SavingsAccountNumberSequence desde el repositorio.
 
             return services;
         }
