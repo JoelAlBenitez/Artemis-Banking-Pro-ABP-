@@ -25,6 +25,7 @@ namespace ArtemisBankingPro.IOC
 
             #region loans
             services.AddScoped<ILoansRepository, LoansRepository>();
+            services.AddScoped<ILoanInstallmentRepository, LoanInstallmentRepository>();
             #endregion
 
             return services;

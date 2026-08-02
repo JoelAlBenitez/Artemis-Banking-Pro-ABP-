@@ -27,6 +27,7 @@ namespace ArtemisBankingPro.IOC
             services.AddScoped<ILoansServices, LoansServices>();
             services.AddScoped<ILoansValidateServices, LoansValidateServices>();
             services.AddScoped<IAmortizationCalculator, AmortizationCalculator>();
+            services.AddScoped<ILoansOverdueServices, LoansOverdueServices>();
             #endregion
 
 
