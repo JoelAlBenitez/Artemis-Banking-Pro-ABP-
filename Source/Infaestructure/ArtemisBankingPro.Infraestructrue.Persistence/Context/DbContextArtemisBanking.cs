@@ -22,7 +22,8 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasSequence<Loan>("LoanNumberSequence")
+            //El genérico es el tipo de valor que emite la secuencia, no la entidad
+            modelBuilder.HasSequence<int>("LoanNumberSequence")
                 .StartsAt(100000000)
                 .IncrementsBy(1);
             
