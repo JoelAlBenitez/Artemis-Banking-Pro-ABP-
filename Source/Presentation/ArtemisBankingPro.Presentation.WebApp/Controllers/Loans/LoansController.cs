@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
 {
+    //Gestión de préstamos: solo el rol Administrador accede al módulo.
+    //Todo formulario viaja por POST con token antifalsificación.
     [Authorize(Roles = "Administrador")]
     public sealed class LoansController : Controller
     {
@@ -29,25 +31,17 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
         }
 
         #region listado y detalles
-        //Listado principal: paginado, con búsqueda por cédula y filtro de estado.
+        //Listado principal: carga inicial, paginación y regreso desde las demás pantallas.
         [HttpGet]
         public async Task<IActionResult> Index(LoansFilterViewModel filter)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(BuildList(filter, PagedResult<LoansDto>.Empty(1, DomainConstants.DefaultPageSize)));
-            }
+            => await ListLoansAsync(filter);
 
-            var result = await _loansServices.GetPagedLoansAsync(_mapper.Map<LoansFilterDto>(filter));
-
-            if (!result.IsValid)
-            {
-                AddErrors(result);
-                return View(BuildList(filter, PagedResult<LoansDto>.Empty(filter.Page, DomainConstants.DefaultPageSize)));
-            }
-
-            return View(BuildList(filter, result.Value!));
-        }
+        //Formulario de búsqueda por cédula y filtro de estado.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName(nameof(Index))]
+        public async Task<IActionResult> IndexFilter(LoansFilterViewModel filter)
+            => await ListLoansAsync(filter);
 
         //Ver detalles: información general del préstamo y su tabla de amortización.
         [HttpGet]
@@ -66,8 +60,10 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
         #endregion
 
         #region asignar prestamo
-        [HttpGet]
-        public IActionResult Create(string customerId)
+        //Paso 1: llega el cliente elegido en el formulario de selección y se muestra el paso 2.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SelectCustomer(string customerId)
         {
             if (string.IsNullOrWhiteSpace(customerId))
             {
@@ -75,7 +71,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(new LoansAssigmentViewModel
+            return View("Create", new LoansAssigmentViewModel
             {
                 CustomerId = customerId,
                 TermLoans = TermMonths.Meses6,
@@ -83,7 +79,10 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
                 AnnualInterestRate = 0m
             });
         }
+
+        //Paso 2: envío del formulario de configuración del préstamo.
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(LoansAssigmentViewModel vm)
         {
             if (!ModelState.IsValid) return View(vm);
@@ -101,6 +100,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
         #endregion
 
         #region editar tasa de interes anual
+        //Acción Editar del listado: precarga el formulario con la tasa actual.
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -115,7 +115,9 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
             return View(_mapper.Map<EditAnnualInterestRateViewModel>(result.Value!));
         }
 
+        //Envío del formulario de modificación de tasa.
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditAnnualInterestRateViewModel vm)
         {
             if (!ModelState.IsValid) return View(vm);
@@ -134,6 +136,27 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
         #endregion
 
         #region private methods
+        //Comparten el mismo armado de pantalla la carga inicial y el envío del filtro.
+        private async Task<IActionResult> ListLoansAsync(LoansFilterViewModel filter)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(nameof(Index),
+                    BuildList(filter, PagedResult<LoansDto>.Empty(1, DomainConstants.DefaultPageSize)));
+            }
+
+            var result = await _loansServices.GetPagedLoansAsync(_mapper.Map<LoansFilterDto>(filter));
+
+            if (!result.IsValid)
+            {
+                AddErrors(result);
+                return View(nameof(Index),
+                    BuildList(filter, PagedResult<LoansDto>.Empty(filter.Page, DomainConstants.DefaultPageSize)));
+            }
+
+            return View(nameof(Index), BuildList(filter, result.Value!));
+        }
+
         private LoansListViewModel BuildList(LoansFilterViewModel filter, PagedResult<LoansDto> paged)
             => new()
             {
