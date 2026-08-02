@@ -1,6 +1,8 @@
+using ArtemisBankingPro.Core.Domain.Interfaces.CreditCards;
+using ArtemisBankingPro.Infraestructrue.Persistence.Context;
+using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.CreditCards;
 ﻿using ArtemisBankingPro.Core.Domain.Interfaces.Generic;
 using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
-using ArtemisBankingPro.Infraestructrue.Persistence.Context;
 using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +24,12 @@ namespace ArtemisBankingPro.IOC
             /*services.AddDbContext<DbContextArtemisBanking>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")
             ));*/
+
+            //Gestión de tarjetas de crédito
+            #region credit cards
+            services.AddScoped<ICreditCardsRepository, CreditCardsRepository>();
+            services.AddScoped<ICardConsumptionRepository, CardConsumptionRepository>();
+            #endregion
 
             #region loans
             services.AddScoped<ILoansRepository, LoansRepository>();

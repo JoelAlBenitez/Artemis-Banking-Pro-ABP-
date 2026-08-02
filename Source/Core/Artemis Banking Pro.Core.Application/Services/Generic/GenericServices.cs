@@ -10,15 +10,15 @@ using Microsoft.Extensions.Logging;
 namespace Artemis_Banking_Pro.Core.Application.Services.Generic
 {
 
-   public abstract class GenericServices<TSaveDto, TDto, Tkey, TEntity>
-       : IGenericServices<TSaveDto, TDto, Tkey>
-       where TEntity : BaseEntitie<Tkey>
-       where TSaveDto : class
-       where TDto : class
-   {
+    public abstract class GenericServices<TSaveDto, TDto, Tkey, TEntity>
+        : IGenericServices<TSaveDto, TDto, Tkey>
+        where TEntity : BaseEntitie<Tkey>
+        where TSaveDto : class
+        where TDto : class
+    {
         protected readonly IGenericRepository<TEntity, Tkey> _genericRepository;
         protected readonly IMapper _mapper;
-        private readonly ILogger<GenericServices<TSaveDto, TDto, Tkey, TEntity>> _logger; 
+        private readonly ILogger<GenericServices<TSaveDto, TDto, Tkey, TEntity>> _logger;
 
         public GenericServices(IGenericRepository<TEntity, Tkey> genericRepository,
             IMapper mapper,
@@ -77,7 +77,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Generic
             {
                 _logger.LogInformation("Recuperando la entidad con ID {ID}", tkey);
                 var entitie = await _genericRepository.GetByIdAsync(tkey);
-                if(entitie is null)
+                if (entitie is null)
                 {
                     _logger.LogWarning("Entidad con ID {ID} inexistente", tkey);
                     return ValidationResult<TDto>.Failure(GeneralError.NonExistence);
@@ -87,7 +87,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Generic
                 var map = _mapper.Map<TDto>(entitie);
                 return ValidationResult<TDto>.Success(map);
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener  los registros  de la entidad {entity}", typeof(TEntity).Name);
                 return ValidationResult<TDto>.Failure(GeneralError.UnexpectedError);
@@ -125,4 +126,4 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Generic
         }
     }
 
-   }
+}
