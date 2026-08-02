@@ -9,6 +9,18 @@ namespace ArtemisBankingPro.Core.Domain.Common.Constants
         //Número de préstamo: 9 dígitos como texto, no repetible como préstamo ni como cuenta
         public const int LoanNumberLength = 9;
 
+        //Número de cuenta de ahorro: 9 dígitos como texto, comparte la unicidad con los préstamos
+        public const int AccountNumberLength = 9;
+
+        //Préstamos y cuentas de ahorro comparten el espacio de 9 dígitos. Cada producto emite su
+        //número desde su propia secuencia y los rangos son disjuntos: un número de préstamo nunca
+        //puede repetirse como número de cuenta sin consultar un solo registro.
+        //No mover estos límites sin revisar ambas secuencias del DbContext.
+        public const int LoanNumberSequenceStart = 100_000_000;
+        public const int LoanNumberSequenceMax = 499_999_999;
+        public const int AccountNumberSequenceStart = 500_000_000;
+        public const int AccountNumberSequenceMax = 999_999_999;
+
         //Número de tarjeta: 16 dígitos como texto, único en el sistema
         public const int CardNumberLength = 16;
 

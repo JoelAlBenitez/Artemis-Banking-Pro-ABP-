@@ -3,7 +3,9 @@ using ArtemisBankingPro.Infraestructrue.Persistence.Context;
 using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.CreditCards;
 ﻿using ArtemisBankingPro.Core.Domain.Interfaces.Generic;
 using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
+using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
 using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans;
+using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.SavingsAccounts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +36,11 @@ namespace ArtemisBankingPro.IOC
             #region loans
             services.AddScoped<ILoansRepository, LoansRepository>();
             services.AddScoped<ILoanInstallmentRepository, LoanInstallmentRepository>();
+            #endregion
+
+            //Gestión de cuentas de ahorro
+            #region savings accounts
+            services.AddScoped<ISavingsAccountsRepository, SavingsAccountsRepository>();
             #endregion
 
             return services;

@@ -159,6 +159,11 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
                 var assignedAt = DateTimeOffset.UtcNow;
                 var creditCard = _mapper.Map<CreditCard>(dto);
                 creditCard.CardNumber = cardNumber;
+
+                //Copia desnormalizada usada en listados, correos y logs: el número completo
+                //nunca se expone. La unicidad del número ya la garantiza el generador.
+                creditCard.LastFourDigits = cardNumber[^DomainConstants.LastFourDigitsLength..];
+
                 creditCard.CvcHash = _cvcHasher.Hash(_cvcHasher.GenerateCvc());
                 creditCard.ExpirationDate = assignedAt.AddYears(DomainConstants.CardExpirationYears);
                 creditCard.AssignedByAdminId = ""; // por modificar

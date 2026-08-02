@@ -6,7 +6,12 @@ using Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.Cred
 using Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.Loans;
 using Artemis_Banking_Pro.Core.Application.Services.CreditCards;
 using Artemis_Banking_Pro.Core.Application.Services.Loans;
+using Artemis_Banking_Pro.Core.Application.Contracts.SavingsAccounts;
+using Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndReverse.SavingsAccounts;
+using Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.SavingsAccounts;
 using Artemis_Banking_Pro.Core.Application.Services.Loans.LoansValidate;
+using Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts;
+using Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts.SavingsAccountsValidate;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -32,6 +37,11 @@ namespace ArtemisBankingPro.IOC
                 configuration.AddMaps(typeof(CreditCardsMappingDtoToViewModelAndReverse).Assembly);
                 configuration.AddMaps(typeof(CreditCardsMappingEntitieToDtoAndReverse).Assembly);
                 #endregion
+
+                #region savings accounts
+                configuration.AddMaps(typeof(SavingsAccountsMappingDtoToViewModelAndReverse).Assembly);
+                configuration.AddMaps(typeof(SavingsAccountsMappingEntitieToDtoAndReverse).Assembly);
+                #endregion
             });
 
             #endregion
@@ -46,6 +56,11 @@ namespace ArtemisBankingPro.IOC
             #region credit cards
             services.AddScoped<ICreditCardsServices, CreditCardsServices>();
             services.AddScoped<ICreditCardsValidationServices, CreditCardsValidationServices>();
+            #endregion
+
+            #region savings accounts
+            services.AddScoped<ISavingsAccountsServices, SavingsAccountsServices>();
+            services.AddScoped<ISavingsAccountsValidateServices, SavingsAccountsValidateServices>();
             #endregion
 
 
