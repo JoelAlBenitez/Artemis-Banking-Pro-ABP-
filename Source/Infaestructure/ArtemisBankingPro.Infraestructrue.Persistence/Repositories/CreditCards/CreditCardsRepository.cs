@@ -15,20 +15,6 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.CreditCards
     {
         public CreditCardsRepository(DbContextArtemisBanking context) : base(context) { }
 
-        public override async Task<CreditCard> AddAsync(CreditCard entity)
-        {
-            var cardNumberInUse = await ExistElementByConsult(card => card.CardNumber == entity.CardNumber);
-            if (cardNumberInUse)
-            {
-                throw new InvalidOperationException(
-                    "El número generado para la tarjeta de crédito ya se encuentra registrado.");
-            }
-
-            entity.LastFourDigits = entity.CardNumber[^DomainConstants.LastFourDigitsLength..];
-
-            return await base.AddAsync(entity);
-        }
-
         public async Task<PagedResult<CreditCard>> GetPagedCreditCardsAsync(
             int page,
             int pageSize,
