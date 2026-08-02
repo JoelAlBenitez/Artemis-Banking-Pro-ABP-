@@ -1,5 +1,6 @@
 ﻿using ArtemisBankingPro.Core.Domain.Entities.CreditCards;
 using ArtemisBankingPro.Core.Domain.Entities.Loans;
+using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -25,6 +26,9 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Context
         public DbSet<CreditCard> CreditCards { get; set; }
         public DbSet<CardConsumption> CardConsumptions { get; set; }
 
+        //Gestión de cuentas de ahorro
+        public DbSet<SavingsAccount> SavingsAccounts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //El genérico es el tipo de valor que emite la secuencia, no la entidad
@@ -32,7 +36,10 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Context
                 .StartsAt(100000000)
                 .IncrementsBy(1);
             
-            //en la feature pertinente agregar el sequence de cuentas de ahorro
+            //Las cuentas de ahorro no usan secuencia: su número de 9 dígitos se genera con
+            //reintento acotado verificando simultáneamente cuentas y préstamos, porque ambos
+            //comparten el mismo espacio de numeración y una secuencia propia colisionaría
+            //con LoanNumberSequence. Ver IAccountNumberGenerator.
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
