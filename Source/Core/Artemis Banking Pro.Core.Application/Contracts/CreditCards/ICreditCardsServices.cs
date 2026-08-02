@@ -6,7 +6,8 @@ using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 namespace Artemis_Banking_Pro.Core.Application.Contracts.CreditCards
 {
     //herencia se debe crear en la implementacion
-    public interface ICreditCardsServices  
+    public interface ICreditCardsServices : 
+       IGenericServices<CreditCardAssignmentDto, CreditCardDto, int>
      
     {
         Task<ValidationResult<PagedResult<CreditCardDto>>> GetPagedCreditCardsAsync(
@@ -17,18 +18,13 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.CreditCards
 
         Task<ValidationResult<EditCardLimitDto>> GetCreditCardForEditLimitAsync(int creditCardId);
 
-        Task<ValidationResult<CreditCardAssignedDto>> AssignCreditCardAsync(
-            CreditCardAssignmentDto dto, string adminUserId);
+        Task<ValidationResult> AssignCreditCardAsync(CreditCardAssignmentDto dto);
 
         Task<ValidationResult<CardLimitUpdatedDto>> EditCreditCardLimitAsync(
-            EditCardLimitDto dto, string adminUserId);
+            EditCardLimitDto dto);
 
-        Task<ValidationResult> CancelCreditCardAsync(int creditCardId, string adminUserId);
+        Task<ValidationResult> CancelCreditCardAsync(int creditCardId);
 
-        Task<ValidationResult> SendCreditCardAssignedNotificationAsync(
-            CreditCardAssignedDto assigned, string customerEmail, string customerFullName);
-
-        Task<ValidationResult> SendCardLimitUpdatedNotificationAsync(
-            CardLimitUpdatedDto limitUpdated, string customerEmail, string customerFullName);
+       
     }
 }

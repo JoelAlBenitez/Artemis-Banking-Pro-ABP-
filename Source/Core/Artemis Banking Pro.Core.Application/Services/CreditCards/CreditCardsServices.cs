@@ -21,7 +21,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
         ICreditCardsServices
     {
         private const string ExpirationDateFormat = "MM/yy";
-
         private readonly ICreditCardsRepository _creditCardsRepository;
         private readonly ICardConsumptionRepository _cardConsumptionRepository;
         private readonly ICreditCardsValidationServices _creditCardsValidationServices;
@@ -50,22 +49,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
             _logger = logger;
         }
 
-        //La asignación exige el administrador responsable para la auditoría de la tarjeta.
-        //Cuando exista ICurrentUserServices (project Identity) este override resolverá el usuario
-        //autenticado e invocará AssignCreditCardAsync sin recibirlo desde la capa de presentación.
-        public override Task<ValidationResult> CreateAsync(CreditCardAssignmentDto dto)
-        {
-            _logger.LogWarning("Intento de asignar una tarjeta de crédito sin el administrador responsable");
-            return Task.FromResult(ValidationResult.Failure(CreditCardError.AdminUserRequired));
-        }
-
-        //La única modificación permitida sobre una tarjeta es su límite de crédito y exige
-        //el administrador responsable, por lo que se resuelve con EditCreditCardLimitAsync.
-        public override Task<ValidationResult> UpdateAsync(int tkey, CreditCardAssignmentDto dto)
-        {
-            _logger.LogWarning("Intento de modificar la tarjeta con ID {CreditCardId} sin el administrador responsable", tkey);
-            return Task.FromResult(ValidationResult.Failure(CreditCardError.AdminUserRequired));
-        }
 
         public async Task<ValidationResult<PagedResult<CreditCardDto>>> GetPagedCreditCardsAsync(
             CreditCardFilterDto filter, string? customerId)
@@ -148,17 +131,13 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
             return ValidationResult<EditCardLimitDto>.Success(_mapper.Map<EditCardLimitDto>(validation.Value!));
         }
 
-        public async Task<ValidationResult<CreditCardAssignedDto>> AssignCreditCardAsync(
-            CreditCardAssignmentDto dto, string adminUserId)
+        public async Task<ValidationResult> AssignCreditCardAsync(
+            CreditCardAssignmentDto dto)
         {
             _logger.LogInformation("Inicio de la asignación de una tarjeta de crédito al cliente {CustomerId}",
                 dto.CustomerId);
 
-            if (string.IsNullOrWhiteSpace(adminUserId))
-            {
-                _logger.LogWarning("Asignación de tarjeta rechazada: no se recibió el administrador responsable");
-                return ValidationResult<CreditCardAssignedDto>.Failure(CreditCardError.AdminUserRequired);
-            }
+              //agregar validacion del admin User Id -> falta metodo de adrian
 
             var validation = await _creditCardsValidationServices.ValidateAssignmentAsync(dto);
             if (!validation.IsValid)
@@ -179,13 +158,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
 
                 var assignedAt = DateTimeOffset.UtcNow;
                 var creditCard = _mapper.Map<CreditCard>(dto);
-
                 creditCard.CardNumber = cardNumber;
                 creditCard.CvcHash = _cvcHasher.Hash(_cvcHasher.GenerateCvc());
                 creditCard.ExpirationDate = assignedAt.AddYears(DomainConstants.CardExpirationYears);
-                creditCard.AssignedByAdminId = adminUserId;
+                creditCard.AssignedByAdminId = ""; // por modificar
                 creditCard.CreatedAt = assignedAt;
-                creditCard.CreateByUserId = adminUserId;
+                creditCard.CreateByUserId = ""; // por modificar
 
                 await _creditCardsRepository.AddAsync(creditCard);
                 var result = await _creditCardsRepository.SaveChangesAsync();
@@ -198,16 +176,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
                 _logger.LogInformation("Tarjeta de crédito terminada en {LastFourDigits} asignada al cliente {CustomerId}",
                     creditCard.LastFourDigits, creditCard.CustomerId);
 
-                var assigned = new CreditCardAssignedDto
-                {
-                    CustomerId = creditCard.CustomerId,
-                    LastFourDigits = creditCard.LastFourDigits,
-                    CreditLimit = creditCard.CreditLimit,
-                    ExpirationDate = creditCard.ExpirationDate.ToString(ExpirationDateFormat),
-                    AssignedAt = assignedAt
-                };
-
-                return ValidationResult<CreditCardAssignedDto>.Success(assigned);
+                return ValidationResult.Success();
             }
             catch (Exception ex)
             {
@@ -217,16 +186,9 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
         }
 
         public async Task<ValidationResult<CardLimitUpdatedDto>> EditCreditCardLimitAsync(
-            EditCardLimitDto dto, string adminUserId)
+            EditCardLimitDto dto)
         {
             _logger.LogInformation("Inicio de la modificación del límite de la tarjeta con ID {CreditCardId}", dto.Id);
-
-            if (string.IsNullOrWhiteSpace(adminUserId))
-            {
-                _logger.LogWarning("Modificación de límite rechazada: no se recibió el administrador responsable");
-                return ValidationResult<CardLimitUpdatedDto>.Failure(CreditCardError.AdminUserRequired);
-            }
-
             var validation = await _creditCardsValidationServices.ValidateLimitEditionAsync(dto);
             if (!validation.IsValid)
             {
@@ -240,7 +202,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
 
                 creditCard.CreditLimit = dto.CreditLimit;
                 creditCard.ModifiedAt = modifiedAt;
-                creditCard.LastModifiedByIdUser = adminUserId;
+                creditCard.LastModifiedByIdUser = ""; // por modificar
 
                 await _creditCardsRepository.UpdateAsync(creditCard);
                 await _creditCardsRepository.SaveChangesAsync();
@@ -265,15 +227,11 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
             }
         }
 
-        public async Task<ValidationResult> CancelCreditCardAsync(int creditCardId, string adminUserId)
+        public async Task<ValidationResult> CancelCreditCardAsync(int creditCardId)
         {
             _logger.LogInformation("Inicio de la cancelación de la tarjeta con ID {CreditCardId}", creditCardId);
 
-            if (string.IsNullOrWhiteSpace(adminUserId))
-            {
-                _logger.LogWarning("Cancelación rechazada: no se recibió el administrador responsable");
-                return ValidationResult.Failure(CreditCardError.AdminUserRequired);
-            }
+         
 
             var validation = await _creditCardsValidationServices.ValidateCancellationAsync(creditCardId);
             if (!validation.IsValid)
@@ -287,7 +245,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
 
                 creditCard.Status = CreditCardStatus.Cancelada;
                 creditCard.ModifiedAt = DateTimeOffset.UtcNow;
-                creditCard.LastModifiedByIdUser = adminUserId;
+                creditCard.LastModifiedByIdUser = ""; // ppr modificar
 
                 await _creditCardsRepository.UpdateAsync(creditCard);
                 await _creditCardsRepository.SaveChangesAsync();
@@ -304,60 +262,64 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
             }
         }
 
-        public async Task<ValidationResult> SendCreditCardAssignedNotificationAsync(
-            CreditCardAssignedDto assigned, string customerEmail, string customerFullName)
-        {
-            var message = new MessageDto
-            {
-                To = customerEmail,
-                Subject = "Nueva tarjeta de crédito asignada",
-                Message = BuildCreditCardAssignedBody(assigned, customerFullName)
-            };
 
-            var sent = await _emailServices.SendNotification(message);
+        // modificar cuando se integre el ICurrenUserServices  para una integracion de los elementos pertinentes, el dto que reciben actualemnte no es valido
 
-            if (!sent)
-            {
-                _logger.LogWarning("No fue posible enviar el correo de asignación de la tarjeta terminada en {LastFourDigits}. La operación no se revierte",
-                    assigned.LastFourDigits);
+        //public async Task<ValidationResult> SendCreditCardAssignedNotificationAsync(
+        //    CreditCardAssignedDto assigned, string customerEmail, string customerFullName)
+        //{
+        //    var message = new MessageDto
+        //    {
+        //        To = customerEmail,
+        //        Subject = "Nueva tarjeta de crédito asignada",
+        //        Message = BuildCreditCardAssignedBody(assigned, customerFullName)
+        //    };
 
-                return ValidationResult.Failure(CreditCardError.CreditCardCreatedWithoutNotification);
-            }
+        //    var sent = await _emailServices.SendNotification(message);
 
-            return ValidationResult.Success();
-        }
+        //    if (!sent)
+        //    {
+        //        _logger.LogWarning("No fue posible enviar el correo de asignación de la tarjeta terminada en {LastFourDigits}. La operación no se revierte",
+        //            assigned.LastFourDigits);
 
-        public async Task<ValidationResult> SendCardLimitUpdatedNotificationAsync(
-            CardLimitUpdatedDto limitUpdated, string customerEmail, string customerFullName)
-        {
-            var message = new MessageDto
-            {
-                To = customerEmail,
-                Subject = "Modificación de límite de tarjeta",
-                Message = BuildCardLimitUpdatedBody(limitUpdated, customerFullName)
-            };
+        //        return ValidationResult.Failure(CreditCardError.CreditCardCreatedWithoutNotification);
+        //    }
 
-            var sent = await _emailServices.SendNotification(message);
+        //    return ValidationResult.Success();
+        //}
 
-            if (!sent)
-            {
-                _logger.LogWarning("No fue posible enviar el correo de modificación de límite de la tarjeta terminada en {LastFourDigits}. La operación no se revierte",
-                    limitUpdated.LastFourDigits);
+        //public async Task<ValidationResult> SendCardLimitUpdatedNotificationAsync(
+        //    CardLimitUpdatedDto limitUpdated, string customerEmail, string customerFullName)
+        //{
+        //    var message = new MessageDto
+        //    {
+        //        To = customerEmail,
+        //        Subject = "Modificación de límite de tarjeta",
+        //        Message = BuildCardLimitUpdatedBody(limitUpdated, customerFullName)
+        //    };
 
-                return ValidationResult.Failure(CreditCardError.CreditLimitUpdatedWithoutNotification);
-            }
+        //    var sent = await _emailServices.SendNotification(message);
 
-            return ValidationResult.Success();
-        }
+        //    if (!sent)
+        //    {
+        //        _logger.LogWarning("No fue posible enviar el correo de modificación de límite de la tarjeta terminada en {LastFourDigits}. La operación no se revierte",
+        //            limitUpdated.LastFourDigits);
 
-        private static string BuildCreditCardAssignedBody(CreditCardAssignedDto assigned, string customerFullName)
-            => $"<p>Hola {customerFullName},</p>" +
-               "<p>Se ha asignado una nueva tarjeta de crédito a su cuenta.</p>" +
-               $"<p>Tarjeta terminada en: {assigned.LastFourDigits}<br/>" +
-               $"Límite aprobado: RD${assigned.CreditLimit:N2}<br/>" +
-               $"Fecha de expiración: {assigned.ExpirationDate}<br/>" +
-               $"Fecha de asignación: {assigned.AssignedAt:dd/MM/yyyy}</p>" +
-               "<p>Por seguridad, no comparta la información de su tarjeta con terceros.</p>";
+        //        return ValidationResult.Failure(CreditCardError.CreditLimitUpdatedWithoutNotification);
+        //    }
+
+        //    return ValidationResult.Success();
+        //} 
+
+        #region private methods
+        //private static string BuildCreditCardAssignedBody(CreditCardAssignedDto assigned, string customerFullName)
+        //    => $"<p>Hola {customerFullName},</p>" +
+        //       "<p>Se ha asignado una nueva tarjeta de crédito a su cuenta.</p>" +
+        //       $"<p>Tarjeta terminada en: {assigned.LastFourDigits}<br/>" +
+        //       $"Límite aprobado: RD${assigned.CreditLimit:N2}<br/>" +
+        //       $"Fecha de expiración: {assigned.ExpirationDate}<br/>" +
+        //       $"Fecha de asignación: {assigned.AssignedAt:dd/MM/yyyy}</p>" +
+        //       "<p>Por seguridad, no comparta la información de su tarjeta con terceros.</p>";
 
         private static string BuildCardLimitUpdatedBody(CardLimitUpdatedDto limitUpdated, string customerFullName)
             => $"<p>Hola {customerFullName},</p>" +
@@ -373,5 +335,9 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
                 CreditCardStatusFilter.Canceladas => CreditCardStatus.Cancelada,
                 _ => null
             };
+
+ 
+        #endregion
+
     }
 }
