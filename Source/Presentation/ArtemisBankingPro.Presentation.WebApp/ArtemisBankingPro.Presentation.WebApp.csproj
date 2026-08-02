@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\ArtemisBankingPro.IOC\ArtemisBankingPro.IOC.csproj" />
     <ProjectReference Include="..\..\Core\Artemis Banking Pro.Core.Application\ArtemisBankingPro.Core.Application.csproj" />
   </ItemGroup>
 

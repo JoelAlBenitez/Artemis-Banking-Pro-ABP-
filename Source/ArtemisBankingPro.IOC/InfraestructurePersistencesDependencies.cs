@@ -1,5 +1,7 @@
 ﻿using ArtemisBankingPro.Core.Domain.Interfaces.Generic;
+using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
 using ArtemisBankingPro.Infraestructrue.Persistence.Context;
+using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +23,10 @@ namespace ArtemisBankingPro.IOC
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")
             ));*/
 
+            #region loans
+            services.AddScoped<ILoansRepository, LoansRepository>();
+            services.AddScoped<ILoanInstallmentRepository, LoanInstallmentRepository>();
+            #endregion
 
             return services;
         }
