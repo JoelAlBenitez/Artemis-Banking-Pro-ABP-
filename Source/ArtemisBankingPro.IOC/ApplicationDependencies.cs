@@ -70,7 +70,7 @@ namespace ArtemisBankingPro.IOC
             #endregion
 
 
-            services.AddTransient<IDashboardService, DashboardService>();
+            services.AddScoped<IDashboardService, DashboardService>();
 
             return services;
         }

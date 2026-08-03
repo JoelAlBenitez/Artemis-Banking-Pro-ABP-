@@ -46,16 +46,16 @@ namespace ArtemisBankingPro.IOC
             #region savings accounts
             services.AddScoped<ISavingsAccountsRepository, SavingsAccountsRepository>();
             #endregion
-            services.AddTransient(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+            services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
 
-            services.AddTransient<ICardPaymentRepository, CardPaymentRepository>();
+            services.AddScoped<ICardPaymentRepository, CardPaymentRepository>();
 
-            services.AddTransient<ITransactionRepository, TransactionRepository>();
-            services.AddTransient<ICashAdvanceRepository, CashAdvanceRepository>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<ICashAdvanceRepository, CashAdvanceRepository>();
 
-            services.AddTransient<IBeneficiaryRepository, BeneficiaryRepository>();
+            services.AddScoped<IBeneficiaryRepository, BeneficiaryRepository>();
 
-            services.AddTransient<ILoansPaymentRepository, LoansPaymentRepository>();
+            services.AddScoped<ILoansPaymentRepository, LoansPaymentRepository>();
 
             return services;
         }
