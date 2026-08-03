@@ -17,16 +17,16 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
 {
     public sealed class DashboardService : IDashboardService
     {
-        private readonly ISavingsAccountRepository _savingsAccountRepository;
-        private readonly ICreditCardRepository _creditCardRepository;
+        private readonly ISavingsAccountsRepository _savingsAccountRepository;
+        private readonly ICreditCardsRepository _creditCardRepository;
         private readonly ILoansRepository _loansRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly ICardConsumptionRepository _cardConsumptionRepository;
         private readonly IMapper _mapper;
 
         public DashboardService(
-            ISavingsAccountRepository savingsAccountRepository,
-            ICreditCardRepository creditCardRepository,
+            ISavingsAccountsRepository savingsAccountRepository,
+            ICreditCardsRepository creditCardRepository,
             ILoansRepository loansRepository,
             ITransactionRepository transactionRepository,
             ICardConsumptionRepository cardConsumptionRepository,
