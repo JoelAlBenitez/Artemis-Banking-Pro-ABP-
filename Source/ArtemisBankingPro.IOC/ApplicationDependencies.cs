@@ -16,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Artemis_Banking_Pro.Core.Application.Contracts.Dashboard;
 using Artemis_Banking_Pro.Core.Application.Services.Dashboard;
+using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
+using Artemis_Banking_Pro.Core.Application.Services.Transactions;
 
 namespace ArtemisBankingPro.IOC
 {
@@ -71,6 +73,10 @@ namespace ArtemisBankingPro.IOC
 
 
             services.AddScoped<IDashboardService, DashboardService>();
+
+            services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<ITransactionsValidationServices, TransactionsValidationServices>();
 
             return services;
         }

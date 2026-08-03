@@ -1,0 +1,15 @@
+using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
+using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
+
+namespace Artemis_Banking_Pro.Core.Application.Contracts.Transactions
+{
+    public interface ITransactionService
+    {
+        Task<ValidationResult<TransactionResultDto>> ProcessExpressAsync(ExpressTransactionDto dto, string clientId);
+        Task<ValidationResult<TransactionResultDto>> ProcessBeneficiaryTransactionAsync(BeneficiaryTransactionDto dto, string clientId);
+        Task<ValidationResult<int>> GetTotalHistoricalAsync();
+        Task<ValidationResult<int>> GetTotalTodayAsync();
+        Task<ValidationResult> RegisterInitialTransactionAsync(int savingsAccountId, decimal amount, string performedByUserId);
+        Task<ValidationResult<IReadOnlyCollection<ClientDto>>> GetClientsAsync();
+    }
+}
