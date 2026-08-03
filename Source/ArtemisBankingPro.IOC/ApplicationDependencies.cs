@@ -14,6 +14,8 @@ using Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts;
 using Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts.SavingsAccountsValidate;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using Artemis_Banking_Pro.Core.Application.Contracts.Dashboard;
+using Artemis_Banking_Pro.Core.Application.Services.Dashboard;
 
 namespace ArtemisBankingPro.IOC
 {
@@ -42,6 +44,10 @@ namespace ArtemisBankingPro.IOC
                 configuration.AddMaps(typeof(SavingsAccountsMappingDtoToViewModelAndReverse).Assembly);
                 configuration.AddMaps(typeof(SavingsAccountsMappingEntitieToDtoAndReverse).Assembly);
                 #endregion
+
+                #region customer dashboard
+                configuration.AddMaps(typeof(SavingsAccountMappingProfile).Assembly);
+                #endregion
             });
 
             #endregion
@@ -64,6 +70,7 @@ namespace ArtemisBankingPro.IOC
             #endregion
 
 
+            services.AddScoped<IDashboardService, DashboardService>();
 
             return services;
         }

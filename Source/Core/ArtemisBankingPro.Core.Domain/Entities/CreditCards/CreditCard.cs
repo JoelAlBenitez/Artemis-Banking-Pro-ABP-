@@ -18,8 +18,6 @@ namespace ArtemisBankingPro.Core.Domain.Entities.CreditCards
 
         public decimal AvailableCredit => CreditLimit - OwedAmount;
 
-        //Collections
-
         public ICollection<CardConsumption> cardConsumptions { get; set; } = new List<CardConsumption>();
     }
 }

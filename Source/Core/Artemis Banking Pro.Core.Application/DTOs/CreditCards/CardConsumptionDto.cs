@@ -1,3 +1,4 @@
+using Artemis_Banking_Pro.Core.Application.DTOs.Base;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 
 namespace Artemis_Banking_Pro.Core.Application.DTOs.CreditCards

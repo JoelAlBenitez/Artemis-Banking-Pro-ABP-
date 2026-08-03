@@ -12,6 +12,9 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.CreditCar
             builder.ToTable("CardConsumptions");
             builder.HasKey(c => c.Id);
 
+            builder.Property(c => c.CreditCardId)
+                .IsRequired();
+
             builder.Property(c => c.Amount)
                 .HasPrecision(DomainConstants.MoneyPrecision, DomainConstants.MoneyScale);
 
@@ -38,6 +41,11 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.CreditCar
                 .HasMaxLength(DomainConstants.IdentityUserIdLength);
 
             builder.HasIndex(c => new { c.CreditCardId, c.CreatedAt });
+
+            builder.HasOne(c => c.CreditCard)
+                .WithMany(cc => cc.cardConsumptions)
+                .HasForeignKey(c => c.CreditCardId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             //La relación con el comercio se configurará cuando exista la entidad Commerce,
             //propia del módulo de Hermes Pay.

@@ -1,5 +1,6 @@
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Entities.Base;
+using ArtemisBankingPro.Core.Domain.Entities.Transactions;
 
 namespace ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts
 {
@@ -26,6 +27,6 @@ namespace ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts
 
         //El historial de transacciones pertenece al módulo Cliente: ni la entidad ni su
         //repositorio se desarrollan aquí. Se habilita cuando ese módulo la exponga.
-        //public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+        public IReadOnlyCollection<Transaction>? Transactions { get; set; } = null;
     }
 }

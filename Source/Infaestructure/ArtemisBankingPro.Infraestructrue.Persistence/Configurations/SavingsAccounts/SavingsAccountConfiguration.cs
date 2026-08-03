@@ -54,8 +54,8 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.SavingsAc
             builder.Ignore(a => a.IsPrimary);
             builder.Ignore(a => a.IsActive);
 
-            //La relaciÃ³n con el historial de transacciones se configura cuando el mÃ³dulo
-            //Cliente exponga la entidad Transaction (OnDelete Restrict, sin borrado fÃ­sico).
+            //La relación con el historial de transacciones se configura cuando el módulo
+            //Cliente exponga la entidad Transaction (OnDelete Restrict, sin borrado físico).
         }
     }
 }

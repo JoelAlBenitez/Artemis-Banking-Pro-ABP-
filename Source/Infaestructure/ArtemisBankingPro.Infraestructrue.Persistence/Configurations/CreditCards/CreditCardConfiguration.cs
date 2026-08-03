@@ -34,6 +34,9 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.CreditCar
             builder.Property(c => c.OwedAmount)
                 .HasPrecision(DomainConstants.MoneyPrecision, DomainConstants.MoneyScale);
 
+            builder.Property(c => c.ExpirationDate)
+                .IsRequired();
+
             builder.Property(c => c.CvcHash)
                 .IsRequired()
                 .HasMaxLength(DomainConstants.CvcHashLength)

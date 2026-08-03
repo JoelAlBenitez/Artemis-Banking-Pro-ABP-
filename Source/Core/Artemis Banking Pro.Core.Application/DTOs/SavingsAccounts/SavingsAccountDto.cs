@@ -8,7 +8,6 @@ namespace Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts
         public required string AccountNumber { get; set; }
         public required string CustomerId { get; set; }
 
-        //Nombre, apellido y cédula provienen del project Identity y los completa el servicio
         public required string FullNameCustomer { get; set; }
         public required string IdCard { get; set; }
 
