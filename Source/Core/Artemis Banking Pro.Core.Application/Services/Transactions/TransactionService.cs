@@ -11,6 +11,7 @@ using ArtemisBankingPro.Core.Domain.Interfaces.Beneficiaries;
 using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Interfaces.Transactions;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
 {
@@ -21,6 +22,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
         private readonly IBeneficiaryRepository _beneficiaryRepository;
         private readonly ITransactionsValidationServices _validationServices;
         private readonly IEmailServices _emailServices;
+        private readonly IMapper _mapper;
         private readonly ILogger<TransactionService> _logger;
 
         public TransactionService(
@@ -29,6 +31,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             IBeneficiaryRepository beneficiaryRepository,
             ITransactionsValidationServices validationServices,
             IEmailServices emailServices,
+            IMapper mapper,
             ILogger<TransactionService> logger)
         {
             _savingsAccountRepository = savingsAccountRepository;
@@ -36,6 +39,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             _beneficiaryRepository = beneficiaryRepository;
             _validationServices = validationServices;
             _emailServices = emailServices;
+            _mapper = mapper;
             _logger = logger;
         }
 
@@ -345,6 +349,13 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             }).ToList();
 
             return ValidationResult<IReadOnlyCollection<ClientDto>>.Success(clients);
+        }
+
+        public async Task<ValidationResult<IReadOnlyCollection<Artemis_Banking_Pro.Core.Application.DTOs.Beneficiaries.BeneficiaryDto>>> GetBeneficiariesAsync(string clientId)
+        {
+            var beneficiaries = await _beneficiaryRepository.GetAllFindAsync(b => b.OwnerClientId == clientId && b.IsActive);
+            var dtos = _mapper.Map<IReadOnlyCollection<Artemis_Banking_Pro.Core.Application.DTOs.Beneficiaries.BeneficiaryDto>>(beneficiaries);
+            return ValidationResult<IReadOnlyCollection<Artemis_Banking_Pro.Core.Application.DTOs.Beneficiaries.BeneficiaryDto>>.Success(dtos);
         }
     }
 }
