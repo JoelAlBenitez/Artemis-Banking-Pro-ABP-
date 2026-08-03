@@ -44,6 +44,10 @@ namespace ArtemisBankingPro.IOC
                 configuration.AddMaps(typeof(SavingsAccountsMappingDtoToViewModelAndReverse).Assembly);
                 configuration.AddMaps(typeof(SavingsAccountsMappingEntitieToDtoAndReverse).Assembly);
                 #endregion
+
+                #region customer dashboard
+                configuration.AddMaps(typeof(SavingsAccountMappingProfile).Assembly);
+                #endregion
             });
 
             #endregion

@@ -48,7 +48,6 @@ namespace ArtemisBankingPro.IOC
             #endregion
             services.AddTransient(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
 
-            services.AddTransient<ICardConsumptionRepository, CardConsumptionRepository>();
             services.AddTransient<ICardPaymentRepository, CardPaymentRepository>();
 
             services.AddTransient<ITransactionRepository, TransactionRepository>();
@@ -56,8 +55,6 @@ namespace ArtemisBankingPro.IOC
 
             services.AddTransient<IBeneficiaryRepository, BeneficiaryRepository>();
 
-            services.AddTransient<ILoansRepository, LoansRepository>();
-            services.AddTransient<ILoanInstallmentRepository, LoanInstallmentRepository>();
             services.AddTransient<ILoansPaymentRepository, LoansPaymentRepository>();
 
             return services;
