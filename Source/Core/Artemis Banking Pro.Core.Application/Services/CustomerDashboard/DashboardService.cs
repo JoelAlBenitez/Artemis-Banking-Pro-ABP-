@@ -45,11 +45,11 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
             try
             {
                 var accounts = await _savingsAccountRepository.GetAllFindAsync(
-                    a => a.ClientId == clientId && a.Status == SavingsAccountStatus.Activa
+                    a => a.CustomerId == clientId && a.Status == SavingsAccountStatus.Activa
                 );
 
                 var sortedAccounts = accounts
-                    .OrderByDescending(a => a.Type == SavingsAccountType.Principal)
+                    .OrderByDescending(a => a.AccountType == SavingsAccountType.Principal)
                     .ThenByDescending(a => a.Balance)
                     .ToList();
 
@@ -59,7 +59,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
                 );
 
                 var cards = await _creditCardRepository.GetAllFindAsync(
-                    c => c.ClientId == clientId && c.Status == CreditCardStatus.Activa
+                    c => c.CustomerId == clientId && c.Status == CreditCardStatus.Activa
                 );
 
                 var accountsMapped = _mapper.Map<IReadOnlyCollection<SavingsAccountDto>>(sortedAccounts);
@@ -88,7 +88,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
             try
             {
                 var account = await _savingsAccountRepository.GetFirstAsync(a => a.Id == accountId);
-                if (account == null || account.ClientId != clientId)
+                if (account == null || account.CustomerId != clientId)
                 {
                     return ValidationResult<IReadOnlyCollection<TransactionResultDto>>.Failure(DashboardError.AccountNotFound);
                 }
@@ -112,13 +112,13 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
             try
             {
                 var card = await _creditCardRepository.GetFirstAsync(c => c.Id == cardId);
-                if (card == null || card.ClientId != clientId)
+                if (card == null || card.CustomerId != clientId)
                 {
                     return ValidationResult<IReadOnlyCollection<CardConsumptionDto>>.Failure(DashboardError.CardNotFound);
                 }
 
                 var consumptions = await _cardConsumptionRepository.GetAllFindAsync(c => c.CreditCardId == cardId);
-                var sortedConsumptions = consumptions.OrderByDescending(c => c.Date).ToList();
+                var sortedConsumptions = consumptions.OrderByDescending(c => c.CreatedAt).ToList();
 
                 var mapped = _mapper.Map<IReadOnlyCollection<CardConsumptionDto>>(sortedConsumptions);
                 return ValidationResult<IReadOnlyCollection<CardConsumptionDto>>.Success(mapped);

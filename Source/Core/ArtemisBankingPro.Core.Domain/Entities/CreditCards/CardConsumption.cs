@@ -1,18 +1,19 @@
-using ArtemisBankingPro.Core.Domain.Entities.Base;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
+using ArtemisBankingPro.Core.Domain.Entities.Base;
 
 namespace ArtemisBankingPro.Core.Domain.Entities.CreditCards
 {
     public sealed class CardConsumption : BaseEntitie<int>
     {
         public required int CreditCardId { get; set; }
-        public required DateTimeOffset Date { get; set; }
         public required decimal Amount { get; set; }
-        public required string CommerceName { get; set; }
-        public required CardConsumptionStatus Status { get; set; }
-        public string? RejectionReason { get; set; }
+        public required ConsumptionOrigin Origin { get; set; }
 
-        // Navigation properties
-        public CreditCard? CreditCard { get; set; } = null;
+        public int? CommerceId { get; set; }
+        public required string CommerceName { get; set; }
+        public required ConsumptionStatus Status { get; set; }
+        public RejectionReason? RejectionReason { get; set; }
+
+        public CreditCard CreditCard { get; set; } = null!;
     }
 }

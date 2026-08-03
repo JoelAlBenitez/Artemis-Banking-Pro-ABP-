@@ -5,15 +5,14 @@ namespace Artemis_Banking_Pro.Core.Application.DTOs.CreditCards
 {
     public sealed class CreditCardDto : BaseDto<int>
     {
-        public required string CardNumber { get; set; }
+        public required string MaskedCardNumber { get; set; }
+        public required string LastFourDigits { get; set; }
+        public required string CustomerId { get; set; }
+        public required string FullNameCustomer { get; set; }
+        public required decimal CreditLimit { get; set; }
         public required string ExpirationDate { get; set; }
-        public required string ClientId { get; set; }
-        public decimal CreditLimit { get; set; }
-        public decimal OwedAmount { get; set; }
-        public required CreditCardStatus Status { get; set; }
-
-        public string MaskedCardNumber => string.IsNullOrEmpty(CardNumber) || CardNumber.Length < 4 
-            ? CardNumber 
-            : $"**** **** **** {CardNumber[^4..]}";
+        public required decimal OwedAmount { get; set; }
+        public required decimal AvailableCredit { get; set; }
+        public required CreditCardStatus StateCreditCard { get; set; }
     }
 }

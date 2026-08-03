@@ -1,15 +1,29 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.Loans;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Entities.Loans;
+using Microsoft.Extensions.Logging;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 {
-    public sealed class AmortizationCalculator : IAmortizationCalculator
+    public sealed class AmortizationCalculator : 
+        IAmortizationCalculator
     {
         private const int MoneyDecimals = 2;
 
-        public decimal CalculateMonthlyInstallment(decimal capital, decimal annualInterestRate, int totalInstallments)
+        //agregar ILogger, ICurrent User Services
+
+        private readonly ILogger<AmortizationCalculator> _logger;
+        public AmortizationCalculator(ILogger<AmortizationCalculator> logger)
         {
+            _logger = logger;
+        }
+
+        public decimal CalculateMonthlyInstallment(
+            decimal capital,
+            decimal annualInterestRate,
+            int totalInstallments)
+        {
+            _logger.LogInformation("Realizando calculo de la cutoas según la tarifa determinada.");
             if (totalInstallments <= 0) return 0m;
             var monthlyRate = MonthlyRate(annualInterestRate);
             if (monthlyRate == 0m) return Money(capital / totalInstallments);
@@ -22,15 +36,22 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             decimal annualInterestRate,
             int totalInstallments,
             DateTimeOffset loanCreatedAt,
-            string createByUserId)
+            int loanId)
         {
             var installments = new List<LoanInstallment>();
             if (totalInstallments <= 0) return installments;
 
+            #region  calculando la tarifa mensual de as cuotas
+            _logger.LogInformation("Realización del calculo de la tarifa mensual" +
+                " y las mensualidades de las cuotas del prestamo con ID {ID} ", loanId);
             var monthlyRate = MonthlyRate(annualInterestRate);
             var monthlyInstallment = CalculateMonthlyInstallment(capital, annualInterestRate, totalInstallments);
             var pendingCapital = capital;
 
+            #endregion
+
+            #region  creando los objectos de las cutoas asignadas a un determinado prestamo
+            _logger.LogInformation("Creando las cuotas del prestamo con ID {ID}", loanId);
             for (var number = 1; number <= totalInstallments; number++)
             {
                 var interest = Money(pendingCapital * monthlyRate);
@@ -45,10 +66,10 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
                 pendingCapital = Money(pendingCapital - capitalAmount);
 
+                _logger.LogInformation("Creando cuota determinada número {N} al prestamo con ID {ID}", number, loanId);
                 installments.Add(new LoanInstallment
                 {
-                    LoanId = 0,// cambiar para recibir el id del prestamo por el service llamado de manager loans 
-                    //al momento de la asignacion.
+                    LoanId = loanId,
                     InstallmentNumber = number,
                     DueDate = loanCreatedAt.AddMonths(number),
                     InstallmentValue = installmentValue,
@@ -58,9 +79,11 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     paymentStatus = PaymentStatus.Pendiente,
                     IsOverdue = false,
                     CreatedAt = loanCreatedAt,
-                    CreateByUserId = createByUserId
+                    CreateByUserId = "" // cambiar cuando se cree el ICurrentUserSession
                 });
+
             }
+            #endregion
 
             return installments;
         }
@@ -69,20 +92,28 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             IReadOnlyCollection<LoanInstallment> installments,
             decimal pendingCapital,
             decimal newAnnualInterestRate,
-            DateTimeOffset today,
-            string modifiedByUserId)
+            DateTimeOffset today
+           )
         {
+            #region obteniendo cuotas futuras
+            _logger.LogInformation("Recuperando cuotas con pago pendientes del prestamos determinado cuya fecha de pago sea futura.");
             var futureInstallments = installments
                 .Where(i => i.paymentStatus == PaymentStatus.Pendiente && i.DueDate > today)
                 .OrderBy(i => i.InstallmentNumber)
                 .ToList();
 
             if (futureInstallments.Count == 0) return futureInstallments;
+            #endregion
 
+            #region calculo en base a nueva tarifa
+            _logger.LogInformation("Realizando calculos de las tarifas de las nuevas cuotas");
             var monthlyRate = MonthlyRate(newAnnualInterestRate);
             var monthlyInstallment = CalculateMonthlyInstallment(
                 pendingCapital, newAnnualInterestRate, futureInstallments.Count);
 
+            #endregion
+            #region Cuotas futuras modificacion
+            _logger.LogInformation("Modificando cuotas futuras del prestamo.");
             for (var index = 0; index < futureInstallments.Count; index++)
             {
                 var installment = futureInstallments[index];
@@ -98,17 +129,20 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 }
 
                 pendingCapital = Money(pendingCapital - capitalAmount);
-
                 installment.InstallmentValue = installmentValue;
                 installment.InterestAmount = interest;
                 installment.CapitalAmount = capitalAmount;
                 installment.PendingBalance = installmentValue;
                 installment.ModifiedAt = today;
-                installment.LastModifiedByIdUser = modifiedByUserId;
+
+                
+               // installment.LastModifiedByIdUser = modifiedByUserId; //en espera de adrian con el ICurrentUserServices
             }
+            #endregion
 
             return futureInstallments;
         }
+        #region private methos
 
         private static decimal MonthlyRate(decimal annualInterestRate)
             => annualInterestRate <= 0m ? 0m : annualInterestRate / 100m / 12m;
@@ -122,5 +156,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
         private static decimal Money(decimal value)
             => Math.Round(value, MoneyDecimals, MidpointRounding.AwayFromZero);
+        #endregion
+
     }
 }

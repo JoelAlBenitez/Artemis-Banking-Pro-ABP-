@@ -14,20 +14,17 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.CreditCar
 
             builder.Property(c => c.CardNumber)
                 .IsRequired()
-                .HasMaxLength(16)
+                .HasMaxLength(DomainConstants.CardNumberLength)
                 .IsUnicode(false);
 
             builder.HasIndex(c => c.CardNumber).IsUnique();
 
-            builder.Property(c => c.CvcHash)
-                .IsRequired();
-
-            builder.Property(c => c.ExpirationDate)
+            builder.Property(c => c.LastFourDigits)
                 .IsRequired()
-                .HasMaxLength(5)
+                .HasMaxLength(DomainConstants.LastFourDigitsLength)
                 .IsUnicode(false);
 
-            builder.Property(c => c.ClientId)
+            builder.Property(c => c.CustomerId)
                 .IsRequired()
                 .HasMaxLength(DomainConstants.IdentityUserIdLength);
 
@@ -37,9 +34,21 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.CreditCar
             builder.Property(c => c.OwedAmount)
                 .HasPrecision(DomainConstants.MoneyPrecision, DomainConstants.MoneyScale);
 
+            builder.Property(c => c.ExpirationDate)
+                .IsRequired();
+
+            builder.Property(c => c.CvcHash)
+                .IsRequired()
+                .HasMaxLength(DomainConstants.CvcHashLength)
+                .IsUnicode(false);
+
             builder.Property(c => c.Status)
                 .HasConversion<int>()
                 .IsRequired();
+
+            builder.Property(c => c.AssignedByAdminId)
+                .IsRequired()
+                .HasMaxLength(DomainConstants.IdentityUserIdLength);
 
             builder.Property(c => c.CreateByUserId)
                 .IsRequired()
@@ -48,9 +57,14 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.CreditCar
             builder.Property(c => c.LastModifiedByIdUser)
                 .HasMaxLength(DomainConstants.IdentityUserIdLength);
 
-            builder.HasMany(c => c.Consumptions)
-                .WithOne(con => con.CreditCard)
-                .HasForeignKey(con => con.CreditCardId)
+            builder.HasIndex(c => c.CustomerId);
+
+            builder.Ignore(c => c.AvailableCredit);
+            builder.Ignore(c => c.IsExpired);
+
+            builder.HasMany(c => c.cardConsumptions)
+                .WithOne(consumption => consumption.CreditCard)
+                .HasForeignKey(consumption => consumption.CreditCardId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
