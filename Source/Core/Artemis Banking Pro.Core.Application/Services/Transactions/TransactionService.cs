@@ -8,6 +8,8 @@ using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 using ArtemisBankingPro.Core.Domain.Entities.Transactions;
 using ArtemisBankingPro.Core.Domain.Interfaces.Beneficiaries;
+using ArtemisBankingPro.Core.Domain.Interfaces.CreditCards;
+using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
 using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Interfaces.Transactions;
 using Microsoft.Extensions.Logging;
@@ -20,6 +22,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
         private readonly ISavingsAccountsRepository _savingsAccountRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IBeneficiaryRepository _beneficiaryRepository;
+        private readonly ICreditCardsRepository _creditCardRepository;
+        private readonly ILoansRepository _loansRepository;
         private readonly ITransactionsValidationServices _validationServices;
         private readonly IEmailServices _emailServices;
         private readonly IMapper _mapper;
@@ -29,6 +33,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             ISavingsAccountsRepository savingsAccountRepository,
             ITransactionRepository transactionRepository,
             IBeneficiaryRepository beneficiaryRepository,
+            ICreditCardsRepository creditCardRepository,
+            ILoansRepository loansRepository,
             ITransactionsValidationServices validationServices,
             IEmailServices emailServices,
             IMapper mapper,
@@ -37,6 +43,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             _savingsAccountRepository = savingsAccountRepository;
             _transactionRepository = transactionRepository;
             _beneficiaryRepository = beneficiaryRepository;
+            _creditCardRepository = creditCardRepository;
+            _loansRepository = loansRepository;
             _validationServices = validationServices;
             _emailServices = emailServices;
             _mapper = mapper;
@@ -337,7 +345,14 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
         {
             // Pendiente: Integrar con IIdentityServices cuando Adrian complete el módulo para obtener clientes reales activos e inactivos
             var accounts = await _savingsAccountRepository.GetAllFindAsync(a => true);
-            var customerIds = accounts.Select(a => a.CustomerId).Distinct().ToList();
+            var cards = await _creditCardRepository.GetAllFindAsync(c => true);
+            var loans = await _loansRepository.GetAllFindAsync(l => true);
+
+            var customerIds = accounts.Select(a => a.CustomerId)
+                .Concat(cards.Select(c => c.CustomerId))
+                .Concat(loans.Select(l => l.CustomerId))
+                .Distinct()
+                .ToList();
 
             var clients = customerIds.Select(id => new ClientDto
             {
