@@ -9,8 +9,6 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.
         public TransactionMappingProfile()
         {
             CreateMap<Transaction, TransactionResultDto>()
-                .ForMember(d => d.TransactionType, o => o.MapFrom(s => s.TransactionType.ToString()))
-                .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()))
                 .ForMember(d => d.EffectiveAmount, o => o.MapFrom(s => s.Amount))
                 .ReverseMap();
         }
