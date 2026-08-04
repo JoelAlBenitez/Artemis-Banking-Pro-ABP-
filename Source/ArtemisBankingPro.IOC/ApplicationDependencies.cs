@@ -18,6 +18,8 @@ using Artemis_Banking_Pro.Core.Application.Contracts.Dashboard;
 using Artemis_Banking_Pro.Core.Application.Services.Dashboard;
 using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Artemis_Banking_Pro.Core.Application.Services.Transactions;
+using Artemis_Banking_Pro.Core.Application.Contracts.Beneficiaries;
+using Artemis_Banking_Pro.Core.Application.Services.Beneficiaries;
 
 namespace ArtemisBankingPro.IOC
 {
@@ -77,6 +79,7 @@ namespace ArtemisBankingPro.IOC
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<ITransactionsValidationServices, TransactionsValidationServices>();
+            services.AddScoped<IBeneficiaryServices, BeneficiaryServices>();
 
             return services;
         }
