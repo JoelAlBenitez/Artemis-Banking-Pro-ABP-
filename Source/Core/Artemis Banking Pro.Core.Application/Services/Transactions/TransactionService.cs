@@ -77,7 +77,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 }
 
                 _logger.LogInformation("Transferencia express procesada y guardada correctamente para el cliente {ClientId}", clientId);
-                SendExpressNotificationEmailsAsync(originAccount, destAccount, dto.Amount, clientId);
+                
+                var emailSent = await SendExpressNotificationEmailsAsync(originAccount, destAccount, dto.Amount, clientId);
+                if (!emailSent)
+                {
+                    result.Value!.WarningMessage = "La transacción fue realizada correctamente, pero no fue posible enviar una o más notificaciones por correo.";
+                }
 
                 return result;
             }
@@ -116,7 +121,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 }
 
                 _logger.LogInformation("Transferencia a beneficiario procesada y guardada correctamente para el cliente {ClientId}", clientId);
-                SendExpressNotificationEmailsAsync(originAccount, destAccount, dto.Amount, clientId);
+                
+                var emailSent = await SendExpressNotificationEmailsAsync(originAccount, destAccount, dto.Amount, clientId);
+                if (!emailSent)
+                {
+                    result.Value!.WarningMessage = "La transacción fue realizada correctamente, pero no fue posible enviar una o más notificaciones por correo.";
+                }
 
                 return result;
             }
@@ -142,13 +152,13 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             return ValidationResult<int>.Success(total);
         }
 
-        public async Task<ValidationResult> RegisterInitialTransactionAsync(int savingsAccountId, decimal amount, string performedByUserId)
+        public async Task<ValidationResult> RegisterInitialTransactionAsync(InitialTransactionDto dto)
         {
-            _logger.LogInformation("Registrando transacción inicial para la cuenta de ahorro ID {SavingsAccountId} por RD${Amount}", savingsAccountId, amount);
+            _logger.LogInformation("Registrando transacción inicial para la cuenta de ahorro ID {SavingsAccountId} por RD${Amount}", dto.SavingsAccountId, dto.Amount);
 
-            if (amount <= 0)
+            if (dto.Amount <= 0)
             {
-                _logger.LogWarning("Registro de transacción inicial fallido: el monto RD${Amount} debe ser mayor que cero", amount);
+                _logger.LogWarning("Registro de transacción inicial fallido: el monto RD${Amount} debe ser mayor que cero", dto.Amount);
                 return ValidationResult.Failure(TransactionError.InvalidAmount);
             }
 
@@ -156,32 +166,32 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             {
                 var transaction = new Transaction
                 {
-                    SavingsAccountId = savingsAccountId,
-                    Amount = amount,
+                    SavingsAccountId = dto.SavingsAccountId,
+                    Amount = dto.Amount,
                     TransactionType = TransactionType.Credito,
                     OperationType = OperationType.AperturaCuenta,
                     Origin = "DEPÓSITO APERTURA",
                     Status = TransactionStatus.Aprobada,
-                    PerformedByUserId = performedByUserId,
+                    PerformedByUserId = dto.PerformedByUserId,
                     Channel = ChannelPayment.Cliente,
                     CreatedAt = DateTimeOffset.UtcNow,
-                    CreateByUserId = performedByUserId
+                    CreateByUserId = dto.PerformedByUserId
                 };
 
                 await _transactionRepository.AddAsync(transaction);
                 var saveResult = await _transactionRepository.SaveChangesAsync();
                 if (saveResult <= 0)
                 {
-                    _logger.LogWarning("No se pudo persistir la transacción inicial para la cuenta de ahorro ID {SavingsAccountId}", savingsAccountId);
+                    _logger.LogWarning("No se pudo persistir la transacción inicial para la cuenta de ahorro ID {SavingsAccountId}", dto.SavingsAccountId);
                     return ValidationResult.Failure(GeneralError.UnexpectedError);
                 }
 
-                _logger.LogInformation("Transacción inicial registrada con éxito para la cuenta ID {SavingsAccountId}", savingsAccountId);
+                _logger.LogInformation("Transacción inicial registrada con éxito para la cuenta ID {SavingsAccountId}", dto.SavingsAccountId);
                 return ValidationResult.Success();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error crítico inesperado al registrar la transacción inicial para la cuenta ID {SavingsAccountId}", savingsAccountId);
+                _logger.LogError(ex, "Error crítico inesperado al registrar la transacción inicial para la cuenta ID {SavingsAccountId}", dto.SavingsAccountId);
                 return ValidationResult.Failure(GeneralError.UnexpectedError);
             }
         }
@@ -380,9 +390,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             };
         }
 
-        private void SendExpressNotificationEmailsAsync(SavingsAccount origin, SavingsAccount dest, decimal amount, string clientId)
+        private async Task<bool> SendExpressNotificationEmailsAsync(SavingsAccount origin, SavingsAccount dest, decimal amount, string clientId)
         {
-            // Pendiente: Obtener correos reales desde IIdentityServices cuando Adrian complete el módulo
             var emisorEmail = $"{clientId}@artemis.com";
             var receptorEmail = $"{dest.CustomerId}@artemis.com";
 
@@ -393,34 +402,26 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             {
                 _logger.LogInformation("Enviando correos de notificación de transferencia desde la cuenta ****{LastFourOrig} a la cuenta ****{LastFourDest}", lastFourOrig, lastFourDest);
                 
-                // Envío asíncrono no bloqueante
-                _ = Task.Run(async () =>
+                var sent1 = await _emailServices.SendNotification(new MessageDto
                 {
-                    try
-                    {
-                        await _emailServices.SendNotification(new MessageDto
-                        {
-                            To = emisorEmail,
-                            Subject = $"Transacción realizada a la cuenta {lastFourDest}",
-                            Message = $"Monto: RD${amount:N2}, Fecha: {DateTimeOffset.UtcNow}, Cuenta Destino: ****{lastFourDest}"
-                        });
-
-                        await _emailServices.SendNotification(new MessageDto
-                        {
-                            To = receptorEmail,
-                            Subject = $"Transacción enviada desde la cuenta {lastFourOrig}",
-                            Message = $"Monto: RD${amount:N2}, Fecha: {DateTimeOffset.UtcNow}, Cuenta Origen: ****{lastFourOrig}"
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Fallo al enviar correo de notificación en el hilo secundario.");
-                    }
+                    To = emisorEmail,
+                    Subject = $"Transacción realizada a la cuenta {lastFourDest}",
+                    Message = $"Monto: RD${amount:N2}, Fecha: {DateTimeOffset.UtcNow}, Cuenta Destino: ****{lastFourDest}"
                 });
+
+                var sent2 = await _emailServices.SendNotification(new MessageDto
+                {
+                    To = receptorEmail,
+                    Subject = $"Transacción enviada desde la cuenta {lastFourOrig}",
+                    Message = $"Monto: RD${amount:N2}, Fecha: {DateTimeOffset.UtcNow}, Cuenta Origen: ****{lastFourOrig}"
+                });
+
+                return sent1 && sent2;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Fallo al iniciar tarea en segundo plano para el envío de notificaciones.");
+                _logger.LogError(ex, "Fallo al enviar correo de notificación.");
+                return false;
             }
         }
 

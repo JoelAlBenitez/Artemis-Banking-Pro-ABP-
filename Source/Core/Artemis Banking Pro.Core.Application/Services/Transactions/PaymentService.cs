@@ -78,7 +78,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 }
 
                 _logger.LogInformation("Pago de tarjeta de crédito ID {CardId} procesado exitosamente por monto efectivo RD${EffectiveAmount}", dto.CreditCardId, effectiveAmount);
-                SendCreditCardPaymentEmailAsync(creditCard, effectiveAmount, clientId);
+                
+                var emailSent = await SendCreditCardPaymentEmailAsync(originAccount, creditCard, effectiveAmount, clientId);
+                if (!emailSent)
+                {
+                    result.Value!.WarningMessage = "La transacción fue realizada correctamente, pero no fue posible enviar una o más notificaciones por correo.";
+                }
 
                 return result;
             }
@@ -109,7 +114,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 }
 
                 _logger.LogInformation("Pago de préstamo ID {LoanId} procesado exitosamente por monto efectivo RD${EffectiveAmount}", dto.LoanId, effectiveAmount);
-                SendLoanPaymentEmailAsync(loan, effectiveAmount, clientId);
+                
+                var emailSent = await SendLoanPaymentEmailAsync(originAccount, loan, effectiveAmount, clientId);
+                if (!emailSent)
+                {
+                    result.Value!.WarningMessage = "La transacción fue realizada correctamente, pero no fue posible enviar una o más notificaciones por correo.";
+                }
 
                 return result;
             }
@@ -266,65 +276,50 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             }
         }
 
-        private void SendCreditCardPaymentEmailAsync(CreditCard card, decimal amount, string clientId)
+        private async Task<bool> SendCreditCardPaymentEmailAsync(SavingsAccount origin, CreditCard card, decimal amount, string clientId)
         {
             var email = $"{clientId}@artemis.com";
-            var lastFour = card.CardNumber.Length >= 4 ? card.CardNumber.Substring(card.CardNumber.Length - 4) : card.CardNumber;
+            var lastFourCard = card.CardNumber.Length >= 4 ? card.CardNumber.Substring(card.CardNumber.Length - 4) : card.CardNumber;
+            var lastFourOrig = origin.AccountNumber.Length >= 4 ? origin.AccountNumber.Substring(origin.AccountNumber.Length - 4) : origin.AccountNumber;
 
             try
             {
-                _logger.LogInformation("Enviando correo de notificación de pago a tarjeta ****{LastFour}", lastFour);
-                _ = Task.Run(async () =>
+                _logger.LogInformation("Enviando correo de notificación de pago a tarjeta ****{LastFourCard}", lastFourCard);
+                var sent = await _emailServices.SendNotification(new MessageDto
                 {
-                    try
-                    {
-                        await _emailServices.SendNotification(new MessageDto
-                        {
-                            To = email,
-                            Subject = $"Pago de tarjeta de crédito ****{lastFour} procesado",
-                            Message = $"Monto pagado: RD${amount:N2}, Fecha: {DateTimeOffset.UtcNow}"
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Fallo al enviar notificación por correo de pago de tarjeta.");
-                    }
+                    To = email,
+                    Subject = $"Pago realizado a la tarjeta {lastFourCard}",
+                    Message = $"Monto pagado: RD${amount:N2}, Cuenta Origen: ****{lastFourOrig}, Tarjeta: ****{lastFourCard}, Fecha: {DateTimeOffset.UtcNow}"
                 });
+                return sent;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Fallo al iniciar tarea en segundo plano para notificar pago de tarjeta.");
+                _logger.LogError(ex, "Fallo al enviar notificación por correo de pago de tarjeta.");
+                return false;
             }
         }
 
-        private void SendLoanPaymentEmailAsync(Loan loan, decimal amount, string clientId)
+        private async Task<bool> SendLoanPaymentEmailAsync(SavingsAccount origin, Loan loan, decimal amount, string clientId)
         {
             var email = $"{clientId}@artemis.com";
-            var lastFour = loan.LoanNumber.Length >= 4 ? loan.LoanNumber.Substring(loan.LoanNumber.Length - 4) : loan.LoanNumber;
+            var lastFourOrig = origin.AccountNumber.Length >= 4 ? origin.AccountNumber.Substring(origin.AccountNumber.Length - 4) : origin.AccountNumber;
 
             try
             {
-                _logger.LogInformation("Enviando correo de notificación de pago a préstamo ****{LastFour}", lastFour);
-                _ = Task.Run(async () =>
+                _logger.LogInformation("Enviando correo de notificación de pago a préstamo {LoanNumber}", loan.LoanNumber);
+                var sent = await _emailServices.SendNotification(new MessageDto
                 {
-                    try
-                    {
-                        await _emailServices.SendNotification(new MessageDto
-                        {
-                            To = email,
-                            Subject = $"Pago de préstamo ****{lastFour} procesado",
-                            Message = $"Monto pagado: RD${amount:N2}, Fecha: {DateTimeOffset.UtcNow}, Deuda restante: RD${loan.PendingAmount:N2}"
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Fallo al enviar notificación por correo de pago de préstamo.");
-                    }
+                    To = email,
+                    Subject = $"Pago realizado al préstamo {loan.LoanNumber}",
+                    Message = $"Monto pagado: RD${amount:N2}, Préstamo: {loan.LoanNumber}, Cuenta Origen: ****{lastFourOrig}, Fecha: {DateTimeOffset.UtcNow}"
                 });
+                return sent;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Fallo al iniciar tarea en segundo plano para notificar pago de préstamo.");
+                _logger.LogError(ex, "Fallo al enviar notificación por correo de pago de préstamo.");
+                return false;
             }
         }
 
