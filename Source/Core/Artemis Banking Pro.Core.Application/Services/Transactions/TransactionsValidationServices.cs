@@ -66,6 +66,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                     return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.DestinationAccountNotFound);
                 }
 
+                // TODO: Cuando Adrián envíe los elementos necesarios (servicios de Identity/Users), verificar la existencia y estado activo del cliente destino (destAccount.CustomerId) en el sistema para fines de reglas de negocio.
+
                 if (originAccount.Id == destAccount.Id)
                 {
                     _logger.LogWarning("Validación fallida: intento de transferencia entre la misma cuenta {AccountNumber}", dto.SourceAccountNumber);
@@ -120,6 +122,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                     _logger.LogWarning("Validación fallida: la cuenta del beneficiario {BeneficiaryAccountNumber} no existe o no está activa", beneficiary.BeneficiaryAccountNumber);
                     return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.DestinationAccountNotFound);
                 }
+
+                // TODO: Cuando Adrián envíe los elementos necesarios (servicios de Identity/Users), verificar la existencia y estado activo del cliente destino (destAccount.CustomerId) en el sistema para fines de reglas de negocio.
 
                 if (originAccount.Id == destAccount.Id)
                 {
