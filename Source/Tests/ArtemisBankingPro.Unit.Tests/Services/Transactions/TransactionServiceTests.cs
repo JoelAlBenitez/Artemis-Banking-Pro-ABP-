@@ -105,7 +105,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
             result.IsValid.Should().BeTrue();
             result.Value.Should().NotBeNull();
             result.Value!.EffectiveAmount.Should().Be(500m);
-            result.Value.Status.Should().Be("APROBADA");
+            result.Value.Status.Should().Be(TransactionStatus.Aprobada);
 
             originAccount.Balance.Should().Be(500m);
             destAccount.Balance.Should().Be(700m);

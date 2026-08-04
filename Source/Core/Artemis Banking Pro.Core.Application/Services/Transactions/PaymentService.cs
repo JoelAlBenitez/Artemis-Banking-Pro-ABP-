@@ -181,8 +181,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             var resultDto = new TransactionResultDto
             {
                 EffectiveAmount = effectiveAmount,
-                TransactionType = "DÉBITO",
-                Status = "APROBADA",
+                TransactionType = TransactionType.Debito,
+                Status = TransactionStatus.Aprobada,
                 CreatedAt = debitTx.CreatedAt
             };
 
@@ -232,8 +232,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             var resultDto = new TransactionResultDto
             {
                 EffectiveAmount = effectiveAmount,
-                TransactionType = "DÉBITO",
-                Status = "APROBADA",
+                TransactionType = TransactionType.Debito,
+                Status = TransactionStatus.Aprobada,
                 CreatedAt = debitTx.CreatedAt
             };
 
