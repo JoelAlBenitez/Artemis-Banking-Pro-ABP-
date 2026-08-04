@@ -3,10 +3,12 @@ using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
 using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
 using ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros;
+using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 using ArtemisBankingPro.Core.Domain.Entities.CreditCards;
 using ArtemisBankingPro.Core.Domain.Entities.Loans;
+using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Entities.Transactions;
 using ArtemisBankingPro.Core.Domain.Interfaces.CreditCards;
 using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
@@ -25,7 +27,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
         private readonly ICardConsumptionRepository _cardConsumptionRepository;
         private readonly ICardPaymentRepository _cardPaymentRepository;
         private readonly ILoanInstallmentRepository _loanInstallmentRepository;
-        private readonly ILoansPaymentRepository _loanPaymentRepository;
+        private readonly ILoansPaymentRepository _loansPaymentRepository;
         private readonly ITransactionsValidationServices _validationServices;
         private readonly IEmailServices _emailServices;
         private readonly ILogger<PaymentService> _logger;
@@ -38,7 +40,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             ICardConsumptionRepository cardConsumptionRepository,
             ICardPaymentRepository cardPaymentRepository,
             ILoanInstallmentRepository loanInstallmentRepository,
-            ILoansPaymentRepository loanPaymentRepository,
+            ILoansPaymentRepository loansPaymentRepository,
             ITransactionsValidationServices validationServices,
             IEmailServices emailServices,
             ILogger<PaymentService> logger)
@@ -50,7 +52,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             _cardConsumptionRepository = cardConsumptionRepository;
             _cardPaymentRepository = cardPaymentRepository;
             _loanInstallmentRepository = loanInstallmentRepository;
-            _loanPaymentRepository = loanPaymentRepository;
+            _loansPaymentRepository = loansPaymentRepository;
             _validationServices = validationServices;
             _emailServices = emailServices;
             _logger = logger;
@@ -58,57 +60,84 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
 
         public async Task<ValidationResult<TransactionResultDto>> PayCreditCardAsync(PayCreditCardDto dto, string clientId)
         {
+            _logger.LogInformation("Iniciando procesamiento de pago de tarjeta de crédito ID {CardId} para el cliente {ClientId} por RD${Amount}", dto.CreditCardId, clientId, dto.Amount);
+
             var validation = await _validationServices.ValidateCreditCardPaymentAsync(dto, clientId);
             if (!validation.IsValid)
             {
-                if (validation.Errors.Contains(TransactionError.InsufficientFunds))
-                {
-                    var srcAcc = await _savingsAccountRepository.GetFirstAsync(a => a.AccountNumber == dto.SourceAccountNumber);
-                    var cc = await _creditCardRepository.GetFirstAsync(c => c.Id == dto.CreditCardId);
-
-                    if (srcAcc is not null && cc is not null)
-                    {
-                        var effAmount = Math.Min(dto.Amount, cc.OwedAmount);
-                        var rejectedTx = new Transaction
-                        {
-                            SavingsAccountId = srcAcc.Id,
-                            Amount = effAmount,
-                            TransactionType = TransactionType.Debito,
-                            OperationType = OperationType.PagoTarjeta,
-                            Origin = srcAcc.AccountNumber,
-                            Beneficiary = cc.LastFourDigits,
-                            Status = TransactionStatus.Rechazada,
-                            RejectionReason = "Fondos insuficientes",
-                            PerformedByUserId = clientId,
-                            Channel = ChannelPayment.Cliente,
-                            CreatedAt = DateTimeOffset.UtcNow,
-                            CreateByUserId = clientId
-                        };
-
-                        await _transactionRepository.AddAsync(rejectedTx);
-                        await _transactionRepository.SaveChangesAsync();
-                    }
-                }
-
                 return ValidationResult<TransactionResultDto>.Failure(validation.Errors.ToList());
             }
 
-            var (originAccount, creditCard, effectiveAmount) = validation.Value;
+            try
+            {
+                var (originAccount, creditCard, effectiveAmount) = validation.Value;
+                var result = await ExecuteCreditCardPaymentAsync(originAccount, creditCard, dto.Amount, effectiveAmount, clientId);
+                if (!result.IsValid)
+                {
+                    return result;
+                }
 
+                _logger.LogInformation("Pago de tarjeta de crédito ID {CardId} procesado exitosamente por monto efectivo RD${EffectiveAmount}", dto.CreditCardId, effectiveAmount);
+                SendCreditCardPaymentEmailAsync(creditCard, effectiveAmount, clientId);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error crítico inesperado al procesar el pago de tarjeta para el cliente {ClientId}", clientId);
+                return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
+            }
+        }
+
+        public async Task<ValidationResult<TransactionResultDto>> PayLoanAsync(PayLoanDto dto, string clientId)
+        {
+            _logger.LogInformation("Iniciando procesamiento de pago de préstamo ID {LoanId} para el cliente {ClientId} por RD${Amount}", dto.LoanId, clientId, dto.Amount);
+
+            var validation = await _validationServices.ValidateLoanPaymentAsync(dto, clientId);
+            if (!validation.IsValid)
+            {
+                return ValidationResult<TransactionResultDto>.Failure(validation.Errors.ToList());
+            }
+
+            try
+            {
+                var (originAccount, loan, installments, effectiveAmount) = validation.Value;
+                var result = await ExecuteLoanPaymentAsync(originAccount, loan, installments, dto.Amount, effectiveAmount, clientId);
+                if (!result.IsValid)
+                {
+                    return result;
+                }
+
+                _logger.LogInformation("Pago de préstamo ID {LoanId} procesado exitosamente por monto efectivo RD${EffectiveAmount}", dto.LoanId, effectiveAmount);
+                SendLoanPaymentEmailAsync(loan, effectiveAmount, clientId);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error crítico inesperado al procesar el pago de préstamo para el cliente {ClientId}", clientId);
+                return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
+            }
+        }
+
+        #region Helper Methods
+
+        private async Task<ValidationResult<TransactionResultDto>> ExecuteCreditCardPaymentAsync(SavingsAccount originAccount, CreditCard creditCard, decimal requestedAmount, decimal effectiveAmount, string clientId)
+        {
             originAccount.Balance -= effectiveAmount;
             creditCard.OwedAmount -= effectiveAmount;
 
             await _savingsAccountRepository.UpdateAsync(originAccount);
             await _creditCardRepository.UpdateAsync(creditCard);
 
-            var transaction = new Transaction
+            var debitTx = new Transaction
             {
                 SavingsAccountId = originAccount.Id,
                 Amount = effectiveAmount,
                 TransactionType = TransactionType.Debito,
                 OperationType = OperationType.PagoTarjeta,
                 Origin = originAccount.AccountNumber,
-                Beneficiary = creditCard.LastFourDigits,
+                Beneficiary = creditCard.CardNumber,
                 Status = TransactionStatus.Aprobada,
                 PerformedByUserId = clientId,
                 Channel = ChannelPayment.Cliente,
@@ -116,14 +145,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 CreateByUserId = clientId
             };
 
-            await _transactionRepository.AddAsync(transaction);
-            await _transactionRepository.SaveChangesAsync();
-
             var cardPayment = new CardPayment
             {
                 CreditCardId = creditCard.Id,
-                TransactionId = transaction.Id,
-                RequestedAmount = dto.Amount,
+                TransactionId = 0,
+                Transaction = debitTx,
+                RequestedAmount = requestedAmount,
                 EffectiveAmount = effectiveAmount,
                 Channel = ChannelPayment.Cliente,
                 PerformedByUserId = clientId,
@@ -131,25 +158,14 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 CreateByUserId = clientId
             };
 
+            await _transactionRepository.AddAsync(debitTx);
             await _cardPaymentRepository.AddAsync(cardPayment);
-            await _cardPaymentRepository.SaveChangesAsync();
 
-            // Pendiente: Obtener correos reales desde IIdentityServices cuando Adrian complete el módulo
-            var emisorEmail = $"{clientId}@artemis.com";
-            var lastFourOrig = originAccount.AccountNumber.Length >= 4 ? originAccount.AccountNumber.Substring(originAccount.AccountNumber.Length - 4) : originAccount.AccountNumber;
-
-            try
+            var saveResult = await _transactionRepository.SaveChangesAsync();
+            if (saveResult <= 0)
             {
-                await _emailServices.SendNotification(new MessageDto
-                {
-                    To = emisorEmail,
-                    Subject = $"Pago realizado a la tarjeta {creditCard.LastFourDigits}",
-                    Message = $"Monto Pagado: RD${effectiveAmount:N2}, Cuenta Origen: ****{lastFourOrig}, Tarjeta Pagada: ****{creditCard.LastFourDigits}, Fecha: {transaction.CreatedAt}"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "La transacción fue realizada correctamente, pero no fue posible enviar una o más notificaciones por correo.");
+                _logger.LogWarning("Error de persistencia: no fue posible guardar el pago de tarjeta de crédito ID {CardId}", creditCard.Id);
+                return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
             }
 
             var resultDto = new TransactionResultDto
@@ -157,61 +173,18 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 EffectiveAmount = effectiveAmount,
                 TransactionType = "DÉBITO",
                 Status = "APROBADA",
-                CreatedAt = transaction.CreatedAt
+                CreatedAt = debitTx.CreatedAt
             };
 
             return ValidationResult<TransactionResultDto>.Success(resultDto);
         }
 
-        public async Task<ValidationResult<TransactionResultDto>> PayLoanAsync(PayLoanDto dto, string clientId)
+        private async Task<ValidationResult<TransactionResultDto>> ExecuteLoanPaymentAsync(SavingsAccount originAccount, Loan loan, List<LoanInstallment> installments, decimal requestedAmount, decimal effectiveAmount, string clientId)
         {
-            var validation = await _validationServices.ValidateLoanPaymentAsync(dto, clientId);
-            if (!validation.IsValid)
-            {
-                if (validation.Errors.Contains(TransactionError.InsufficientFunds))
-                {
-                    var srcAcc = await _savingsAccountRepository.GetFirstAsync(a => a.AccountNumber == dto.SourceAccountNumber);
-                    var ln = await _loansRepository.GetFirstAsync(l => l.Id == dto.LoanId);
-
-                    if (srcAcc is not null && ln is not null)
-                    {
-                        var insts = (await _loanInstallmentRepository.GetAllFindAsync(i => i.LoanId == ln.Id && i.paymentStatus != PaymentStatus.Pagada))
-                            .OrderBy(i => i.DueDate)
-                            .ToList();
-
-                        var totalPending = insts.Sum(i => i.PendingBalance);
-                        var effAmount = Math.Min(dto.Amount, totalPending);
-
-                        var rejectedTx = new Transaction
-                        {
-                            SavingsAccountId = srcAcc.Id,
-                            Amount = effAmount,
-                            TransactionType = TransactionType.Debito,
-                            OperationType = OperationType.PagoPrestamo,
-                            Origin = srcAcc.AccountNumber,
-                            Beneficiary = ln.LoanNumber,
-                            Status = TransactionStatus.Rechazada,
-                            RejectionReason = "Fondos insuficientes",
-                            PerformedByUserId = clientId,
-                            Channel = ChannelPayment.Cliente,
-                            CreatedAt = DateTimeOffset.UtcNow,
-                            CreateByUserId = clientId
-                        };
-
-                        await _transactionRepository.AddAsync(rejectedTx);
-                        await _transactionRepository.SaveChangesAsync();
-                    }
-                }
-
-                return ValidationResult<TransactionResultDto>.Failure(validation.Errors.ToList());
-            }
-
-            var (originAccount, loan, installments, effectiveAmount) = validation.Value;
-
             originAccount.Balance -= effectiveAmount;
             await _savingsAccountRepository.UpdateAsync(originAccount);
 
-            var transaction = new Transaction
+            var debitTx = new Transaction
             {
                 SavingsAccountId = originAccount.Id,
                 Amount = effectiveAmount,
@@ -226,72 +199,24 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 CreateByUserId = clientId
             };
 
-            await _transactionRepository.AddAsync(transaction);
-            await _transactionRepository.SaveChangesAsync();
+            await _transactionRepository.AddAsync(debitTx);
 
-            var remainingAmount = effectiveAmount;
-            foreach (var installment in installments)
-            {
-                if (remainingAmount <= 0) break;
-
-                var paymentForThisInstallment = Math.Min(remainingAmount, installment.PendingBalance);
-                installment.PendingBalance -= paymentForThisInstallment;
-
-                if (installment.PendingBalance <= 0)
-                {
-                    installment.paymentStatus = PaymentStatus.Pagada;
-                    installment.IsOverdue = false;
-                    installment.PaidAt = DateTimeOffset.UtcNow;
-                }
-                else
-                {
-                    installment.paymentStatus = PaymentStatus.ParcialmentePagada;
-                }
-
-                await _loanInstallmentRepository.UpdateAsync(installment);
-
-                var loanPayment = new LoanPayment
-                {
-                    LoandId = loan.Id,
-                    LoanInstallmentId = installment.Id,
-                    EffectiveAmount = paymentForThisInstallment,
-                    Channel = ChannelPayment.Cliente,
-                    PerformedByUserId = clientId,
-                    PaidAt = DateTimeOffset.UtcNow
-                };
-
-                await _loanPaymentRepository.AddAsync(loanPayment);
-                remainingAmount -= paymentForThisInstallment;
-            }
+            ApplyInstallmentPayments(installments, effectiveAmount, clientId);
 
             loan.PendingAmount -= effectiveAmount;
-
-            var hasUnpaid = await _loanInstallmentRepository.ExistElementByConsult(i => i.LoanId == loan.Id && i.paymentStatus != PaymentStatus.Pagada);
-            if (!hasUnpaid)
+            if (loan.PendingAmount <= 0)
             {
                 loan.Status = LoanStatus.Completado;
-                loan.CompletedAt = DateTimeOffset.UtcNow;
+                _logger.LogInformation("El préstamo ID {LoanId} ha sido completamente liquidado. Cambiando estado a Completado.", loan.Id);
             }
 
             await _loansRepository.UpdateAsync(loan);
-            await _loanInstallmentRepository.SaveChangesAsync();
 
-            // Pendiente: Obtener correos reales desde IIdentityServices cuando Adrian complete el módulo
-            var emisorEmail = $"{clientId}@artemis.com";
-            var lastFourOrig = originAccount.AccountNumber.Length >= 4 ? originAccount.AccountNumber.Substring(originAccount.AccountNumber.Length - 4) : originAccount.AccountNumber;
-
-            try
+            var saveResult = await _loanInstallmentRepository.SaveChangesAsync();
+            if (saveResult <= 0)
             {
-                await _emailServices.SendNotification(new MessageDto
-                {
-                    To = emisorEmail,
-                    Subject = $"Pago realizado al préstamo {loan.LoanNumber}",
-                    Message = $"Monto Pagado: RD${effectiveAmount:N2}, Cuenta Origen: ****{lastFourOrig}, Préstamo: {loan.LoanNumber}, Fecha: {transaction.CreatedAt}"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "La transacción fue realizada correctamente, pero no fue posible enviar una o más notificaciones por correo.");
+                _logger.LogWarning("Error de persistencia: no fue posible guardar los cambios de pago del préstamo ID {LoanId}", loan.Id);
+                return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
             }
 
             var resultDto = new TransactionResultDto
@@ -299,10 +224,110 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 EffectiveAmount = effectiveAmount,
                 TransactionType = "DÉBITO",
                 Status = "APROBADA",
-                CreatedAt = transaction.CreatedAt
+                CreatedAt = debitTx.CreatedAt
             };
 
             return ValidationResult<TransactionResultDto>.Success(resultDto);
         }
+
+        private void ApplyInstallmentPayments(List<LoanInstallment> installments, decimal effectiveAmount, string clientId)
+        {
+            var remainingPayment = effectiveAmount;
+            var now = DateTimeOffset.UtcNow;
+
+            foreach (var inst in installments)
+            {
+                if (remainingPayment <= 0) break;
+
+                var paymentToApply = Math.Min(remainingPayment, inst.PendingBalance);
+                inst.PendingBalance -= paymentToApply;
+                remainingPayment -= paymentToApply;
+
+                if (inst.PendingBalance <= 0)
+                {
+                    inst.paymentStatus = PaymentStatus.Pagada;
+                    inst.IsOverdue = false;
+                    inst.PaidAt = now;
+                }
+
+                _loanInstallmentRepository.UpdateAsync(inst);
+
+                var loanPayment = new LoanPayment
+                {
+                    LoandId = inst.LoanId,
+                    LoanInstallmentId = inst.Id,
+                    EffectiveAmount = paymentToApply,
+                    PaidAt = now,
+                    Channel = ChannelPayment.Cliente,
+                    PerformedByUserId = clientId
+                };
+
+                _loansPaymentRepository.AddAsync(loanPayment);
+            }
+        }
+
+        private void SendCreditCardPaymentEmailAsync(CreditCard card, decimal amount, string clientId)
+        {
+            var email = $"{clientId}@artemis.com";
+            var lastFour = card.CardNumber.Length >= 4 ? card.CardNumber.Substring(card.CardNumber.Length - 4) : card.CardNumber;
+
+            try
+            {
+                _logger.LogInformation("Enviando correo de notificación de pago a tarjeta ****{LastFour}", lastFour);
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _emailServices.SendNotification(new MessageDto
+                        {
+                            To = email,
+                            Subject = $"Pago de tarjeta de crédito ****{lastFour} procesado",
+                            Message = $"Monto pagado: RD${amount:N2}, Fecha: {DateTimeOffset.UtcNow}"
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Fallo al enviar notificación por correo de pago de tarjeta.");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Fallo al iniciar tarea en segundo plano para notificar pago de tarjeta.");
+            }
+        }
+
+        private void SendLoanPaymentEmailAsync(Loan loan, decimal amount, string clientId)
+        {
+            var email = $"{clientId}@artemis.com";
+            var lastFour = loan.LoanNumber.Length >= 4 ? loan.LoanNumber.Substring(loan.LoanNumber.Length - 4) : loan.LoanNumber;
+
+            try
+            {
+                _logger.LogInformation("Enviando correo de notificación de pago a préstamo ****{LastFour}", lastFour);
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _emailServices.SendNotification(new MessageDto
+                        {
+                            To = email,
+                            Subject = $"Pago de préstamo ****{lastFour} procesado",
+                            Message = $"Monto pagado: RD${amount:N2}, Fecha: {DateTimeOffset.UtcNow}, Deuda restante: RD${loan.PendingAmount:N2}"
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Fallo al enviar notificación por correo de pago de préstamo.");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Fallo al iniciar tarea en segundo plano para notificar pago de préstamo.");
+            }
+        }
+
+        #endregion
     }
 }
