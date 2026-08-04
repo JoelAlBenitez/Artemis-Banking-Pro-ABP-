@@ -6,6 +6,7 @@ using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 using ArtemisBankingPro.Core.Domain.Entities.Beneficiaries;
+using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Interfaces.Beneficiaries;
 using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
 using AutoMapper;
@@ -35,44 +36,15 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Beneficiaries
         {
             _logger.LogInformation("Iniciando registro de nuevo beneficiario para el cliente {ClientId} con cuenta {AccountNumber}", dto.OwnerClientId, dto.AccountNumber);
 
-            if (string.IsNullOrWhiteSpace(dto.AccountNumber) || dto.AccountNumber.Length != 9 || !dto.AccountNumber.All(char.IsDigit))
+            var validation = await ValidateBeneficiaryCreationAsync(dto);
+            if (!validation.IsValid)
             {
-                _logger.LogWarning("Registro fallido: el número de cuenta '{AccountNumber}' no tiene el formato válido de 9 dígitos", dto.AccountNumber);
-                return ValidationResult.Failure(BeneficiaryError.AccountNotFound);
+                return ValidationResult.Failure(validation.Errors.ToList());
             }
 
             try
             {
-                var savingsAccount = await _savingsAccountsRepository.GetFirstAsync(a => a.AccountNumber == dto.AccountNumber);
-                if (savingsAccount is null)
-                {
-                    _logger.LogWarning("Registro fallido: la cuenta de ahorros {AccountNumber} no existe", dto.AccountNumber);
-                    return ValidationResult.Failure(BeneficiaryError.AccountNotFound);
-                }
-
-                if (savingsAccount.Status != SavingsAccountStatus.Activa)
-                {
-                    _logger.LogWarning("Registro fallido: la cuenta de ahorros {AccountNumber} se encuentra cancelada o inactiva", dto.AccountNumber);
-                    return ValidationResult.Failure(BeneficiaryError.AccountCanceled);
-                }
-
-                if (savingsAccount.CustomerId == dto.OwnerClientId)
-                {
-                    _logger.LogWarning("Registro fallido: el cliente {ClientId} intentó agregarse a sí mismo como beneficiario", dto.OwnerClientId);
-                    return ValidationResult.Failure(BeneficiaryError.OwnAccount);
-                }
-
-                var alreadyExists = await _genericRepository.ExistElementByConsult(b => 
-                    b.OwnerClientId == dto.OwnerClientId && 
-                    b.BeneficiarySavingsAccountId == savingsAccount.Id && 
-                    b.IsActive);
-
-                if (alreadyExists)
-                {
-                    _logger.LogWarning("Registro fallido: la cuenta {AccountNumber} ya se encuentra registrada como beneficiario activo para el cliente {ClientId}", dto.AccountNumber, dto.OwnerClientId);
-                    return ValidationResult.Failure(BeneficiaryError.AlreadyRegistered);
-                }
-
+                var savingsAccount = validation.Value!;
                 var beneficiary = new Beneficiary
                 {
                     OwnerClientId = dto.OwnerClientId,
@@ -166,5 +138,50 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Beneficiaries
                 return ValidationResult<IReadOnlyCollection<BeneficiaryDto>>.Failure(GeneralError.UnexpectedError);
             }
         }
+
+        #region Helper Methods
+
+        private async Task<ValidationResult<SavingsAccount>> ValidateBeneficiaryCreationAsync(SaveBeneficiaryDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.AccountNumber) || dto.AccountNumber.Length != 9 || !dto.AccountNumber.All(char.IsDigit))
+            {
+                _logger.LogWarning("Validación fallida: el número de cuenta '{AccountNumber}' no tiene el formato válido de 9 dígitos", dto.AccountNumber);
+                return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AccountNotFound);
+            }
+
+            var savingsAccount = await _savingsAccountsRepository.GetFirstAsync(a => a.AccountNumber == dto.AccountNumber);
+            if (savingsAccount is null)
+            {
+                _logger.LogWarning("Validación fallida: la cuenta de ahorros {AccountNumber} no existe", dto.AccountNumber);
+                return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AccountNotFound);
+            }
+
+            if (savingsAccount.Status != SavingsAccountStatus.Activa)
+            {
+                _logger.LogWarning("Validación fallida: la cuenta de ahorros {AccountNumber} se encuentra cancelada o inactiva", dto.AccountNumber);
+                return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AccountCanceled);
+            }
+
+            if (savingsAccount.CustomerId == dto.OwnerClientId)
+            {
+                _logger.LogWarning("Validación fallida: el cliente {ClientId} intentó agregarse a sí mismo como beneficiario", dto.OwnerClientId);
+                return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.OwnAccount);
+            }
+
+            var alreadyExists = await _genericRepository.ExistElementByConsult(b => 
+                b.OwnerClientId == dto.OwnerClientId && 
+                b.BeneficiarySavingsAccountId == savingsAccount.Id && 
+                b.IsActive);
+
+            if (alreadyExists)
+            {
+                _logger.LogWarning("Validación fallida: la cuenta {AccountNumber} ya se encuentra registrada como beneficiario activo para el cliente {ClientId}", dto.AccountNumber, dto.OwnerClientId);
+                return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AlreadyRegistered);
+            }
+
+            return ValidationResult<SavingsAccount>.Success(savingsAccount);
+        }
+
+        #endregion
     }
 }
