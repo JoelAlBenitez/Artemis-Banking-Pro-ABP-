@@ -1,16 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Artemis_Banking_Pro.Core.Application.ViewModels.Transactions
 {
     public class PayCardViewModel
     {
-        [SetsRequiredMembers]
-        public PayCardViewModel()
-        {
-            SourceAccountNumber = null!;
-        }
-
         [Required(ErrorMessage = "Debe seleccionar la cuenta de ahorro de origen.")]
         public required string SourceAccountNumber { get; set; }
 
