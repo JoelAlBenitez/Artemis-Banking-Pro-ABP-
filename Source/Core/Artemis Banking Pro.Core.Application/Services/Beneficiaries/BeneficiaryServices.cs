@@ -1,14 +1,10 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.DTOs.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.Services.Generic;
-using ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
-using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 using ArtemisBankingPro.Core.Domain.Entities.Beneficiaries;
-using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Interfaces.Beneficiaries;
-using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 
@@ -18,17 +14,17 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Beneficiaries
         : GenericServices<SaveBeneficiaryDto, BeneficiaryDto, int, Beneficiary>,
           IBeneficiaryServices
     {
-        private readonly ISavingsAccountsRepository _savingsAccountsRepository;
+        private readonly IBeneficiaryValidationServices _validationServices;
         private readonly ILogger<BeneficiaryServices> _logger;
 
         public BeneficiaryServices(
             IBeneficiaryRepository beneficiaryRepository,
-            ISavingsAccountsRepository savingsAccountsRepository,
+            IBeneficiaryValidationServices validationServices,
             IMapper mapper,
             ILogger<BeneficiaryServices> logger)
             : base(beneficiaryRepository, mapper, logger)
         {
-            _savingsAccountsRepository = savingsAccountsRepository;
+            _validationServices = validationServices;
             _logger = logger;
         }
 
@@ -36,7 +32,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Beneficiaries
         {
             _logger.LogInformation("Iniciando registro de nuevo beneficiario para el cliente {ClientId} con cuenta {AccountNumber}", dto.OwnerClientId, dto.AccountNumber);
 
-            var validation = await ValidateBeneficiaryCreationAsync(dto);
+            var validation = await _validationServices.ValidateCreationAsync(dto);
             if (!validation.IsValid)
             {
                 return ValidationResult.Failure(validation.Errors.ToList());
@@ -77,15 +73,15 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Beneficiaries
         {
             _logger.LogInformation("Iniciando baja lógica de beneficiario ID {BeneficiaryId} para el cliente {ClientId}", id, ownerClientId);
 
+            var validationResult = await _validationServices.ValidateDeactivationAsync(id, ownerClientId);
+            if (!validationResult.IsValid)
+            {
+                return ValidationResult.Failure(validationResult.Errors.ToList());
+            }
+
             try
             {
-                var beneficiary = await _genericRepository.GetFirstAsync(b => b.Id == id && b.OwnerClientId == ownerClientId);
-                if (beneficiary is null)
-                {
-                    _logger.LogWarning("Baja lógica fallida: el beneficiario ID {BeneficiaryId} no existe o no pertenece al cliente {ClientId}", id, ownerClientId);
-                    return ValidationResult.Failure(BeneficiaryError.BeneficiaryNotFound);
-                }
-
+                var beneficiary = validationResult.Value!;
                 beneficiary.IsActive = false;
                 beneficiary.DeactivatedAt = DateTimeOffset.UtcNow;
                 beneficiary.LastModifiedByIdUser = ownerClientId;
@@ -138,50 +134,5 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Beneficiaries
                 return ValidationResult<IReadOnlyCollection<BeneficiaryDto>>.Failure(GeneralError.UnexpectedError);
             }
         }
-
-        #region Helper Methods
-
-        private async Task<ValidationResult<SavingsAccount>> ValidateBeneficiaryCreationAsync(SaveBeneficiaryDto dto)
-        {
-            if (string.IsNullOrWhiteSpace(dto.AccountNumber) || dto.AccountNumber.Length != 9 || !dto.AccountNumber.All(char.IsDigit))
-            {
-                _logger.LogWarning("Validación fallida: el número de cuenta '{AccountNumber}' no tiene el formato válido de 9 dígitos", dto.AccountNumber);
-                return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AccountNotFound);
-            }
-
-            var savingsAccount = await _savingsAccountsRepository.GetFirstAsync(a => a.AccountNumber == dto.AccountNumber);
-            if (savingsAccount is null)
-            {
-                _logger.LogWarning("Validación fallida: la cuenta de ahorros {AccountNumber} no existe", dto.AccountNumber);
-                return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AccountNotFound);
-            }
-
-            if (savingsAccount.Status != SavingsAccountStatus.Activa)
-            {
-                _logger.LogWarning("Validación fallida: la cuenta de ahorros {AccountNumber} se encuentra cancelada o inactiva", dto.AccountNumber);
-                return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AccountCanceled);
-            }
-
-            if (savingsAccount.CustomerId == dto.OwnerClientId)
-            {
-                _logger.LogWarning("Validación fallida: el cliente {ClientId} intentó agregarse a sí mismo como beneficiario", dto.OwnerClientId);
-                return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.OwnAccount);
-            }
-
-            var alreadyExists = await _genericRepository.ExistElementByConsult(b => 
-                b.OwnerClientId == dto.OwnerClientId && 
-                b.BeneficiarySavingsAccountId == savingsAccount.Id && 
-                b.IsActive);
-
-            if (alreadyExists)
-            {
-                _logger.LogWarning("Validación fallida: la cuenta {AccountNumber} ya se encuentra registrada como beneficiario activo para el cliente {ClientId}", dto.AccountNumber, dto.OwnerClientId);
-                return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AlreadyRegistered);
-            }
-
-            return ValidationResult<SavingsAccount>.Success(savingsAccount);
-        }
-
-        #endregion
     }
 }

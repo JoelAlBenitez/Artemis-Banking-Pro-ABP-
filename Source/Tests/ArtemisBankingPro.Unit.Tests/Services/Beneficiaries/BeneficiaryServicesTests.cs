@@ -2,14 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Artemis_Banking_Pro.Core.Application.Contracts.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.DTOs.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.Services.Beneficiaries;
 using ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
+using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 using ArtemisBankingPro.Core.Domain.Entities.Beneficiaries;
 using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Interfaces.Beneficiaries;
-using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
     public sealed class BeneficiaryServicesTests
     {
         private readonly Mock<IBeneficiaryRepository> _beneficiaryRepositoryMock;
-        private readonly Mock<ISavingsAccountsRepository> _savingsAccountsRepositoryMock;
+        private readonly Mock<IBeneficiaryValidationServices> _beneficiaryValidationServicesMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<ILogger<BeneficiaryServices>> _loggerMock;
         private readonly BeneficiaryServices _beneficiaryServices;
@@ -29,13 +30,13 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
         public BeneficiaryServicesTests()
         {
             _beneficiaryRepositoryMock = new Mock<IBeneficiaryRepository>();
-            _savingsAccountsRepositoryMock = new Mock<ISavingsAccountsRepository>();
+            _beneficiaryValidationServicesMock = new Mock<IBeneficiaryValidationServices>();
             _mapperMock = new Mock<IMapper>();
             _loggerMock = new Mock<ILogger<BeneficiaryServices>>();
 
             _beneficiaryServices = new BeneficiaryServices(
                 _beneficiaryRepositoryMock.Object,
-                _savingsAccountsRepositoryMock.Object,
+                _beneficiaryValidationServicesMock.Object,
                 _mapperMock.Object,
                 _loggerMock.Object
             );
@@ -50,10 +51,8 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
                 AccountNumber = "999999999"
             };
 
-            _savingsAccountsRepositoryMock.Setup(r => r.GetFirstAsync(
-                It.IsAny<Expression<Func<SavingsAccount, bool>>>(),
-                It.IsAny<Expression<Func<SavingsAccount, object>>[]>()
-            )).ReturnsAsync((SavingsAccount)null!);
+            _beneficiaryValidationServicesMock.Setup(r => r.ValidateCreationAsync(It.IsAny<SaveBeneficiaryDto>()))
+                .ReturnsAsync(ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AccountNotFound));
 
             var result = await _beneficiaryServices.CreateAsync(dto);
 
@@ -70,21 +69,8 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
                 AccountNumber = "111111111"
             };
 
-            var account = new SavingsAccount
-            {
-                Id = 1,
-                AccountNumber = "111111111",
-                CustomerId = "other-1",
-                Status = SavingsAccountStatus.Cancelada,
-                AccountType = SavingsAccountType.Secundaria,
-                CreateByUserId = "system",
-                CreatedAt = DateTimeOffset.UtcNow
-            };
-
-            _savingsAccountsRepositoryMock.Setup(r => r.GetFirstAsync(
-                It.IsAny<Expression<Func<SavingsAccount, bool>>>(),
-                It.IsAny<Expression<Func<SavingsAccount, object>>[]>()
-            )).ReturnsAsync(account);
+            _beneficiaryValidationServicesMock.Setup(r => r.ValidateCreationAsync(It.IsAny<SaveBeneficiaryDto>()))
+                .ReturnsAsync(ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AccountCanceled));
 
             var result = await _beneficiaryServices.CreateAsync(dto);
 
@@ -101,21 +87,8 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
                 AccountNumber = "222222222"
             };
 
-            var account = new SavingsAccount
-            {
-                Id = 2,
-                AccountNumber = "222222222",
-                CustomerId = "owner-1",
-                Status = SavingsAccountStatus.Activa,
-                AccountType = SavingsAccountType.Principal,
-                CreateByUserId = "system",
-                CreatedAt = DateTimeOffset.UtcNow
-            };
-
-            _savingsAccountsRepositoryMock.Setup(r => r.GetFirstAsync(
-                It.IsAny<Expression<Func<SavingsAccount, bool>>>(),
-                It.IsAny<Expression<Func<SavingsAccount, object>>[]>()
-            )).ReturnsAsync(account);
+            _beneficiaryValidationServicesMock.Setup(r => r.ValidateCreationAsync(It.IsAny<SaveBeneficiaryDto>()))
+                .ReturnsAsync(ValidationResult<SavingsAccount>.Failure(BeneficiaryError.OwnAccount));
 
             var result = await _beneficiaryServices.CreateAsync(dto);
 
@@ -132,25 +105,8 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
                 AccountNumber = "333333333"
             };
 
-            var account = new SavingsAccount
-            {
-                Id = 3,
-                AccountNumber = "333333333",
-                CustomerId = "other-2",
-                Status = SavingsAccountStatus.Activa,
-                AccountType = SavingsAccountType.Secundaria,
-                CreateByUserId = "system",
-                CreatedAt = DateTimeOffset.UtcNow
-            };
-
-            _savingsAccountsRepositoryMock.Setup(r => r.GetFirstAsync(
-                It.IsAny<Expression<Func<SavingsAccount, bool>>>(),
-                It.IsAny<Expression<Func<SavingsAccount, object>>[]>()
-            )).ReturnsAsync(account);
-
-            _beneficiaryRepositoryMock.Setup(r => r.ExistElementByConsult(
-                It.IsAny<Expression<Func<Beneficiary, bool>>>()
-            )).ReturnsAsync(true);
+            _beneficiaryValidationServicesMock.Setup(r => r.ValidateCreationAsync(It.IsAny<SaveBeneficiaryDto>()))
+                .ReturnsAsync(ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AlreadyRegistered));
 
             var result = await _beneficiaryServices.CreateAsync(dto);
 
@@ -178,14 +134,8 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
                 CreatedAt = DateTimeOffset.UtcNow
             };
 
-            _savingsAccountsRepositoryMock.Setup(r => r.GetFirstAsync(
-                It.IsAny<Expression<Func<SavingsAccount, bool>>>(),
-                It.IsAny<Expression<Func<SavingsAccount, object>>[]>()
-            )).ReturnsAsync(account);
-
-            _beneficiaryRepositoryMock.Setup(r => r.ExistElementByConsult(
-                It.IsAny<Expression<Func<Beneficiary, bool>>>()
-            )).ReturnsAsync(false);
+            _beneficiaryValidationServicesMock.Setup(r => r.ValidateCreationAsync(It.IsAny<SaveBeneficiaryDto>()))
+                .ReturnsAsync(ValidationResult<SavingsAccount>.Success(account));
 
             _beneficiaryRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Beneficiary>()))
                 .ReturnsAsync((Beneficiary b) => b);
@@ -219,10 +169,8 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
                 CreatedAt = DateTimeOffset.UtcNow
             };
 
-            _beneficiaryRepositoryMock.Setup(r => r.GetFirstAsync(
-                It.IsAny<Expression<Func<Beneficiary, bool>>>(),
-                It.IsAny<Expression<Func<Beneficiary, object>>[]>()
-            )).ReturnsAsync(beneficiary);
+            _beneficiaryValidationServicesMock.Setup(r => r.ValidateDeactivationAsync(10, "owner-1"))
+                .ReturnsAsync(ValidationResult<Beneficiary>.Success(beneficiary));
 
             _beneficiaryRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<Beneficiary>()))
                 .ReturnsAsync(true);
