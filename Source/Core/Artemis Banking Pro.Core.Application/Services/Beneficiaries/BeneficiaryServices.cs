@@ -41,15 +41,11 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Beneficiaries
             try
             {
                 var savingsAccount = validation.Value!;
-                var beneficiary = new Beneficiary
-                {
-                    OwnerClientId = dto.OwnerClientId,
-                    BeneficiarySavingsAccountId = savingsAccount.Id,
-                    BeneficiaryAccountNumber = dto.AccountNumber,
-                    IsActive = true,
-                    CreateByUserId = dto.OwnerClientId,
-                    CreatedAt = DateTimeOffset.UtcNow
-                };
+                var beneficiary = _mapper.Map<Beneficiary>(dto);
+                beneficiary.BeneficiarySavingsAccountId = savingsAccount.Id;
+                beneficiary.IsActive = true;
+                beneficiary.CreateByUserId = dto.OwnerClientId;
+                beneficiary.CreatedAt = DateTimeOffset.UtcNow;
 
                 await _genericRepository.AddAsync(beneficiary);
                 var saveResult = await _genericRepository.SaveChangesAsync();
@@ -116,14 +112,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Beneficiaries
                     b => b.BeneficiarySavingsAccount!
                 );
 
-                var dtos = beneficiaries.Select(b => new BeneficiaryDto
-                {
-                    Id = b.Id,
-                    AccountNumber = b.BeneficiaryAccountNumber,
-                    OwnerFullName = b.BeneficiarySavingsAccount is not null 
-                        ? $"Cliente {b.BeneficiarySavingsAccount.CustomerId}" 
-                        : "Cliente Desconocido"
-                }).ToList();
+                var dtos = _mapper.Map<IReadOnlyCollection<BeneficiaryDto>>(beneficiaries);
 
                 _logger.LogInformation("Se recuperaron {Count} beneficiarios activos para el cliente {ClientId}", dtos.Count, ownerClientId);
                 return ValidationResult<IReadOnlyCollection<BeneficiaryDto>>.Success(dtos);

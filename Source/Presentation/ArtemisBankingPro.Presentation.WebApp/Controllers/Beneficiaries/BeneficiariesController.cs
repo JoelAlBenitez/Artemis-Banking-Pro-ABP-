@@ -38,13 +38,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Beneficiaries
                 return View(new List<BeneficiaryListViewModel>());
             }
 
-            var viewModels = result.Value!.Select(d => new BeneficiaryListViewModel
-            {
-                Id = d.Id,
-                Name = d.OwnerFullName.StartsWith("Cliente ") ? d.OwnerFullName : "Cliente",
-                LastName = d.OwnerFullName.StartsWith("Cliente ") ? d.OwnerFullName.Replace("Cliente ", "") : "Asociado",
-                AccountNumber = d.AccountNumber
-            }).ToList();
+            var viewModels = _mapper.Map<List<BeneficiaryListViewModel>>(result.Value);
 
             return View(viewModels);
         }

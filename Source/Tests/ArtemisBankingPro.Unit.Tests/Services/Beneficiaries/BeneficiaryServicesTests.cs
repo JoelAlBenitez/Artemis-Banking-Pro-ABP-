@@ -137,6 +137,17 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
             _beneficiaryValidationServicesMock.Setup(r => r.ValidateCreationAsync(It.IsAny<SaveBeneficiaryDto>()))
                 .ReturnsAsync(ValidationResult<SavingsAccount>.Success(account));
 
+            _mapperMock.Setup(m => m.Map<Beneficiary>(It.IsAny<SaveBeneficiaryDto>()))
+                .Returns((SaveBeneficiaryDto s) => new Beneficiary
+                {
+                    OwnerClientId = s.OwnerClientId,
+                    BeneficiaryAccountNumber = s.AccountNumber,
+                    BeneficiarySavingsAccountId = 0,
+                    IsActive = true,
+                    CreateByUserId = s.OwnerClientId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                });
+
             _beneficiaryRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Beneficiary>()))
                 .ReturnsAsync((Beneficiary b) => b);
 
