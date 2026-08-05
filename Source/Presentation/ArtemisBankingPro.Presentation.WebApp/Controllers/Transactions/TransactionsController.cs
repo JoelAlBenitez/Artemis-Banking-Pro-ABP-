@@ -43,7 +43,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
             }
 
             await PopulateSavingsAccountsAsync(clientId);
-            return View(new ExpressTransactionViewModel());
+            return View(new ExpressTransactionViewModel { SourceAccountNumber = "", DestinationAccountNumber = "" });
         }
 
         [HttpPost]
@@ -91,7 +91,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
 
             await PopulateSavingsAccountsAsync(clientId);
             await PopulateBeneficiariesAsync(clientId);
-            return View(new BeneficiaryTransactionViewModel());
+            return View(new BeneficiaryTransactionViewModel { SourceAccountNumber = "" });
         }
 
         [HttpPost]
@@ -141,7 +141,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
 
             await PopulateSavingsAccountsAsync(clientId);
             await PopulateCreditCardsAsync(clientId);
-            return View(new PayCardViewModel());
+            return View(new PayCardViewModel { SourceAccountNumber = "" });
         }
 
         [HttpPost]
@@ -191,7 +191,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
 
             await PopulateSavingsAccountsAsync(clientId);
             await PopulateLoansAsync(clientId);
-            return View(new PayLoanViewModel());
+            return View(new PayLoanViewModel { SourceAccountNumber = "" });
         }
 
         [HttpPost]

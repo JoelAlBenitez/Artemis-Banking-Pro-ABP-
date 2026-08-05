@@ -52,7 +52,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Beneficiaries
         [HttpGet]
         public IActionResult Add()
         {
-            return View(new SaveBeneficiaryViewModel());
+            return View(new SaveBeneficiaryViewModel { AccountNumber = "" });
         }
 
         [HttpPost]
