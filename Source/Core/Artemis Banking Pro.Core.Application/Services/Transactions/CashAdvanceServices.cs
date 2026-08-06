@@ -11,6 +11,7 @@ using ArtemisBankingPro.Core.Domain.Entities.Transactions;
 using ArtemisBankingPro.Core.Domain.Interfaces.CreditCards;
 using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Interfaces.Transactions;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
@@ -24,6 +25,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
         private readonly ICardConsumptionRepository _cardConsumptionRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IEmailServices _emailServices;
+        private readonly IMapper _mapper;
         private readonly ILogger<CashAdvanceServices> _logger;
 
         public CashAdvanceServices(
@@ -34,6 +36,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             ICardConsumptionRepository cardConsumptionRepository,
             ITransactionRepository transactionRepository,
             IEmailServices emailServices,
+            IMapper mapper,
             ILogger<CashAdvanceServices> logger)
         {
             _validationServices = validationServices;
@@ -43,6 +46,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             _cardConsumptionRepository = cardConsumptionRepository;
             _transactionRepository = transactionRepository;
             _emailServices = emailServices;
+            _mapper = mapper;
             _logger = logger;
         }
 
@@ -125,20 +129,11 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
 
                 var emailSent = await SendCashAdvanceEmailAsync(card.LastFourDigits, account.AccountNumber, dto.Amount, interestAmount, totalCharged, clientId);
 
-                var lastFourAccount = account.AccountNumber.Length >= 4 
-                    ? account.AccountNumber.Substring(account.AccountNumber.Length - 4) 
-                    : account.AccountNumber;
+                // Asignamos las referencias en memoria para que AutoMapper resuelva las propiedades de navegación de la tarjeta y cuenta
+                cashAdvance.CreditCard = card;
+                cashAdvance.SavingsAccount = account;
 
-                var resultDto = new CashAdvanceDto
-                {
-                    RequestedAmount = dto.Amount,
-                    InterestAmount = interestAmount,
-                    TotalCharged = totalCharged,
-                    CardLastFourDigits = card.LastFourDigits,
-                    AccountLastFourDigits = lastFourAccount,
-                    CreatedAt = cashAdvance.CreatedAt
-                };
-
+                var resultDto = _mapper.Map<CashAdvanceDto>(cashAdvance);
                 return ValidationResult<CashAdvanceDto>.Success(resultDto);
             }
             catch (Exception ex)
