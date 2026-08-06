@@ -87,6 +87,10 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Registration
             await _userManager.AddToRoleAsync(user, request.Role);
             response.UserId = user.Id;
 
+            // TODO: llamar a ISavingsAccountService.CreatePrimaryAccountAsync(user.Id, 0.00m)
+            // Se debe crear automáticamente una cuenta de ahorro principal al registrar un Cliente de forma atómica.
+            // Avisar a Joel para exponer esta interfaz.
+
             _logger.LogInformation("Usuario {UserName} registrado exitosamente con rol {Role}.", request.UserName, request.Role);
             return response;
         }
