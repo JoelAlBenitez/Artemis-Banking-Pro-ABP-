@@ -9,10 +9,15 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.
         public BeneficiaryMappingProfile()
         {
             CreateMap<Beneficiary, BeneficiaryDto>()
-                .ForMember(d => d.OwnerFullName, o => o.Ignore())
-                .ReverseMap();
+                .ForMember(d => d.AccountNumber, o => o.MapFrom(s => s.BeneficiaryAccountNumber))
+                .ForMember(d => d.OwnerFullName, o => o.MapFrom(s => s.BeneficiarySavingsAccount != null 
+                    ? $"Cliente {s.BeneficiarySavingsAccount.CustomerId}" 
+                    : "Cliente Desconocido"))
+                .ReverseMap()
+                .ForMember(d => d.BeneficiarySavingsAccount, o => o.Ignore());
 
             CreateMap<SaveBeneficiaryDto, Beneficiary>()
+                .ForMember(d => d.BeneficiaryAccountNumber, o => o.MapFrom(s => s.AccountNumber))
                 .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.IsActive, o => o.Ignore())
                 .ForMember(d => d.DeactivatedAt, o => o.Ignore())

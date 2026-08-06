@@ -11,6 +11,7 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.Beneficia
         {
             builder.ToTable("Beneficiaries");
             builder.HasKey(b => b.Id);
+            builder.HasQueryFilter(b => b.IsActive);
 
             builder.Property(b => b.OwnerClientId)
                 .IsRequired()

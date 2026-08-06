@@ -13,8 +13,8 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndRevers
                 .ReverseMap();
 
             CreateMap<BeneficiaryDto, BeneficiaryListViewModel>()
-                .ForMember(d => d.Name, o => o.Ignore())
-                .ForMember(d => d.LastName, o => o.Ignore())
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.OwnerFullName.StartsWith("Cliente ") ? "Cliente" : s.OwnerFullName))
+                .ForMember(d => d.LastName, o => o.MapFrom(s => s.OwnerFullName.StartsWith("Cliente ") ? s.OwnerFullName.Replace("Cliente ", "") : "Asociado"))
                 .ReverseMap();
         }
     }
