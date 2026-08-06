@@ -7,18 +7,12 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Seeds
     {
         public static async Task SeedAsync(RoleManager<IdentityRole> roleManager)
         {
-            string[] roles = { 
-                Roles.Administrador.ToString(), 
-                Roles.Cajero.ToString(), 
-                Roles.Cliente.ToString(), 
-                Roles.Comercio.ToString() 
-            };
-
-            foreach (var role in roles)
+            foreach (Roles role in Enum.GetValues(typeof(Roles)))
             {
-                if (!await roleManager.RoleExistsAsync(role))
+                var roleName = role.ToString();
+                if (!await roleManager.RoleExistsAsync(roleName))
                 {
-                    await roleManager.CreateAsync(new IdentityRole(role));
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
                 }
             }
         }
