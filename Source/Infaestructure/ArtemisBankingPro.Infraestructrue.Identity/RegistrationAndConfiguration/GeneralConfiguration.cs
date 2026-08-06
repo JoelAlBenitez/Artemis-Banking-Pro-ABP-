@@ -28,6 +28,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguratio
             services.AddScoped<IPasswordRecoveryService, PasswordRecoveryService>();
             services.AddScoped<IAccountRegistrationService, AccountRegistrationService>();
             services.AddScoped<IUserManagementService, UserManagementService>();
+            services.AddScoped<ArtemisBankingPro.Infraestructrue.Identity.Interfaces.IGenerateTokens, ArtemisBankingPro.Infraestructrue.Identity.Services.Tokens.GenerateTokens>();
         }
     }
 }

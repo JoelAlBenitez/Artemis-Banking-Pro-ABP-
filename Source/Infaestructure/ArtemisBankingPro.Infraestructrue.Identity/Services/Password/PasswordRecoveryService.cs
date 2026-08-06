@@ -6,6 +6,7 @@ using ArtemisBankingPro.Core.Application.Contracts.Users.ExternalUsers;
 using ArtemisBankingPro.Core.Application.Contracts.Users.InternalUsers;
 using ArtemisBankingPro.Core.Application.Contracts.Users.Tokens;
 using ArtemisBankingPro.Infraestructrue.Identity.Entities;
+using ArtemisBankingPro.Infraestructrue.Identity.Interfaces;
 using Artemis_Banking_Pro.Core.Application.Contracts.EmailSerives;
 using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailServices _emailServices;
         private readonly ILogger<PasswordRecoveryService> _logger;
+        private readonly IGenerateTokens _generateTokens;
 
         private const string TokenProvider = "ResetPasswordProvider";
         private const string TokenDateKey = "TokenDate";
@@ -28,24 +30,25 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
         public PasswordRecoveryService(
             UserManager<ApplicationUser> userManager,
             IEmailServices emailServices,
-            ILogger<PasswordRecoveryService> logger)
+            ILogger<PasswordRecoveryService> logger,
+            IGenerateTokens generateTokens)
         {
             _userManager = userManager;
             _emailServices = emailServices;
             _logger = logger;
+            _generateTokens = generateTokens;
         }
 
         public async Task<ForgotPasswordResponse> ForgotPasswordAsync(ForgotPasswordRequest request, string origin)
         {
-            _logger.LogInformation("Iniciando solicitud de restablecimiento de contraseÃ±a para el usuario {UserName}", request.UserName);
+            _logger.LogInformation("Iniciando solicitud de restablecimiento de contraseña para el usuario {UserName}", request.UserName);
             var response = new ForgotPasswordResponse();
             var user = await _userManager.FindByNameAsync(request.UserName);
 
             if (user == null || string.IsNullOrEmpty(user.Email))
             {
                 _logger.LogWarning("Restablecimiento fallido: El usuario {UserName} no existe o no tiene correo registrado.", request.UserName);
-                response.HasError = true;
-                response.Error = "Este usuario no tiene un correo electrÃ³nico registrado. No es posible enviar la solicitud de restablecimiento.";
+                // Retornar éxito ficticio para evitar la enumeración de usuarios
                 return response;
             }
 
@@ -59,7 +62,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
                 return response;
             }
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var token = await _generateTokens.GenerateTokenResetPasswordAsync(user, origin);
             user.IsActive = false;
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
@@ -70,7 +73,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
                 return response;
             }
 
-            // Guarda metadata del token (fecha de creaciÃ³n y estado de uso)
+            // Guarda metadata del token (fecha de creación y estado de uso)
             var tokenDateResult = await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, TokenDateKey, DateTime.UtcNow.ToString("o"));
             var tokenUsedResult = await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, TokenUsedKey, "false");
             
@@ -88,8 +91,8 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
             await _emailServices.SendNotification(new MessageDto
             {
                 To = user.Email!,
-                Subject = "Restablecimiento de contraseÃ±a",
-                Message = $"<p>Hola {user.FirstName},</p><p>Hemos recibido una solicitud para restablecer la contraseÃ±a de su cuenta.</p><p>Para continuar, haga clic en el siguiente enlace:</p><p><a href='{verificationUri}'>{verificationUri}</a></p><p>Este enlace tendrÃ¡ una vigencia de 30 minutos.</p><p>Si usted no solicitÃ³ este cambio, ignore este mensaje.</p>"
+                Subject = "Restablecimiento de contraseña",
+                Message = $"<p>Hola {user.FirstName},</p><p>Hemos recibido una solicitud para restablecer la contraseña de su cuenta.</p><p>Para continuar, haga clic en el siguiente enlace:</p><p><a href='{verificationUri}'>{verificationUri}</a></p><p>Este enlace tendrá una vigencia de 30 minutos.</p><p>Si usted no solicitó este cambio, ignore este mensaje.</p>"
             });
 
             _logger.LogInformation("Correo de restablecimiento enviado exitosamente a {Email} para {UserName}", user.Email, user.UserName);
@@ -98,23 +101,23 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
 
         public async Task<ResetPasswordResponse> ResetPasswordAsync(ResetPasswordRequest request)
         {
-            _logger.LogInformation("Iniciando confirmaciÃ³n de nueva contraseÃ±a para la cuenta con email {Email}", request.Email);
+            _logger.LogInformation("Iniciando confirmación de nueva contraseña para la cuenta con email {Email}", request.Email);
             var response = new ResetPasswordResponse();
 
             if (request.Password != request.ConfirmPassword)
             {
-                _logger.LogWarning("Fallo al restablecer contraseÃ±a: Las contraseÃ±as no coinciden para el email {Email}.", request.Email);
+                _logger.LogWarning("Fallo al restablecer contraseña: Las contraseñas no coinciden para el email {Email}.", request.Email);
                 response.HasError = true;
-                response.Error = "La contraseÃ±a y la confirmaciÃ³n de contraseÃ±a deben coincidir.";
+                response.Error = "La contraseña y la confirmación de contraseña deben coincidir.";
                 return response;
             }
 
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                _logger.LogWarning("Fallo al restablecer contraseÃ±a: El usuario con email {Email} no existe.", request.Email);
+                _logger.LogWarning("Fallo al restablecer contraseña: El usuario con email {Email} no existe.", request.Email);
                 response.HasError = true;
-                response.Error = "El enlace de restablecimiento no es vÃ¡lido.";
+                response.Error = "El enlace de restablecimiento no es válido.";
                 return response;
             }
 
@@ -122,20 +125,20 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
             var tokenUsed = await _userManager.GetAuthenticationTokenAsync(user, TokenProvider, TokenUsedKey);
             if (tokenUsed == "true")
             {
-                _logger.LogWarning("Fallo al restablecer contraseÃ±a: El token ya fue usado para {UserId}.", user.Id);
+                _logger.LogWarning("Fallo al restablecer contraseña: El token ya fue usado para {UserId}.", user.Id);
                 response.HasError = true;
                 response.Error = "Este enlace de restablecimiento ya fue utilizado.";
                 return response;
             }
 
-            // 2. Verificar si el token expirÃ³ (30 minutos)
+            // 2. Verificar si el token expiró (30 minutos)
             var tokenDateStr = await _userManager.GetAuthenticationTokenAsync(user, TokenProvider, TokenDateKey);
             if (!string.IsNullOrEmpty(tokenDateStr) &&
                 DateTime.TryParse(tokenDateStr, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var tokenDate))
             {
                 if ((DateTime.UtcNow - tokenDate).TotalMinutes > 30)
                 {
-                    _logger.LogWarning("Fallo al restablecer contraseÃ±a: El token expirÃ³ para {UserId}.", user.Id);
+                    _logger.LogWarning("Fallo al restablecer contraseña: El token expiró para {UserId}.", user.Id);
                     response.HasError = true;
                     response.Error = "El enlace de restablecimiento ha expirado.";
                     return response;
@@ -146,9 +149,9 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
             var result = await _userManager.ResetPasswordAsync(user, request.Token, request.Password);
             if (!result.Succeeded)
             {
-                _logger.LogWarning("Fallo al restablecer contraseÃ±a: Token invÃ¡lido o error de Identity para {UserId}.", user.Id);
+                _logger.LogWarning("Fallo al restablecer contraseña: Token inválido o error de Identity para {UserId}.", user.Id);
                 response.HasError = true;
-                response.Error = "El enlace de restablecimiento no es vÃ¡lido.";
+                response.Error = "El enlace de restablecimiento no es válido.";
                 return response;
             }
 
@@ -162,14 +165,13 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
 
             if (!setTokenResult.Succeeded || !stampResult.Succeeded || !updateResult.Succeeded)
             {
-                _logger.LogError("Error crÃ­tico al guardar el restablecimiento (SetToken/SecurityStamp/Update) para {UserId}.", user.Id);
+                _logger.LogError("Error crítico al guardar el restablecimiento (SetToken/SecurityStamp/Update) para {UserId}.", user.Id);
                 response.HasError = true;
-                response.Error = "OcurriÃ³ un error al finalizar el restablecimiento. Intente nuevamente.";
+                response.Error = "Ocurrió un error al finalizar el restablecimiento. Intente nuevamente.";
                 return response;
             }
 
-            _logger.LogInformation("ContraseÃ±a restablecida y cuenta reactivada exitosamente para {UserId}.", user.Id);
-
+            _logger.LogInformation("Contraseña restablecida y cuenta reactivada exitosamente para {UserId}.", user.Id);
             return response;
         }
 
@@ -182,8 +184,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
 
             if (user == null || string.IsNullOrEmpty(user.Email))
             {
-                response.HasError = true;
-                response.Error = "Este usuario no tiene un correo electrÃ³nico registrado. No es posible enviar la solicitud de restablecimiento.";
+                // Retornar éxito ficticio para evitar la enumeración de usuarios
                 return response;
             }
 
@@ -196,19 +197,19 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
                 return response;
             }
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var token = await _generateTokens.GenerateTokenResetPasswordAsync(user, "");
             user.IsActive = false;
             await _userManager.UpdateAsync(user);
 
-            // Guarda metadata del token (fecha de creaciÃ³n y estado de uso)
+            // Guarda metadata del token (fecha de creación y estado de uso)
             await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, TokenDateKey, DateTime.UtcNow.ToString("o"));
             await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, TokenUsedKey, "false");
 
             await _emailServices.SendNotification(new MessageDto
             {
                 To = user.Email!,
-                Subject = "Token de restablecimiento de contraseÃ±a",
-                Message = $"<p>Hola {user.FirstName},</p><p>Se ha generado un token para restablecer la contraseÃ±a de su cuenta.</p><p>Token de restablecimiento:<br><strong>{token}</strong></p><p>Utilice este token en el endpoint correspondiente para completar el cambio de contraseÃ±a.</p><p>Si usted no solicitÃ³ este cambio, ignore este mensaje.</p>"
+                Subject = "Token de restablecimiento de contraseña",
+                Message = $"<p>Hola {user.FirstName},</p><p>Se ha generado un token para restablecer la contraseña de su cuenta.</p><p>Token de restablecimiento:<br><strong>{token}</strong></p><p>Utilice este token en el endpoint correspondiente para completar el cambio de contraseña.</p><p>Si usted no solicitó este cambio, ignore este mensaje.</p>"
             });
 
             return response;
@@ -221,7 +222,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
             if (request.Password != request.ConfirmPassword)
             {
                 response.HasError = true;
-                response.Error = "La contraseÃ±a y la confirmaciÃ³n de contraseÃ±a deben coincidir.";
+                response.Error = "La contraseña y la confirmación de contraseña deben coincidir.";
                 return response;
             }
 
@@ -229,7 +230,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
             if (user == null)
             {
                 response.HasError = true;
-                response.Error = "El enlace de restablecimiento no es vÃ¡lido.";
+                response.Error = "El enlace de restablecimiento no es válido.";
                 return response;
             }
 
@@ -242,7 +243,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
                 return response;
             }
 
-            // 2. Verificar si el token expirÃ³ (30 minutos)
+            // 2. Verificar si el token expiró (30 minutos)
             var tokenDateStr = await _userManager.GetAuthenticationTokenAsync(user, TokenProvider, TokenDateKey);
             if (!string.IsNullOrEmpty(tokenDateStr) &&
                 DateTime.TryParse(tokenDateStr, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var tokenDate))
@@ -260,7 +261,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
             if (!result.Succeeded)
             {
                 response.HasError = true;
-                response.Error = "El enlace de restablecimiento no es vÃ¡lido.";
+                response.Error = "El enlace de restablecimiento no es válido.";
                 return response;
             }
 
@@ -275,7 +276,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
             if (!stampResult.Succeeded || !updateResult.Succeeded)
             {
                 response.HasError = true;
-                response.Error = "OcurriÃ³ un error al finalizar el restablecimiento. Intente nuevamente.";
+                response.Error = "Ocurrió un error al finalizar el restablecimiento. Intente nuevamente.";
                 return response;
             }
 
