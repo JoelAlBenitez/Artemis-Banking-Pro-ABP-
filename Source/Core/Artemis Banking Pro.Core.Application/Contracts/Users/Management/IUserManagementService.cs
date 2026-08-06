@@ -11,7 +11,7 @@ namespace ArtemisBankingPro.Core.Application.Contracts.Users.Management
         // 1
         Task<PagedResponseDto<UserDto>> GetUsersAsync(int page, int pageSize, StatusFilter status);
         // 2
-        Task<PagedResponseDto<UserDto>> GetUsersByRoleAsync(string roleName, int page, int pageSize);
+        Task<PagedResponseDto<UserDto>> GetUsersByRoleAsync(Roles role, int page, int pageSize);
         // 3
         Task<List<string>> GetRolesAsync();
         // 5

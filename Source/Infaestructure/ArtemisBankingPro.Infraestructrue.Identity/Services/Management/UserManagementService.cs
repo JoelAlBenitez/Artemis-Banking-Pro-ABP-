@@ -2,6 +2,7 @@ using ArtemisBankingPro.Core.Application.DTOs.Common;
 using ArtemisBankingPro.Core.Application.DTOs.Users;
 using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
+using ArtemisBankingPro.Core.Domain.Common.Constants;
 using ArtemisBankingPro.Infraestructrue.Identity.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -36,7 +37,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
         public async Task<PagedResponseDto<UserDto>> GetUsersAsync(int page, int pageSize, StatusFilter status)
         {
             _logger.LogInformation("Obteniendo lista de usuarios. Pagina: {Page}, Status: {Status}", page, status);
-            var query = _userManager.Users.Where(u => u.Id != "SYSTEM");
+            var query = _userManager.Users.AsNoTracking();
 
             if (status == StatusFilter.Activos)
                 query = query.Where(u => u.IsActive);
@@ -45,7 +46,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
 
             var users = await query
                 .OrderByDescending(u => u.IsActive)
-                .ThenByDescending(u => u.Id)
+                .ThenByDescending(u => u.CreatedAt)
                 .ToListAsync();
 
             var dtos = new List<UserDto>();
@@ -56,15 +57,15 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
                 if (roles.Contains(Roles.Comercio.ToString())) continue;
 
                 var dto = _mapper.Map<UserDto>(user);
-                dto.TypeUser = roles.FirstOrDefault() ?? "Sin Rol";
+                if (System.Enum.TryParse<Roles>(roles.FirstOrDefault(), true, out var roleEnum))
+                {
+                    dto.TypeUser = roleEnum;
+                }
                 dtos.Add(dto);
             }
 
-            // Paged services max 20 records, order descending (ya estan order descending por id arriba, paginamos aqui)
-            var pagedDtos = dtos.Take(pageSize > 20 ? 20 : pageSize).ToList();
-            if (page > 1) {
-                pagedDtos = dtos.Skip((page - 1) * (pageSize > 20 ? 20 : pageSize)).Take(pageSize > 20 ? 20 : pageSize).ToList();
-            }
+            var limit = pageSize > DomainConstants.MaxPageSize ? DomainConstants.MaxPageSize : pageSize;
+            var pagedDtos = dtos.Skip((page - 1) * limit).Take(limit).ToList();
 
             return new PagedResponseDto<UserDto>
             {
@@ -74,32 +75,33 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
         }
 
         // 2
-        public async Task<PagedResponseDto<UserDto>> GetUsersByRoleAsync(string roleName, int page, int pageSize)
+        public async Task<PagedResponseDto<UserDto>> GetUsersByRoleAsync(Roles role, int page, int pageSize)
         {
-            _logger.LogInformation("Obteniendo usuarios por rol: {RoleName}. Pagina: {Page}", roleName, page);
+            _logger.LogInformation("Obteniendo usuarios por rol: {Role}. Pagina: {Page}", role, page);
             
             // Parte 3: El rol Comercio queda excluido de forma permanente
-            if (roleName == Roles.Comercio.ToString()) 
+            if (role == Roles.Comercio) 
                 return new PagedResponseDto<UserDto> { Items = new List<UserDto>(), TotalCount = 0 };
 
-            var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
-            var dtos = new List<UserDto>();
+            var usersInRole = await _userManager.GetUsersInRoleAsync(role.ToString());
+            
+            var dtos = usersInRole
+                .OrderByDescending(u => u.IsActive)
+                .ThenByDescending(u => u.CreatedAt)
+                .Select(user => {
+                    var dto = _mapper.Map<UserDto>(user);
+                    dto.TypeUser = role;
+                    return dto;
+                })
+                .ToList();
 
-            foreach (var user in usersInRole)
-            {
-                var dto = _mapper.Map<UserDto>(user);
-                dto.TypeUser = roleName;
-                dtos.Add(dto);
-            }
-
-            var ordered = dtos.OrderByDescending(u => u.IdUser).ToList();
-            var realPageSize = pageSize > 20 ? 20 : pageSize;
-            var pagedDtos = ordered.Skip((page - 1) * realPageSize).Take(realPageSize).ToList();
+            var limit = pageSize > DomainConstants.MaxPageSize ? DomainConstants.MaxPageSize : pageSize;
+            var pagedDtos = dtos.Skip((page - 1) * limit).Take(limit).ToList();
 
             return new PagedResponseDto<UserDto>
             {
                 Items = pagedDtos,
-                TotalCount = ordered.Count
+                TotalCount = dtos.Count
             };
         }
 

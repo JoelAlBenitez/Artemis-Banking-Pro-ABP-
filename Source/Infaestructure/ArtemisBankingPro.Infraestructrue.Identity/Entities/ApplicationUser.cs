@@ -8,5 +8,6 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Entities
         public string LastName { get; set; } = null!;
         public string IDCARD { get; set; } = null!;
         public bool IsActive { get; set; } = false;
+        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     }
 }
