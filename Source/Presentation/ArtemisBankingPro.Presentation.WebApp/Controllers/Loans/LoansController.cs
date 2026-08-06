@@ -60,6 +60,24 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
         #endregion
 
         #region asignar prestamo
+        //Paso 1: clientes activos sin préstamo activo y monto promedio de deuda del sistema.
+        [HttpGet]
+        public async Task<IActionResult> Assign(string? idCard)
+        {
+            var result = await _loansServices.GetCustomersForAssignmentAsync(idCard);
+
+            if (!result.IsValid)
+            {
+                AddErrors(result);
+                return RedirectToAction(nameof(Index));
+            }
+
+            var vm = _mapper.Map<ClientsForLoanAssignmentViewModel>(result.Value!);
+            vm.IdCard = idCard;
+
+            return View(vm);
+        }
+
         //Paso 1: llega el cliente elegido en el formulario de selección y se muestra el paso 2.
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -68,7 +86,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
             if (string.IsNullOrWhiteSpace(customerId))
             {
                 _logger.LogWarning("Intento de asignacion de prestamo sin cliente seleccionado");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Assign));
             }
 
             return View("Create", new LoansAssigmentViewModel
@@ -87,7 +105,49 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
         {
             if (!ModelState.IsValid) return View(vm);
 
-            var result = await _loansServices.CreateAsync(_mapper.Map<LoansAssignmentDto>(vm));
+            var dto = _mapper.Map<LoansAssignmentDto>(vm);
+
+            //Antes de registrar se evalúa el riesgo: si el cliente es o se convierte en cliente de
+            //alto riesgo y el administrador aún no ha confirmado, se muestra la advertencia.
+            if (!vm.ConfirmHighRisk)
+            {
+                var risk = await _loansServices.EvaluateRiskAsync(dto);
+
+                if (!risk.IsValid)
+                {
+                    AddErrors(risk);
+                    return View(vm);
+                }
+
+                if (risk.Value!.RequiresConfirmation)
+                {
+                    var warning = _mapper.Map<RiskWarningViewModel>(dto);
+                    _mapper.Map(risk.Value, warning);
+
+                    return View(nameof(RiskWarning), warning);
+                }
+            }
+
+            var result = await _loansServices.CreateAsync(dto);
+
+            if (!result.IsValid)
+            {
+                AddErrors(result);
+                return View(vm);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        //Botón Confirmar asignación de la pantalla de advertencia. Cancelar regresa al listado.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RiskWarning(RiskWarningViewModel vm)
+        {
+            var dto = _mapper.Map<LoansAssignmentDto>(vm);
+            dto.ConfirmHighRisk = true;
+
+            var result = await _loansServices.CreateAsync(dto);
 
             if (!result.IsValid)
             {
