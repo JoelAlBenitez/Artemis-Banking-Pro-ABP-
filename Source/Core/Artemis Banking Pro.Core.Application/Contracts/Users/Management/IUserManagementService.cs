@@ -33,5 +33,6 @@ namespace ArtemisBankingPro.Core.Application.Contracts.Users.Management
         // 12
         Task<ClientSummaryDto?> GetClientByIdCardAsync(string idCard);
         Task<RegisterResponse> UpdateUserAsync(string id, EditUserDto dto);
+        Task<PagedResponseDto<UserDto>> GetCommerceUsersAsync(int page, int pageSize);
     }
 }

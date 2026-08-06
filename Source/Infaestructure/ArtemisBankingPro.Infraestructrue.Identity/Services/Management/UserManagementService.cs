@@ -381,5 +381,31 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
 
             return response;
         }
+
+        public async Task<PagedResponseDto<UserDto>> GetCommerceUsersAsync(int page, int pageSize)
+        {
+            _logger.LogInformation("Obteniendo usuarios con rol Comercio. Pagina: {Page}", page);
+            
+            var usersInRole = await _userManager.GetUsersInRoleAsync(Roles.Comercio.ToString());
+            
+            var dtos = usersInRole
+                .OrderByDescending(u => u.IsActive)
+                .ThenByDescending(u => u.CreatedAt)
+                .Select(user => {
+                    var dto = _mapper.Map<UserDto>(user);
+                    dto.TypeUser = Roles.Comercio;
+                    return dto;
+                })
+                .ToList();
+
+            var limit = pageSize > DomainConstants.MaxPageSize ? DomainConstants.MaxPageSize : pageSize;
+            var pagedDtos = dtos.Skip((page - 1) * limit).Take(limit).ToList();
+
+            return new PagedResponseDto<UserDto>
+            {
+                Items = pagedDtos,
+                TotalCount = dtos.Count
+            };
+        }
     }
 }
