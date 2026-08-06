@@ -1,0 +1,12 @@
+C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Core\ArtemisBankingPro.Core.Domain\bin\Debug\net9.0\ArtemisBankingPro.Core.Domain.deps.json
+C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Core\ArtemisBankingPro.Core.Domain\bin\Debug\net9.0\ArtemisBankingPro.Core.Domain.dll
+C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Core\ArtemisBankingPro.Core.Domain\bin\Debug\net9.0\ArtemisBankingPro.Core.Domain.pdb
+C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Core\ArtemisBankingPro.Core.Domain\obj\Debug\net9.0\ArtemisBankingPro.Core.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Core\ArtemisBankingPro.Core.Domain\obj\Debug\net9.0\ArtemisBankingPro.Core.Domain.AssemblyInfoInputs.cache
+C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Core\ArtemisBankingPro.Core.Domain\obj\Debug\net9.0\ArtemisBankingPro.Core.Domain.AssemblyInfo.cs
+C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Core\ArtemisBankingPro.Core.Domain\obj\Debug\net9.0\ArtemisBankingPro.Core.Domain.csproj.CoreCompileInputs.cache
+C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Core\ArtemisBankingPro.Core.Domain\obj\Debug\net9.0\ArtemisBankingPro.Core.Domain.sourcelink.json
+C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Core\ArtemisBankingPro.Core.Domain\obj\Debug\net9.0\ArtemisBankingPro.Core.Domain.dll
+C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Core\ArtemisBankingPro.Core.Domain\obj\Debug\net9.0\refint\ArtemisBankingPro.Core.Domain.dll
+C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Core\ArtemisBankingPro.Core.Domain\obj\Debug\net9.0\ArtemisBankingPro.Core.Domain.pdb
+C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Core\ArtemisBankingPro.Core.Domain\obj\Debug\net9.0\ref\ArtemisBankingPro.Core.Domain.dll

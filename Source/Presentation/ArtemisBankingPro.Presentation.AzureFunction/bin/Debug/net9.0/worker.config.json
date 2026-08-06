@@ -1,0 +1,10 @@
+{
+  "description": {
+    "language": "dotnet-isolated",
+    "extensions": [ ".dll" ],
+    "defaultExecutablePath": "dotnet",
+    "defaultWorkerPath": "ArtemisBankingPro.Presentation.AzureFunction.dll",
+    "workerIndexing": "true",
+    "canUsePlaceholder": true
+  }
+}

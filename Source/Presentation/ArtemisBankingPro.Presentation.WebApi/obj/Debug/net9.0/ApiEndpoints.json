@@ -1,0 +1,66 @@
+[
+  {
+    "ContainingType": "ArtemisBankingPro.Presentation.WebApi.Controllers.AccountController",
+    "Method": "ConfirmAccount",
+    "RelativePath": "api/Account/confirm",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "ArtemisBankingPro.Presentation.WebApi.Controllers.ConfirmAccountRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ArtemisBankingPro.Presentation.WebApi.Controllers.AccountController",
+    "Method": "GetResetToken",
+    "RelativePath": "api/Account/get-reset-token",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "ArtemisBankingPro.Core.Application.DTOs.Account.ForgotPasswordRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ArtemisBankingPro.Presentation.WebApi.Controllers.AccountController",
+    "Method": "Login",
+    "RelativePath": "api/Account/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "ArtemisBankingPro.Core.Application.DTOs.Account.AuthenticationRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ArtemisBankingPro.Presentation.WebApi.Controllers.AccountController",
+    "Method": "ResetPassword",
+    "RelativePath": "api/Account/reset-password",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "ArtemisBankingPro.Core.Application.DTOs.Account.ResetPasswordApiRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

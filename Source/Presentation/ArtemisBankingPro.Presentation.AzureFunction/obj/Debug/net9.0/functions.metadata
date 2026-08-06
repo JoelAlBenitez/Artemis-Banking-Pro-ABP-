@@ -1,0 +1,20 @@
+[
+  {
+    "name": "OverdueLoanInstallments",
+    "scriptFile": "ArtemisBankingPro.Presentation.AzureFunction.dll",
+    "entryPoint": "ArtemisBankingPro.Presentation.AzureFunction.Functions.Loans.OverdueLoanInstallmentsFunction.Run",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "timer",
+        "direction": "In",
+        "type": "timerTrigger",
+        "schedule": "%LoansOverdueScheduleCron%",
+        "properties": {}
+      }
+    ]
+  }
+]
