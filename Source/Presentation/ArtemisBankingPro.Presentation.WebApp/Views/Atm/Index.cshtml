@@ -1,44 +1,44 @@
-@model ArtemisBankingPro.Core.Application.ViewModels.Cajero.DashboardCajeroViewModel
+@model ArtemisBankingPro.Core.Application.ViewModels.Atm.AtmDashboardViewModel
 @{
-    ViewData["Title"] = "Home Cajero";
+    ViewData["Title"] = "ATM Dashboard";
     Layout = "_CajeroLayout";
 }
 
 <div class="text-center mb-4">
-    <h1 class="display-4">Panel del Cajero</h1>
-    <p>Resumen operativo del día actual</p>
+    <h1 class="display-4">ATM Dashboard</h1>
+    <p>Operational summary for today</p>
 </div>
 
 <div class="row">
     <div class="col-md-3 mb-4">
         <div class="card text-white bg-primary h-100">
             <div class="card-body">
-                <h5 class="card-title">Transacciones realizadas hoy</h5>
-                <p class="card-text display-6">@Model.TransaccionesRealizadasHoy</p>
+                <h5 class="card-title">Transactions Made Today</h5>
+                <p class="card-text display-6">@Model.TransactionsMadeToday</p>
             </div>
         </div>
     </div>
     <div class="col-md-3 mb-4">
         <div class="card text-white bg-success h-100">
             <div class="card-body">
-                <h5 class="card-title">Pagos realizados hoy</h5>
-                <p class="card-text display-6">@Model.PagosRealizadosHoy</p>
+                <h5 class="card-title">Payments Made Today</h5>
+                <p class="card-text display-6">@Model.PaymentsMadeToday</p>
             </div>
         </div>
     </div>
     <div class="col-md-3 mb-4">
         <div class="card text-white bg-info h-100">
             <div class="card-body">
-                <h5 class="card-title">Depósitos realizados hoy</h5>
-                <p class="card-text display-6">@Model.DepositosRealizadosHoy</p>
+                <h5 class="card-title">Deposits Made Today</h5>
+                <p class="card-text display-6">@Model.DepositsMadeToday</p>
             </div>
         </div>
     </div>
     <div class="col-md-3 mb-4">
         <div class="card text-white bg-warning h-100">
             <div class="card-body">
-                <h5 class="card-title">Retiros realizados hoy</h5>
-                <p class="card-text display-6">@Model.RetirosRealizadosHoy</p>
+                <h5 class="card-title">Withdrawals Made Today</h5>
+                <p class="card-text display-6">@Model.WithdrawalsMadeToday</p>
             </div>
         </div>
     </div>

@@ -11,7 +11,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Cajero" asp-action="Index">Artemis ATM</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Atm" asp-action="Index">Artemis ATM</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -19,22 +19,22 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cajero" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Atm" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cajero" asp-action="Deposito">Depósito</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Atm" asp-action="Deposit">Depósito</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cajero" asp-action="Retiro">Retiro</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Atm" asp-action="Withdraw">Retiro</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cajero" asp-action="PagoTarjeta">Pago a tarjeta de crédito</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Atm" asp-action="CreditCardPayment">Pago a tarjeta de crédito</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cajero" asp-action="PagoPrestamo">Pago a préstamo</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Atm" asp-action="LoanPayment">Pago a préstamo</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cajero" asp-action="TransferenciaTerceros">Transacciones a cuentas de terceros</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Atm" asp-action="ThirdPartyTransfer">Transacciones a cuentas de terceros</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav">
