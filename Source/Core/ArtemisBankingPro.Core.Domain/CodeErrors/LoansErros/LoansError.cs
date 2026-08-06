@@ -42,5 +42,33 @@ namespace ArtemisBankingPro.Core.Domain.CodeErrors.LoansErros
 
         public static readonly Error NonExistLoansByIndicateState
             = new("Advertencia", "No existen prestamos para el estado indicado.");
+
+        //Literales de las páginas 34-43 que faltaban por centralizar
+
+        public static readonly Error NonSelectedCustomer
+            = new("Error", "Debe seleccionar un cliente para continuar.");
+
+        public static readonly Error InvalidAmount
+            = new("Error", "El monto a prestar debe ser mayor que cero.");
+
+        public static readonly Error CustomerWithCurrentHighRisk
+            = new("Advertencia", "Este cliente se considera de alto riesgo, ya que su deuda actual supera el promedio del sistema.");
+
+        public static readonly Error CustomerWithProjectedHighRisk
+            = new("Advertencia", "Asignar este préstamo convertirá al cliente en un cliente de alto riesgo, ya que su deuda superará el umbral promedio del sistema.");
+
+        public static readonly Error LoanCreatedWithoutNotification
+            = new("Advertencia", "El préstamo fue creado correctamente, pero no fue posible enviar el correo de notificación.");
+
+        //Casos que el documento funcional no cubre, construidos con el mismo patrón
+
+        public static readonly Error FailedGenerateLoanNumber
+            = new("Error", "El número del préstamo no pudo ser generado. Favor intente de nuevo más tarde.");
+
+        public static readonly Error CustomerIsNotActive
+            = new("Error", "Solo se pueden asignar préstamos a clientes activos.");
+
+        public static readonly Error AdminNotIdentified
+            = new("Error", "No fue posible identificar al administrador responsable de la asignación.");
     }
 }

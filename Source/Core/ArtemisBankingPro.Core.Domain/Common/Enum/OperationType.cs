@@ -11,6 +11,10 @@ namespace ArtemisBankingPro.Core.Domain.Common.Enum
         PagoTarjeta = 7,
         PagoPrestamo = 8,
         AvanceEfectivo = 9,
-        PagoHermesPay = 10
+        PagoHermesPay = 10,
+
+        //Acreditación del capital aprobado de un préstamo en la cuenta principal del cliente.
+        //Se agrega al final para no alterar los valores ya persistidos por los demás módulos.
+        DesembolsoPrestamo = 11
     }
 }
