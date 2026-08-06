@@ -7,7 +7,8 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.Loans
 {
     public interface ILoansValidateServices
     {
-        Task<ValidationResult> EditValidateAnnualInterestRateAsync(int Id);
+        //Devuelve el préstamo con sus cuotas ya cargadas: el servicio no lo vuelve a consultar
+        Task<ValidationResult<Loan>> EditValidateAnnualInterestRateAsync(int Id);
         Task<ValidationResult> AssigmentLoansValidateAsync(LoansAssignmentDto assignment);
         Task<ValidationResult> GetLoansByCustomerValidateAsync(LoansFilterDto dto);
     }

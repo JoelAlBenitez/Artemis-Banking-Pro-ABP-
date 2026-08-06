@@ -1,6 +1,5 @@
 namespace Artemis_Banking_Pro.Core.Application.DTOs.Loans
 {
-    //Datos del préstamo aprobado que viajan al correo de notificación (pág. 43).
     public sealed class LoanAssignedDto
     {
         public required string CustomerId { get; set; }

@@ -2,8 +2,7 @@ using ArtemisBankingPro.Core.Domain.Common.Enum;
 
 namespace Artemis_Banking_Pro.Core.Application.ViewModels.Loans
 {
-    //Pantalla de advertencia de riesgo. Solo lectura: los datos del préstamo viajan para poder
-    //reenviar la asignación cuando el administrador pulsa Confirmar asignación.
+    
     public sealed class RiskWarningViewModel
     {
         public required string CustomerId { get; set; }
