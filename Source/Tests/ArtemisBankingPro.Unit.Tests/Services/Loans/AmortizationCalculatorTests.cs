@@ -1,5 +1,4 @@
-using System;
-using System.Linq;
+
 using Artemis_Banking_Pro.Core.Application.Services.Loans;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Entities.Loans;
