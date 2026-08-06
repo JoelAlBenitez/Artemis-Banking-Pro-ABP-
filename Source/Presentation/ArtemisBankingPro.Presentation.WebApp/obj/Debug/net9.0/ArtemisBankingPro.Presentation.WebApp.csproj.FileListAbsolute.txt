@@ -273,4 +273,3 @@ C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\Artem
 C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\ArtemisB.F0FAB873.Up2Date
 C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\ArtemisBankingPro.Presentation.WebApp.genruntimeconfig.cache
 C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\ref\ArtemisBankingPro.Presentation.WebApp.dll
-C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

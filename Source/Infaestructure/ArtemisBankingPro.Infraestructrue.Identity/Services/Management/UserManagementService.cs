@@ -57,7 +57,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
                 if (roles.Contains(Roles.Comercio.ToString())) continue;
 
                 var dto = _mapper.Map<UserDto>(user);
-                dto.Role = roles.FirstOrDefault() ?? "Sin Rol";
+                dto.TypeUser = roles.FirstOrDefault() ?? "Sin Rol";
                 dtos.Add(dto);
             }
 
@@ -89,11 +89,11 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
             foreach (var user in usersInRole)
             {
                 var dto = _mapper.Map<UserDto>(user);
-                dto.Role = roleName;
+                dto.TypeUser = roleName;
                 dtos.Add(dto);
             }
 
-            var ordered = dtos.OrderByDescending(x => x.Id).ToList();
+            var ordered = dtos.OrderByDescending(u => u.IdUser).ToList();
             var realPageSize = pageSize > 20 ? 20 : pageSize;
             var pagedDtos = ordered.Skip((page - 1) * realPageSize).Take(realPageSize).ToList();
 
@@ -150,15 +150,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
             // Parte 3: El rol Comercio queda excluido de forma permanente
             if (roles.Contains(Roles.Comercio.ToString())) return null;
 
-            return new UserDetailDto
-            {
-                Id = user.Id,
-                UserName = user.UserName!,
-                Name = user.FirstName,
-                LastName = user.LastName,
-                IDCARD = user.IDCARD,
-                Email = user.Email!
-            };
+            return _mapper.Map<UserDetailDto>(user);
         }
 
         // 7
@@ -226,12 +218,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
             
             return usersInRole
                 .Where(u => u.IsActive)
-                .Select(u => new ClientSummaryDto
-                {
-                    IDCARD = u.IDCARD,
-                    FullName = $"{u.FirstName} {u.LastName}",
-                    Email = u.Email!
-                })
+                .Select(u => _mapper.Map<ClientSummaryDto>(u))
                 .ToList();
         }
 
@@ -252,12 +239,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
             var isClient = await _userManager.IsInRoleAsync(user, Roles.Cliente.ToString());
             if (!isClient) return null;
 
-            return new ClientSummaryDto
-            {
-                IDCARD = user.IDCARD,
-                FullName = $"{user.FirstName} {user.LastName}",
-                Email = user.Email!
-            };
+            return _mapper.Map<ClientSummaryDto>(user);
         }
     }
 }
