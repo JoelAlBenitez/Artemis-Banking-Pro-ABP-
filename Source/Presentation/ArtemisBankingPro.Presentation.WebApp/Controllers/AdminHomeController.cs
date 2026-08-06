@@ -1,10 +1,10 @@
-using ArtemisBankingPro.Core.Domain.Enums;
+using ArtemisBankingPro.Core.Domain.Common.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArtemisBankingPro.Presentation.WebApp.Controllers
 {
-    [Authorize(Roles = Roles.Administrador)]
+    [Authorize(Roles = nameof(Roles.Administrador))]
     public class AdminHomeController : Controller
     {
         public IActionResult Index() => View();

@@ -2,7 +2,6 @@ using ArtemisBankingPro.Core.Application.DTOs.Common;
 using ArtemisBankingPro.Core.Application.DTOs.Users;
 using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
-using ArtemisBankingPro.Core.Domain.Enums;
 using ArtemisBankingPro.Infraestructrue.Identity.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;

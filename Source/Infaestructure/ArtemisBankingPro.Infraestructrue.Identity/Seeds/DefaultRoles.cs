@@ -1,4 +1,4 @@
-using ArtemisBankingPro.Core.Domain.Enums;
+using ArtemisBankingPro.Core.Domain.Common.Enum;
 using Microsoft.AspNetCore.Identity;
 
 namespace ArtemisBankingPro.Infraestructrue.Identity.Seeds
@@ -7,7 +7,12 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Seeds
     {
         public static async Task SeedAsync(RoleManager<IdentityRole> roleManager)
         {
-            string[] roles = { Roles.Administrador, Roles.Cajero, Roles.Cliente, Roles.Comercio };
+            string[] roles = { 
+                Roles.Administrador.ToString(), 
+                Roles.Cajero.ToString(), 
+                Roles.Cliente.ToString(), 
+                Roles.Comercio.ToString() 
+            };
 
             foreach (var role in roles)
             {

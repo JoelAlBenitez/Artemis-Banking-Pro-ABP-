@@ -1,4 +1,4 @@
-using ArtemisBankingPro.Core.Domain.Enums;
+using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Infraestructrue.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
@@ -26,7 +26,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(defaultUser, "Admin123*");
-                    await userManager.AddToRoleAsync(defaultUser, Roles.Administrador);
+                    await userManager.AddToRoleAsync(defaultUser, Roles.Administrador.ToString());
                 }
             }
         }
@@ -51,7 +51,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(defaultUser, "Cajero123*");
-                    await userManager.AddToRoleAsync(defaultUser, Roles.Cajero);
+                    await userManager.AddToRoleAsync(defaultUser, Roles.Cajero.ToString());
                 }
             }
         }
@@ -76,7 +76,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(defaultUser, "Cliente123*");
-                    await userManager.AddToRoleAsync(defaultUser, Roles.Cliente);
+                    await userManager.AddToRoleAsync(defaultUser, Roles.Cliente.ToString());
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(defaultUser, "AdminApi123*");
-                    await userManager.AddToRoleAsync(defaultUser, Roles.Administrador);
+                    await userManager.AddToRoleAsync(defaultUser, Roles.Administrador.ToString());
                 }
             }
         }
@@ -126,7 +126,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(defaultUser, "ComercioApi123*");
-                    await userManager.AddToRoleAsync(defaultUser, Roles.Comercio);
+                    await userManager.AddToRoleAsync(defaultUser, Roles.Comercio.ToString());
                 }
             }
         }

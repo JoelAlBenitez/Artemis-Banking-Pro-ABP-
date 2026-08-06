@@ -5,7 +5,7 @@ using ArtemisBankingPro.Core.Application.Contracts.Users.Password;
 using ArtemisBankingPro.Core.Application.Contracts.Users.ExternalUsers;
 using ArtemisBankingPro.Core.Application.Contracts.Users.InternalUsers;
 using ArtemisBankingPro.Core.Application.Contracts.Users.Tokens;
-using ArtemisBankingPro.Core.Domain.Enums;
+using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Presentation.WebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -144,17 +144,17 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
             var homeAction = "Login";
 
             // Punto 2: controllers reales por rol
-            if (User.IsInRole(Roles.Administrador))
+            if (User.IsInRole(Roles.Administrador.ToString()))
             {
                 homeController = "AdminHome";
                 homeAction = "Index";
             }
-            else if (User.IsInRole(Roles.Cajero))
+            else if (User.IsInRole(Roles.Cajero.ToString()))
             {
                 homeController = "CashierHome";
                 homeAction = "Index";
             }
-            else if (User.IsInRole(Roles.Cliente))
+            else if (User.IsInRole(Roles.Cliente.ToString()))
             {
                 homeController = "ClientHome";
                 homeAction = "Index";
@@ -178,13 +178,13 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
                 .Select(c => c.Value)
                 .ToList();
 
-            if (userRoles.Contains(Roles.Administrador))
+            if (userRoles.Contains(Roles.Administrador.ToString()))
                 return RedirectToAction("Index", "AdminHome");
 
-            if (userRoles.Contains(Roles.Cajero))
+            if (userRoles.Contains(Roles.Cajero.ToString()))
                 return RedirectToAction("Index", "CashierHome");
 
-            if (userRoles.Contains(Roles.Cliente))
+            if (userRoles.Contains(Roles.Cliente.ToString()))
                 return RedirectToAction("Index", "ClientHome");
 
             // Fallback si el rol no es reconocido (ej. Comercio — solo usa la API)

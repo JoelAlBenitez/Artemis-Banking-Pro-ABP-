@@ -5,7 +5,7 @@ using ArtemisBankingPro.Core.Application.Contracts.Users.Password;
 using ArtemisBankingPro.Core.Application.Contracts.Users.ExternalUsers;
 using ArtemisBankingPro.Core.Application.Contracts.Users.InternalUsers;
 using ArtemisBankingPro.Core.Application.Contracts.Users.Tokens;
-using ArtemisBankingPro.Core.Domain.Enums;
+using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Infraestructrue.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
