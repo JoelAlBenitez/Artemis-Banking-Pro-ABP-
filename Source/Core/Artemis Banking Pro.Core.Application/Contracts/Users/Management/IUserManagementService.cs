@@ -1,3 +1,4 @@
+using ArtemisBankingPro.Core.Application.DTOs.Account;
 using ArtemisBankingPro.Core.Application.DTOs.Common;
 using ArtemisBankingPro.Core.Application.DTOs.Users;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
@@ -28,8 +29,9 @@ namespace ArtemisBankingPro.Core.Application.Contracts.Users.Management
         // 10
         Task<List<ClientSummaryDto>> GetActiveClientsAsync();
         // 11
-        Task<List<string>> GetActiveClientIdsAsync();
+        Task<IReadOnlyCollection<string>> GetActiveClientIdsAsync();
         // 12
         Task<ClientSummaryDto?> GetClientByIdCardAsync(string idCard);
+        Task<RegisterResponse> UpdateUserAsync(string id, EditUserDto dto);
     }
 }

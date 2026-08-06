@@ -22,8 +22,13 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Mappings
 
             CreateMap<ApplicationUser, UserDetailDto>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.FirstName))
+                .ForMember(dest => dest.IsClient, opt => opt.Ignore());
+
+            CreateMap<ApplicationUser, EditUserDto>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.FirstName))
                 .ForMember(dest => dest.NewPassword, opt => opt.Ignore())
-                .ForMember(dest => dest.ConfirmNewPassword, opt => opt.Ignore());
+                .ForMember(dest => dest.ConfirmNewPassword, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalAmount, opt => opt.Ignore());
         }
     }
 }

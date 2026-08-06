@@ -1,8 +1,13 @@
+using ArtemisBankingPro.Core.Application.DTOs.Account;
 using ArtemisBankingPro.Core.Application.DTOs.Common;
 using ArtemisBankingPro.Core.Application.DTOs.Users;
 using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Common.Constants;
+using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
+using ArtemisBankingPro.Core.Domain.Entities.Transactions;
+using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
+using ArtemisBankingPro.Core.Domain.Interfaces.Transactions;
 using ArtemisBankingPro.Infraestructrue.Identity.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -20,17 +25,23 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly ILogger<UserManagementService> _logger;
+        private readonly ISavingsAccountsRepository _savingsAccountsRepository;
+        private readonly ITransactionRepository _transactionRepository;
 
         public UserManagementService(
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
             IMapper mapper,
-            ILogger<UserManagementService> logger)
+            ILogger<UserManagementService> logger,
+            ISavingsAccountsRepository savingsAccountsRepository,
+            ITransactionRepository transactionRepository)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _mapper = mapper;
             _logger = logger;
+            _savingsAccountsRepository = savingsAccountsRepository;
+            _transactionRepository = transactionRepository;
         }
 
         // 1
@@ -151,7 +162,9 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
             // Parte 3: El rol Comercio queda excluido de forma permanente
             if (roles.Contains(Roles.Comercio.ToString())) return null;
 
-            return _mapper.Map<UserDetailDto>(user);
+            var dto = _mapper.Map<UserDetailDto>(user);
+            dto.IsClient = roles.Contains(Roles.Cliente.ToString());
+            return dto;
         }
 
         // 7
@@ -224,11 +237,11 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
         }
 
         // 11
-        public async Task<List<string>> GetActiveClientIdsAsync()
+        public async Task<IReadOnlyCollection<string>> GetActiveClientIdsAsync()
         {
             // Las consultas de cliente devuelven unicamente usuarios activos con rol Cliente.
             var usersInRole = await _userManager.GetUsersInRoleAsync(Roles.Cliente.ToString());
-            return usersInRole.Where(u => u.IsActive).Select(u => u.Id).ToList();
+            return usersInRole.Where(u => u.IsActive).Select(u => u.Id).ToList().AsReadOnly();
         }
 
         // 12
@@ -241,6 +254,132 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
             if (!isClient) return null;
 
             return _mapper.Map<ClientSummaryDto>(user);
+        }
+
+        public async Task<RegisterResponse> UpdateUserAsync(string id, EditUserDto dto)
+        {
+            _logger.LogInformation("Actualizando datos del usuario con Id: {UserId}", id);
+            var response = new RegisterResponse { HasError = false };
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                response.HasError = true;
+                response.Error = "Usuario no encontrado.";
+                return response;
+            }
+
+            // Validar que el correo electrónico no esté duplicado
+            if (!string.Equals(user.Email, dto.Email, System.StringComparison.OrdinalIgnoreCase))
+            {
+                var userWithSameEmail = await _userManager.FindByEmailAsync(dto.Email);
+                if (userWithSameEmail != null)
+                {
+                    response.HasError = true;
+                    response.Error = "Ya existe un usuario registrado con este correo electrónico.";
+                    return response;
+                }
+            }
+
+            // Validar que la cédula no esté duplicada
+            if (user.IDCARD != dto.IDCARD)
+            {
+                var userWithSameIdCard = await _userManager.Users.FirstOrDefaultAsync(u => u.IDCARD == dto.IDCARD);
+                if (userWithSameIdCard != null)
+                {
+                    response.HasError = true;
+                    response.Error = "Ya existe un usuario registrado con esta cédula.";
+                    return response;
+                }
+            }
+
+            // Actualizar campos básicos
+            user.FirstName = dto.Name;
+            user.LastName = dto.LastName;
+            user.IDCARD = dto.IDCARD;
+            user.Email = dto.Email;
+            user.UserName = dto.Email; // Opcional, dependiendo de si el username cambia con el email
+
+            // Actualizar contraseña si se especificó una nueva
+            if (!string.IsNullOrWhiteSpace(dto.NewPassword))
+            {
+                if (dto.NewPassword != dto.ConfirmNewPassword)
+                {
+                    response.HasError = true;
+                    response.Error = "La contraseña y la confirmación de contraseña deben coincidir.";
+                    return response;
+                }
+
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var resultPassword = await _userManager.ResetPasswordAsync(user, token, dto.NewPassword);
+                if (!resultPassword.Succeeded)
+                {
+                    response.HasError = true;
+                    response.Error = resultPassword.Errors.FirstOrDefault()?.Description ?? "Error al actualizar la contraseña.";
+                    return response;
+                }
+            }
+
+            // Guardar cambios del usuario
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                response.HasError = true;
+                response.Error = result.Errors.FirstOrDefault()?.Description ?? "Error al actualizar el usuario.";
+                return response;
+            }
+
+            // Monto adicional para Clientes (si aplica)
+            if (dto.AdditionalAmount.HasValue && dto.AdditionalAmount.Value > 0)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                if (roles.Contains(Roles.Cliente.ToString()))
+                {
+                    // Buscar la cuenta principal activa del cliente
+                    var primaryAccount = await _savingsAccountsRepository.GetFirstAsync(
+                        a => a.CustomerId == user.Id && 
+                             a.AccountType == SavingsAccountType.Principal && 
+                             a.Status == SavingsAccountStatus.Activa
+                    );
+
+                    if (primaryAccount == null)
+                    {
+                        response.HasError = true;
+                        response.Error = "No se encontró una cuenta principal activa para asignar el monto adicional.";
+                        return response;
+                    }
+
+                    // Sumar el balance
+                    primaryAccount.Balance += dto.AdditionalAmount.Value;
+                    await _savingsAccountsRepository.UpdateAsync(primaryAccount);
+
+                    // Registrar transacción de Crédito por Depósito (como ajuste administrativo)
+                    var transaction = new Transaction
+                    {
+                        SavingsAccountId = primaryAccount.Id,
+                        Amount = dto.AdditionalAmount.Value,
+                        TransactionType = TransactionType.Credito,
+                        OperationType = OperationType.Deposito, // Mantenemos deposito para no alterar enums ajenos
+                        Origin = "Ajuste Administrativo",
+                        Status = TransactionStatus.Aprobada,
+                        PerformedByUserId = "SYSTEM",
+                        Channel = ChannelPayment.Cajero,
+                        CreatedAt = DateTimeOffset.UtcNow,
+                        CreateByUserId = "SYSTEM"
+                    };
+
+                    await _transactionRepository.AddAsync(transaction);
+                    await _transactionRepository.SaveChangesAsync();
+                }
+                else
+                {
+                    response.HasError = true;
+                    response.Error = "El monto adicional solo se puede asignar a usuarios con rol Cliente.";
+                    return response;
+                }
+            }
+
+            return response;
         }
     }
 }
