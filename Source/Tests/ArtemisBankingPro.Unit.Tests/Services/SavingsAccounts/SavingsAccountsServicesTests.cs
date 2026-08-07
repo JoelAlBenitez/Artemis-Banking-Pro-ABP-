@@ -25,8 +25,7 @@ using Xunit;
 
 namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
 {
-    //El mapeo se resuelve con el perfil real: una prueba que finge el mapper no detectaría que
-    //la cuenta se crea Secundaria y Activa, que es una regla del módulo, no del servicio.
+ 
     public sealed class SavingsAccountsServicesTests
     {
         private readonly Mock<ISavingsAccountsRepository> _savingsAccountsRepository = new();
@@ -49,7 +48,6 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
                 configuration => configuration.AddProfile<SavingsAccountsMappingEntitieToDtoAndReverse>(),
                 NullLoggerFactory.Instance).CreateMapper();
 
-            //Los asientos se capturan para verificar cuántos y de qué tipo se registran
             _transactionRepository
                 .Setup(repository => repository.AddAsync(It.IsAny<Transaction>()))
                 .ReturnsAsync((Transaction transaction) =>
