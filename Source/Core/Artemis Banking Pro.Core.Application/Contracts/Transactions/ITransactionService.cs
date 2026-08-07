@@ -14,5 +14,6 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.Transactions
         Task<ValidationResult<IReadOnlyCollection<Artemis_Banking_Pro.Core.Application.DTOs.Beneficiaries.BeneficiaryDto>>> GetBeneficiariesAsync(string clientId);
         Task<bool> ProcessDepositAsync(DepositDto depositData);
         Task<TransactionIndicatorsDto> GetCashierDailyIndicatorsAsync(string cashierId);
+        Task<ValidationResult<TransactionResultDto>> ProcessAccountTransferAsync(AccountTransferDto dto, string clientId);
     }
 }
