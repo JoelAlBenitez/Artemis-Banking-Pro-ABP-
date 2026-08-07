@@ -10,3 +10,5 @@ Logs/
 *.user
 *.suo
 .idea/
+obj/
+/.agents

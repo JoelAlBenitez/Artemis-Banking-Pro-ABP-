@@ -63,5 +63,25 @@ namespace ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros
             "Transaction.BeneficiaryNotFound", 
             "El beneficiario seleccionado no está registrado o no se encuentra activo."
         );
+
+        public static readonly Error MinTwoAccountsRequired = new(
+            "Transaction.MinTwoAccountsRequired", 
+            "Debe tener al menos dos cuentas de ahorro activas para realizar una transferencia entre cuentas."
+        );
+
+        public static readonly Error TransferSameAccount = new(
+            "Transaction.TransferSameAccount", 
+            "La cuenta de origen y la cuenta de destino no pueden ser la misma."
+        );
+
+        public static readonly Error TransferInvalidAmount = new(
+            "Transaction.TransferInvalidAmount", 
+            "El monto a transferir debe ser mayor que cero."
+        );
+
+        public static readonly Error TransferInsufficientFunds = new(
+            "Transaction.TransferInsufficientFunds", 
+            "No dispone del monto requerido en la cuenta seleccionada."
+        );
     }
 }

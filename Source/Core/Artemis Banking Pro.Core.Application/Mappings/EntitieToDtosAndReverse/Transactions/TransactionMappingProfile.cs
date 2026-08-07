@@ -1,4 +1,6 @@
+using Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts;
 using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
+using Artemis_Banking_Pro.Core.Application.ViewModels.Transactions;
 using ArtemisBankingPro.Core.Domain.Entities.Transactions;
 using AutoMapper;
 
@@ -17,6 +19,9 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.
                 .ForMember(d => d.AccountLastFourDigits, o => o.MapFrom(s => s.SavingsAccount != null && s.SavingsAccount.AccountNumber.Length >= 4 
                     ? s.SavingsAccount.AccountNumber.Substring(s.SavingsAccount.AccountNumber.Length - 4) 
                     : ""));
+
+            CreateMap<AccountTransferViewModel, AccountTransferDto>().ReverseMap();
+            CreateMap<SavingsAccountDto, SavingsAccountSelectViewModel>().ReverseMap();
         }
     }
 }

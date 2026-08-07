@@ -251,5 +251,60 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 return ValidationResult<(SavingsAccount, Loan, List<LoanInstallment>, decimal)>.Failure(GeneralError.UnexpectedError);
             }
         }
+
+        public async Task<ValidationResult<(SavingsAccount Origin, SavingsAccount Destination)>> ValidateAccountTransferAsync(AccountTransferDto dto, string clientId)
+        {
+            _logger.LogInformation("Iniciando validación de transferencia entre cuentas propias para el cliente {ClientId} por monto RD${Amount}", clientId, dto.Amount);
+
+            if (dto.Amount <= 0)
+            {
+                _logger.LogWarning("Validación fallida: el monto ingresado {Amount} debe ser mayor que cero", dto.Amount);
+                return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.TransferInvalidAmount);
+            }
+
+            try
+            {
+                var activeAccountsCount = await _savingsAccountRepository.CountAsync(a => a.CustomerId == clientId && a.Status == SavingsAccountStatus.Activa);
+                if (activeAccountsCount < 2)
+                {
+                    _logger.LogWarning("Validación fallida: el cliente {ClientId} no posee al menos dos cuentas de ahorro activas. Total: {Count}", clientId, activeAccountsCount);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.MinTwoAccountsRequired);
+                }
+
+                if (dto.SourceAccountId == dto.DestinationAccountId)
+                {
+                    _logger.LogWarning("Validación fallida: intento de transferencia entre la misma cuenta ID {SourceAccountId}", dto.SourceAccountId);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.TransferSameAccount);
+                }
+
+                var originAccount = await _savingsAccountRepository.GetFirstAsync(a => a.Id == dto.SourceAccountId && a.CustomerId == clientId && a.Status == SavingsAccountStatus.Activa);
+                if (originAccount is null)
+                {
+                    _logger.LogWarning("Validación fallida: la cuenta de origen ID {SourceAccountId} no existe, está inactiva o no pertenece al cliente {ClientId}", dto.SourceAccountId, clientId);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.OriginAccountNotFound);
+                }
+
+                var destAccount = await _savingsAccountRepository.GetFirstAsync(a => a.Id == dto.DestinationAccountId && a.CustomerId == clientId && a.Status == SavingsAccountStatus.Activa);
+                if (destAccount is null)
+                {
+                    _logger.LogWarning("Validación fallida: la cuenta de destino ID {DestinationAccountId} no existe, está inactiva o no pertenece al cliente {ClientId}", dto.DestinationAccountId, clientId);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.DestinationAccountNotFound);
+                }
+
+                if (originAccount.Balance < dto.Amount)
+                {
+                    _logger.LogWarning("Validación fallida: fondos insuficientes en la cuenta {AccountNumber}. Balance actual RD${Balance}, monto requerido RD${Amount}", originAccount.AccountNumber, originAccount.Balance, dto.Amount);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.TransferInsufficientFunds);
+                }
+
+                _logger.LogInformation("Validación de transferencia entre cuentas propia exitosa para el cliente {ClientId}", clientId);
+                return ValidationResult<(SavingsAccount, SavingsAccount)>.Success((originAccount, destAccount));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado al validar la transferencia entre cuentas del cliente {ClientId}", clientId);
+                return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(GeneralError.UnexpectedError);
+            }
+        }
     }
 }
