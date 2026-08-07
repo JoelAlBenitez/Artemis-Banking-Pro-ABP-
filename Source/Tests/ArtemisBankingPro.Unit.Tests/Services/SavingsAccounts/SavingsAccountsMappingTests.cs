@@ -37,8 +37,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
             validation.Should().NotThrow();
         }
 
-        //Reproduce el escaneo de assembly que hace ApplicationDependencies al arrancar la WebApp:
-        //dos Profile que declaren el mismo par de tipos rompen la construcción del contenedor.
+  
         [Fact]
         public void ApplicationProfiles_ShouldNotDeclareDuplicatedTypeMaps()
         {
@@ -78,12 +77,10 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
             dto.TypeSavingsAccount.Should().Be(SavingsAccountType.Secundaria);
             dto.StateSavingsAccount.Should().Be(SavingsAccountStatus.Activa);
 
-            //Provienen de Identity: el perfil los ignora y los completa el servicio
             dto.FullNameCustomer.Should().BeNull();
             dto.IdCard.Should().BeNull();
         }
 
-        //El Dashboard del módulo Cliente materializa entidades a partir del DTO.
         [Fact]
         public void SavingsAccountDto_ShouldReturnToTheEntityWithItsTypeAndStatus()
         {

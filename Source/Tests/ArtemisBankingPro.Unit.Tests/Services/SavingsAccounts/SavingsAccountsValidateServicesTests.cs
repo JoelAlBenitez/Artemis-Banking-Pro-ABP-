@@ -13,8 +13,7 @@ using Xunit;
 
 namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
 {
-    //Reglas de negocio del módulo. Ninguna necesita base de datos: el repositorio se sustituye
-    //por un doble y las consultas se expresan con predicados.
+    
     public sealed class SavingsAccountsValidateServicesTests
     {
         private readonly Mock<ISavingsAccountsRepository> _savingsAccountsRepository = new();
