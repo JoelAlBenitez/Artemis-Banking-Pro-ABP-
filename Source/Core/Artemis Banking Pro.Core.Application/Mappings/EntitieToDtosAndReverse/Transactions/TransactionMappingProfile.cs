@@ -1,3 +1,4 @@
+using Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts;
 using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
 using Artemis_Banking_Pro.Core.Application.ViewModels.Transactions;
 using ArtemisBankingPro.Core.Domain.Entities.Transactions;
@@ -20,6 +21,7 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.
                     : ""));
 
             CreateMap<AccountTransferViewModel, AccountTransferDto>().ReverseMap();
+            CreateMap<SavingsAccountDto, SavingsAccountSelectViewModel>().ReverseMap();
         }
     }
 }

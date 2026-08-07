@@ -25,6 +25,9 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndRevers
 
             CreateMap<AccountTransferViewModel, AccountTransferDto>()
                 .ReverseMap();
+
+            CreateMap<ConfirmAccountTransferViewModel, AccountTransferDto>()
+                .ReverseMap();
         }
     }
 }

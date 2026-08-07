@@ -14,15 +14,18 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
     {
         private readonly ITransactionService _transactionService;
         private readonly IDashboardService _dashboardService;
+        private readonly ITransactionsValidationServices _validationServices;
         private readonly IMapper _mapper;
 
         public AccountTransferController(
             ITransactionService transactionService,
             IDashboardService dashboardService,
+            ITransactionsValidationServices validationServices,
             IMapper mapper)
         {
             _transactionService = transactionService;
             _dashboardService = dashboardService;
+            _validationServices = validationServices;
             _mapper = mapper;
         }
 
@@ -57,16 +60,53 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
             }
 
             var dto = _mapper.Map<AccountTransferDto>(vm);
-            var result = await _transactionService.ProcessAccountTransferAsync(dto, clientId);
+            var validation = await _validationServices.ValidateAccountTransferAsync(dto, clientId);
 
-            if (!result.IsValid)
+            if (!validation.IsValid)
             {
-                foreach (var error in result.Errors)
+                foreach (var error in validation.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
                 await PopulateViewModelListsAsync(vm, clientId);
                 return View(vm);
+            }
+
+            var confirmVm = new ConfirmAccountTransferViewModel
+            {
+                SourceAccountId = vm.SourceAccountId,
+                SourceAccountNumber = validation.Value.Origin.AccountNumber,
+                DestinationAccountId = vm.DestinationAccountId,
+                DestinationAccountNumber = validation.Value.Destination.AccountNumber,
+                Amount = vm.Amount
+            };
+
+            return View("Confirm", confirmVm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Execute(ConfirmAccountTransferViewModel vm)
+        {
+            var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(clientId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Datos de confirmación inválidos.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var dto = _mapper.Map<AccountTransferDto>(vm);
+            var result = await _transactionService.ProcessAccountTransferAsync(dto, clientId);
+
+            if (!result.IsValid)
+            {
+                TempData["ErrorMessage"] = string.Join(" ", result.Errors.Select(e => e.Description));
+                return RedirectToAction(nameof(Index));
             }
 
             if (!string.IsNullOrEmpty(result.Value?.WarningMessage))
@@ -81,8 +121,10 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
         private async Task PopulateViewModelListsAsync(AccountTransferViewModel vm, string clientId)
         {
             var dashboardResult = await _dashboardService.GetClientDashboardAsync(clientId);
-            vm.AvailableAccounts = dashboardResult.Value?.SavingsAccounts 
+            var accountsDto = dashboardResult.Value?.SavingsAccounts 
                 ?? new List<Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts.SavingsAccountDto>();
+            
+            vm.AvailableAccounts = _mapper.Map<IReadOnlyCollection<SavingsAccountSelectViewModel>>(accountsDto);
         }
     }
 }
