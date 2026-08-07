@@ -523,6 +523,177 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             return indicators;
         }
 
+        public async Task<ValidationResult<TransactionResultDto>> ProcessAccountTransferAsync(AccountTransferDto dto, string clientId)
+        {
+            _logger.LogInformation("Iniciando procesamiento de transferencia entre cuentas propias para el cliente {ClientId} por monto RD${Amount}", clientId, dto.Amount);
+
+            var validation = await _validationServices.ValidateAccountTransferAsync(dto, clientId);
+            if (!validation.IsValid)
+            {
+                var sourceAccount = await _savingsAccountRepository.GetFirstAsync(a => a.Id == dto.SourceAccountId && a.CustomerId == clientId && a.Status == SavingsAccountStatus.Activa);
+                if (sourceAccount != null)
+                {
+                    var destAccount = await _savingsAccountRepository.GetByIdAsync(dto.DestinationAccountId);
+                    var destNum = destAccount?.AccountNumber ?? "";
+                    var reason = validation.Errors.FirstOrDefault()?.Description ?? "Validación fallida";
+                    await RegisterRejectedTransferAsync(sourceAccount, destNum, dto.Amount, reason, clientId);
+                }
+                return ValidationResult<TransactionResultDto>.Failure(validation.Errors.ToList());
+            }
+
+            try
+            {
+                var (sourceAccount, destAccount) = validation.Value;
+
+                var result = await ExecuteApprovedAccountTransferAsync(sourceAccount, destAccount, dto.Amount, clientId);
+                if (!result.IsValid)
+                {
+                    return result;
+                }
+
+                _logger.LogInformation("Transferencia entre cuentas propias procesada y guardada correctamente para el cliente {ClientId}", clientId);
+
+                var emailSent = await SendAccountTransferEmailAsync(sourceAccount, destAccount, dto.Amount, clientId);
+                if (!emailSent)
+                {
+                    result.Value!.WarningMessage = "La transferencia fue realizada correctamente, pero no fue posible enviar el correo de notificación.";
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error crítico inesperado al procesar la transferencia entre cuentas para el cliente {ClientId}", clientId);
+                return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
+            }
+        }
+
+        private async Task RegisterRejectedTransferAsync(SavingsAccount sourceAccount, string destAccountNumber, decimal amount, string reason, string clientId)
+        {
+            _logger.LogWarning("Registrando intento de transferencia rechazada desde cuenta {Source} hacia {Destination} por RD${Amount} debido a: {Reason}", sourceAccount.AccountNumber, destAccountNumber, amount, reason);
+            try
+            {
+                var rejectedTx = new Transaction
+                {
+                    SavingsAccountId = sourceAccount.Id,
+                    Amount = amount,
+                    TransactionType = TransactionType.Debito,
+                    OperationType = OperationType.TransferenciaEntreCuentas,
+                    Origin = sourceAccount.AccountNumber,
+                    Beneficiary = destAccountNumber,
+                    Status = TransactionStatus.Rechazada,
+                    RejectionReason = reason,
+                    PerformedByUserId = clientId,
+                    Channel = ChannelPayment.Cliente,
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    CreateByUserId = clientId
+                };
+
+                await _transactionRepository.AddAsync(rejectedTx);
+                await _transactionRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al registrar el intento de transferencia rechazada.");
+            }
+        }
+
+        private async Task<ValidationResult<TransactionResultDto>> ExecuteApprovedAccountTransferAsync(SavingsAccount source, SavingsAccount dest, decimal amount, string clientId)
+        {
+            source.Balance -= amount;
+            dest.Balance += amount;
+
+            await _savingsAccountRepository.UpdateAsync(source);
+            await _savingsAccountRepository.UpdateAsync(dest);
+
+            var debitTx = new Transaction
+            {
+                SavingsAccountId = source.Id,
+                Amount = amount,
+                TransactionType = TransactionType.Debito,
+                OperationType = OperationType.TransferenciaEntreCuentas,
+                Origin = source.AccountNumber,
+                Beneficiary = dest.AccountNumber,
+                Status = TransactionStatus.Aprobada,
+                PerformedByUserId = clientId,
+                Channel = ChannelPayment.Cliente,
+                CreatedAt = DateTimeOffset.UtcNow,
+                CreateByUserId = clientId
+            };
+
+            var creditTx = new Transaction
+            {
+                SavingsAccountId = dest.Id,
+                Amount = amount,
+                TransactionType = TransactionType.Credito,
+                OperationType = OperationType.TransferenciaEntreCuentas,
+                Origin = source.AccountNumber,
+                Beneficiary = dest.AccountNumber,
+                Status = TransactionStatus.Aprobada,
+                PerformedByUserId = clientId,
+                Channel = ChannelPayment.Cliente,
+                CreatedAt = DateTimeOffset.UtcNow,
+                CreateByUserId = clientId
+            };
+
+            await _transactionRepository.AddAsync(debitTx);
+            await _transactionRepository.AddAsync(creditTx);
+
+            var saveResult1 = await _transactionRepository.SaveChangesAsync();
+            if (saveResult1 <= 0)
+            {
+                _logger.LogWarning("Error de persistencia: no fue posible guardar los registros de transferencia entre cuentas.");
+                return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
+            }
+
+            debitTx.RelatedTransactionId = creditTx.Id;
+            creditTx.RelatedTransactionId = debitTx.Id;
+
+            await _transactionRepository.UpdateAsync(debitTx);
+            await _transactionRepository.UpdateAsync(creditTx);
+
+            var saveResult2 = await _transactionRepository.SaveChangesAsync();
+            if (saveResult2 <= 0)
+            {
+                _logger.LogWarning("Error de persistencia: no fue posible vincular las transacciones relacionadas.");
+                return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
+            }
+
+            var resultDto = new TransactionResultDto
+            {
+                EffectiveAmount = amount,
+                TransactionType = TransactionType.Debito,
+                Status = TransactionStatus.Aprobada,
+                CreatedAt = debitTx.CreatedAt
+            };
+
+            return ValidationResult<TransactionResultDto>.Success(resultDto);
+        }
+
+        private async Task<bool> SendAccountTransferEmailAsync(SavingsAccount source, SavingsAccount dest, decimal amount, string clientId)
+        {
+            var email = $"{clientId}@artemis.com";
+            var lastFourSource = source.AccountNumber.Length >= 4 ? source.AccountNumber.Substring(source.AccountNumber.Length - 4) : source.AccountNumber;
+            var lastFourDest = dest.AccountNumber.Length >= 4 ? dest.AccountNumber.Substring(dest.AccountNumber.Length - 4) : dest.AccountNumber;
+
+            try
+            {
+                _logger.LogInformation("Enviando correo de notificación de transferencia entre cuentas al cliente {ClientId}", clientId);
+                var sent = await _emailServices.SendNotification(new MessageDto
+                {
+                    To = email,
+                    Subject = "Transferencia entre cuentas realizada",
+                    Message = $"Monto transferido: RD${amount:N2}, Cuenta Origen: ****{lastFourSource}, Cuenta Destino: ****{lastFourDest}, Fecha: {DateTimeOffset.UtcNow}"
+                });
+                return sent;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Fallo al enviar notificación por correo de transferencia entre cuentas.");
+                return false;
+            }
+        }
+
         #endregion
     }
 }

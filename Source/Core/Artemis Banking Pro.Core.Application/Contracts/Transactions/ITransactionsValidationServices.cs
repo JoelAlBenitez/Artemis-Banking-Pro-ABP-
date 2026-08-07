@@ -11,7 +11,7 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.Transactions
         Task<ValidationResult<(SavingsAccount Origin, SavingsAccount Destination)>> ValidateExpressAsync(ExpressTransactionDto dto, string clientId);
         Task<ValidationResult<(SavingsAccount Origin, SavingsAccount Destination)>> ValidateBeneficiaryAsync(BeneficiaryTransactionDto dto, string clientId);
         Task<ValidationResult<(SavingsAccount Origin, CreditCard Card, decimal EffectiveAmount)>> ValidateCreditCardPaymentAsync(PayCreditCardDto dto, string clientId);
-        Task<ValidationResult<(SavingsAccount Origin, SavingsAccount Destination)>> ValidateLoanPaymentAsync(PayLoanDto dto, string clientId);
+        Task<ValidationResult<(SavingsAccount Origin, Loan Loan, List<LoanInstallment> Installments, decimal EffectiveAmount)>> ValidateLoanPaymentAsync(PayLoanDto dto, string clientId);
         Task<ValidationResult<(SavingsAccount Origin, SavingsAccount Destination)>> ValidateAccountTransferAsync(AccountTransferDto dto, string clientId);
     }
 }
