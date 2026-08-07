@@ -425,6 +425,104 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             }
         }
 
+        public async Task<bool> ProcessDepositAsync(DepositDto depositData)
+        {
+            _logger.LogInformation("Procesando depósito de RD${Amount} en cuenta {AccountNumber} por el cajero {CashierId}", depositData.Amount, depositData.AccountNumber, depositData.CashierId);
+
+            if (depositData.Amount <= 0)
+            {
+                _logger.LogWarning("Monto de depósito inválido: {Amount}", depositData.Amount);
+                return false;
+            }
+
+            var account = await _savingsAccountRepository.GetFirstAsync(a => a.AccountNumber == depositData.AccountNumber);
+            if (account == null || !account.IsActive)
+            {
+                _logger.LogWarning("Cuenta destino no encontrada o inactiva: {AccountNumber}", depositData.AccountNumber);
+                return false;
+            }
+
+            try
+            {
+                account.Balance += depositData.Amount;
+                await _savingsAccountRepository.UpdateAsync(account);
+
+                var tx = new Transaction
+                {
+                    SavingsAccountId = account.Id,
+                    Amount = depositData.Amount,
+                    TransactionType = TransactionType.Credito,
+                    OperationType = OperationType.Deposito,
+                    Origin = "DEPÓSITO",
+                    Beneficiary = account.AccountNumber,
+                    Status = TransactionStatus.Aprobada,
+                    PerformedByUserId = depositData.CashierId,
+                    Channel = ChannelPayment.Cajero,
+                    CreateByUserId = depositData.CashierId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+
+                await _transactionRepository.AddAsync(tx);
+                var saveResult = await _transactionRepository.SaveChangesAsync();
+
+                if (saveResult <= 0)
+                {
+                    _logger.LogWarning("Fallo al guardar la transacción de depósito en base de datos.");
+                    return false;
+                }
+
+                _logger.LogInformation("Depósito procesado exitosamente en cuenta {AccountNumber}.", depositData.AccountNumber);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error crítico inesperado al procesar depósito en cuenta {AccountNumber}", depositData.AccountNumber);
+                return false;
+            }
+        }
+
+        public async Task<TransactionIndicatorsDto> GetCashierDailyIndicatorsAsync(string cashierId)
+        {
+            _logger.LogInformation("Obteniendo indicadores diarios para el cajero {CashierId}", cashierId);
+
+            var startOfDay = new DateTimeOffset(DateTimeOffset.UtcNow.Date, TimeSpan.Zero);
+            var endOfDay = startOfDay.AddDays(1);
+
+            var transactions = await _transactionRepository.GetAllFindAsync(t =>
+                t.PerformedByUserId == cashierId &&
+                t.CreatedAt >= startOfDay &&
+                t.CreatedAt < endOfDay
+            );
+
+            var indicators = new TransactionIndicatorsDto
+            {
+                TotalTransactions = transactions.Count,
+                TotalPaymentsAmount = 0,
+                TotalDepositsAmount = 0,
+                TotalWithdrawalsAmount = 0
+            };
+
+            foreach (var t in transactions)
+            {
+                if (t.Status != TransactionStatus.Aprobada) continue;
+
+                if (t.OperationType == OperationType.PagoTarjeta || t.OperationType == OperationType.PagoPrestamo)
+                {
+                    indicators.TotalPaymentsAmount += t.Amount;
+                }
+                else if (t.OperationType == OperationType.Deposito)
+                {
+                    indicators.TotalDepositsAmount += t.Amount;
+                }
+                else if (t.OperationType == OperationType.Retiro)
+                {
+                    indicators.TotalWithdrawalsAmount += t.Amount;
+                }
+            }
+
+            return indicators;
+        }
+
         #endregion
     }
 }
