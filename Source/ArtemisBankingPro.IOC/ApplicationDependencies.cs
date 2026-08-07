@@ -29,33 +29,14 @@ namespace ArtemisBankingPro.IOC
     {
         public static IServiceCollection AddApplicationDependecies(this IServiceCollection services)
         {
-            services.AddAutoMapper(configuration => { }, Assembly.GetAssembly(typeof(ICreditCardsServices))!);
-
-           
-
             #region Mappings
+            //Todos los perfiles de préstamos, tarjetas, cuentas de ahorro, transacciones y
+            //dashboard viven en la misma assembly: un único escaneo los registra todos.
+            //Repetir AddMaps sobre la misma assembly solo multiplica el trabajo de arranque.
             services.AddAutoMapper(configuration =>
             {
-                #region loans
-                configuration.AddMaps(typeof(LoansMappingDtoToViewModelAndReverse).Assembly);
-                configuration.AddMaps(typeof(LoansMappingEntitieToDtoAndReverse).Assembly);
-                #endregion
-
-                #region credit cards
-                configuration.AddMaps(typeof(CreditCardsMappingDtoToViewModelAndReverse).Assembly);
-                configuration.AddMaps(typeof(CreditCardsMappingEntitieToDtoAndReverse).Assembly);
-                #endregion
-
-                #region savings accounts
-                configuration.AddMaps(typeof(SavingsAccountsMappingDtoToViewModelAndReverse).Assembly);
                 configuration.AddMaps(typeof(SavingsAccountsMappingEntitieToDtoAndReverse).Assembly);
-                #endregion
-
-                #region customer dashboard
-                configuration.AddMaps(typeof(SavingsAccountMappingProfile).Assembly);
-                #endregion
             });
-
             #endregion
 
             #region loans

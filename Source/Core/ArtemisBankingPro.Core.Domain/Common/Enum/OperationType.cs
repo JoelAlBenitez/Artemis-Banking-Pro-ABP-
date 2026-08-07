@@ -15,6 +15,11 @@ namespace ArtemisBankingPro.Core.Domain.Common.Enum
 
         //Acreditación del capital aprobado de un préstamo en la cuenta principal del cliente.
         //Se agrega al final para no alterar los valores ya persistidos por los demás módulos.
-        DesembolsoPrestamo = 11
+        DesembolsoPrestamo = 11,
+
+        //Transferencia del saldo remanente de una cuenta secundaria a la principal del cliente
+        //al cancelarla. No es una transferencia del cliente: la origina el administrador, y
+        //distinguirla permite excluirla de los indicadores de pagos del Dashboard.
+        CancelacionCuenta = 12
     }
 }

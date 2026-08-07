@@ -25,8 +25,9 @@ namespace ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts
 
         //Collections
 
-        //El historial de transacciones pertenece al módulo Cliente: ni la entidad ni su
-        //repositorio se desarrollan aquí. Se habilita cuando ese módulo la exponga.
-        public IReadOnlyCollection<Transaction>? Transactions { get; set; } = null;
+        //Extremo inverso de la relación configurada en TransactionConfiguration. EF Core
+        //necesita una colección mutable para materializar la navegación, por lo que no puede
+        //declararse como IReadOnlyCollection.
+        public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
     }
 }
