@@ -10,7 +10,9 @@ using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Common.Pagination;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
+using ArtemisBankingPro.Core.Domain.Entities.Transactions;
 using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
+using ArtemisBankingPro.Core.Domain.Interfaces.Transactions;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 
@@ -21,12 +23,14 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
         ISavingsAccountsServices
     {
         private readonly ISavingsAccountsRepository _savingsAccountsRepository;
+        private readonly ITransactionRepository _transactionRepository;
         private readonly ISavingsAccountsValidateServices _savingsAccountsValidateServices;
         private readonly IEmailServices _emailServices;
         private readonly ILogger<SavingsAccountsServices> _logger;
 
         public SavingsAccountsServices(
             ISavingsAccountsRepository savingsAccountsRepository,
+            ITransactionRepository transactionRepository,
             ISavingsAccountsValidateServices savingsAccountsValidateServices,
             IEmailServices emailServices,
             IMapper mapper,
@@ -34,6 +38,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
             : base(savingsAccountsRepository, mapper, logger)
         {
             _savingsAccountsRepository = savingsAccountsRepository;
+            _transactionRepository = transactionRepository;
             _savingsAccountsValidateServices = savingsAccountsValidateServices;
             _emailServices = emailServices;
             _logger = logger;
@@ -98,19 +103,17 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                     return ValidationResult<PagedResult<TransactionDto>>.Failure(SavingsAccountError.NonExistsSavingsAccount);
                 }
 
-                //La entidad Transaction y su repositorio pertenecen al módulo Cliente: no se
-                //desarrollan aquí. Cuando ese módulo los exponga, esta consulta se resuelve con
-                //su repositorio, paginada y del movimiento más reciente al más antiguo.
-                //var result = await _transactionRepository.GetAllAsync(
-                //    page,
-                //    DomainConstants.DefaultPageSize,
-                //    transaction => transaction.SavingsAccountId == savingsAccountId,
-                //    query => query.OrderByDescending(transaction => transaction.CreatedAt));
-                //var items = _mapper.Map<IReadOnlyCollection<TransactionDto>>(result.Items);
-                //var paged = new PagedResult<TransactionDto>(
-                //    items, result.Page, result.PageSize, result.TotalRecords);
+                //Historial paginado del movimiento más reciente al más antiguo. La entidad
+                //Transaction pertenece al módulo Cliente: este módulo solo la consulta.
+                var result = await _transactionRepository.GetAllAsync(
+                    page,
+                    DomainConstants.DefaultPageSize,
+                    transaction => transaction.SavingsAccountId == savingsAccountId,
+                    query => query.OrderByDescending(transaction => transaction.CreatedAt));
 
-                var paged = PagedResult<TransactionDto>.Empty(page, DomainConstants.DefaultPageSize);
+                var items = _mapper.Map<IReadOnlyCollection<TransactionDto>>(result.Items);
+                var paged = new PagedResult<TransactionDto>(
+                    items, result.Page, result.PageSize, result.TotalRecords);
 
                 return ValidationResult<PagedResult<TransactionDto>>.Success(paged);
             }
@@ -165,20 +168,30 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                 if (dto.InitialBalance > 0m)
                 {
                     //Todo balance inicial mayor que cero se registra como una transacción de tipo
-                    //CRÉDITO en el historial de la cuenta. La entidad Transaction pertenece al
-                    //módulo Cliente y se agrega aquí cuando ese módulo la exponga.
-                    //await _transactionRepository.AddAsync(new Transaction
-                    //{
-                    //    SavingsAccount = savingsAccount,
-                    //    Amount = dto.InitialBalance,
-                    //    TypeTransaction = TransactionType.Credito,
-                    //    OperationType = OperationType.AperturaCuenta,
-                    //    Origin = accountNumber,
-                    //    Beneficiary = accountNumber,
-                    //    Status = TransactionStatus.Aprobada
-                    //});
+                    //CRÉDITO en el historial de la cuenta.
+                    //El módulo Cliente expone ITransactionService.RegisterInitialTransactionAsync,
+                    //pero su DTO solo lleva el SavingsAccountId, que no existe antes de persistir:
+                    //llamarlo obligaría a un segundo SaveChangesAsync y rompería el todo o nada.
+                    //Se escribe con el repositorio para que EF resuelva la FK por navegación.
+                    await _transactionRepository.AddAsync(new Transaction
+                    {
+                        SavingsAccount = savingsAccount,
+                        SavingsAccountId = default,
+                        Amount = dto.InitialBalance,
+                        TransactionType = TransactionType.Credito,
+                        OperationType = OperationType.AperturaCuenta,
+                        Origin = accountNumber,
+                        Beneficiary = accountNumber,
+                        Status = TransactionStatus.Aprobada,
+                        Channel = ChannelPayment.Administrador,
+                        //Hasta que exista ICurrentUserServices no hay administrador autenticado
+                        //que atribuir: la auditoría queda a nombre del sistema.
+                        PerformedByUserId = DomainConstants.SystemUserId,
+                        CreatedAt = assignedAt,
+                        CreateByUserId = DomainConstants.SystemUserId
+                    });
 
-                    _logger.LogInformation("La cuenta {AccountNumber} se crea con un balance inicial de RD${Balance}, pendiente de registrar como CRÉDITO",
+                    _logger.LogInformation("La cuenta {AccountNumber} se crea con un balance inicial de RD${Balance} registrado como CRÉDITO",
                         accountNumber, dto.InitialBalance);
                 }
 
@@ -245,29 +258,45 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
 
                     await _savingsAccountsRepository.UpdateAsync(primaryAccount);
 
-                    //Se registran dos transacciones: un DÉBITO en la secundaria cancelada y un
-                    //CRÉDITO en la principal receptora. La entidad Transaction pertenece al módulo
-                    //Cliente y ambas se agregan aquí cuando ese módulo la exponga.
-                    //await _transactionRepository.AddAsync(new Transaction
-                    //{
-                    //    SavingsAccount = savingsAccount,
-                    //    Amount = transferredAmount,
-                    //    TypeTransaction = TransactionType.Debito,
-                    //    OperationType = OperationType.CancelacionCuenta,
-                    //    Origin = savingsAccount.AccountNumber,
-                    //    Beneficiary = primaryAccount.AccountNumber,
-                    //    Status = TransactionStatus.Aprobada
-                    //});
-                    //await _transactionRepository.AddAsync(new Transaction
-                    //{
-                    //    SavingsAccount = primaryAccount,
-                    //    Amount = transferredAmount,
-                    //    TypeTransaction = TransactionType.Credito,
-                    //    OperationType = OperationType.CancelacionCuenta,
-                    //    Origin = savingsAccount.AccountNumber,
-                    //    Beneficiary = primaryAccount.AccountNumber,
-                    //    Status = TransactionStatus.Aprobada
-                    //});
+                    //Se registran dos transacciones cruzadas: un DÉBITO en la secundaria
+                    //cancelada y un CRÉDITO en la principal receptora. Ambas comparten Origen
+                    //(la secundaria) y Beneficiario (la principal): esos campos describen el
+                    //movimiento, no el lado desde el que se mira el asiento.
+                    var debitEntry = new Transaction
+                    {
+                        SavingsAccountId = savingsAccount.Id,
+                        Amount = transferredAmount,
+                        TransactionType = TransactionType.Debito,
+                        OperationType = OperationType.CancelacionCuenta,
+                        Origin = savingsAccount.AccountNumber,
+                        Beneficiary = primaryAccount.AccountNumber,
+                        Status = TransactionStatus.Aprobada,
+                        Channel = ChannelPayment.Administrador,
+                        PerformedByUserId = DomainConstants.SystemUserId,
+                        CreatedAt = cancelledAt,
+                        CreateByUserId = DomainConstants.SystemUserId
+                    };
+
+                    //El Id del débito no existe antes de SaveChangesAsync: el enlace se declara
+                    //por navegación y EF resuelve la FK al persistir ambos asientos.
+                    var creditEntry = new Transaction
+                    {
+                        SavingsAccountId = primaryAccount.Id,
+                        Amount = transferredAmount,
+                        TransactionType = TransactionType.Credito,
+                        OperationType = OperationType.CancelacionCuenta,
+                        Origin = savingsAccount.AccountNumber,
+                        Beneficiary = primaryAccount.AccountNumber,
+                        Status = TransactionStatus.Aprobada,
+                        Channel = ChannelPayment.Administrador,
+                        PerformedByUserId = DomainConstants.SystemUserId,
+                        RelatedTransaction = debitEntry,
+                        CreatedAt = cancelledAt,
+                        CreateByUserId = DomainConstants.SystemUserId
+                    };
+
+                    await _transactionRepository.AddAsync(debitEntry);
+                    await _transactionRepository.AddAsync(creditEntry);
 
                     _logger.LogInformation("Balance de RD${Monto} transferido de la cuenta {AccountNumber} a la principal {PrimaryAccountNumber}",
                         transferredAmount, savingsAccount.AccountNumber, primaryAccount.AccountNumber);
