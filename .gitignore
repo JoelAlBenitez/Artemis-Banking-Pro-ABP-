@@ -4,5 +4,9 @@ bin/
 obj/
 .claudes/
 .claude/
+.gemini/
 Logs/
-/.agents
+.agents/
+*.user
+*.suo
+.idea/

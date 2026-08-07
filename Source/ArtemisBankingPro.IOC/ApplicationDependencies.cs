@@ -86,6 +86,8 @@ namespace ArtemisBankingPro.IOC
             services.AddScoped<ITransactionsValidationServices, TransactionsValidationServices>();
             services.AddScoped<IBeneficiaryServices, BeneficiaryServices>();
             services.AddScoped<IBeneficiaryValidationServices, BeneficiaryValidationServices>();
+            services.AddScoped<ICashAdvanceServices, CashAdvanceServices>();
+            services.AddScoped<ICashAdvanceValidationServices, CashAdvanceValidationServices>();
 
             return services;
         }
