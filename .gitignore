@@ -2,4 +2,13 @@
 docs/
 bin/
 obj/
+.claudes/
+.claude/
+.gemini/
+Logs/
+.agents/
+*.user
+*.suo
+.idea/
+obj/
 /.agents
