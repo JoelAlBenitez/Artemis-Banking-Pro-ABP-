@@ -11,6 +11,8 @@ using ArtemisBankingPro.Core.Domain.Common.Pagination;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Entities.Transactions;
+using ArtemisBankingPro.Core.Domain.Interfaces.CreditCards;
+using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
 using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Interfaces.Transactions;
 using AutoMapper;
@@ -24,6 +26,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
     {
         private readonly ISavingsAccountsRepository _savingsAccountsRepository;
         private readonly ITransactionRepository _transactionRepository;
+        private readonly ILoansRepository _loansRepository;
+        private readonly ICreditCardsRepository _creditCardsRepository;
         private readonly ISavingsAccountsValidateServices _savingsAccountsValidateServices;
         private readonly IEmailServices _emailServices;
         private readonly ILogger<SavingsAccountsServices> _logger;
@@ -31,6 +35,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
         public SavingsAccountsServices(
             ISavingsAccountsRepository savingsAccountsRepository,
             ITransactionRepository transactionRepository,
+            ILoansRepository loansRepository,
+            ICreditCardsRepository creditCardsRepository,
             ISavingsAccountsValidateServices savingsAccountsValidateServices,
             IEmailServices emailServices,
             IMapper mapper,
@@ -39,6 +45,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
         {
             _savingsAccountsRepository = savingsAccountsRepository;
             _transactionRepository = transactionRepository;
+            _loansRepository = loansRepository;
+            _creditCardsRepository = creditCardsRepository;
             _savingsAccountsValidateServices = savingsAccountsValidateServices;
             _emailServices = emailServices;
             _logger = logger;
@@ -125,6 +133,85 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                 return ValidationResult<PagedResult<TransactionDto>>.Failure(GeneralError.UnexpectedError);
             }
         }
+
+        public async Task<bool> IsAccountActiveAsync(string accountNumber)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(accountNumber))
+                {
+                    return false;
+                }
+
+                var isActive = await _savingsAccountsRepository.ExistElementByConsult(
+                    account => account.AccountNumber == accountNumber
+                        && account.Status == SavingsAccountStatus.Activa);
+
+                if (!isActive)
+                {
+                    _logger.LogWarning("La cuenta {AccountNumber} no existe o no está activa", accountNumber);
+                }
+
+                return isActive;
+            }
+            catch (Exception ex)
+            {
+               
+                _logger.LogError(ex, "Error al verificar el estado de la cuenta {AccountNumber}", accountNumber);
+                return false;
+            }
+        }
+
+        public async Task<decimal> GetCustomerTotalDebtAmountAsync(string customerId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(customerId))
+                {
+                    return 0m;
+                }
+
+             
+                var loansDebt = await _loansRepository.SumAsync(
+                    loan => loan.CustomerId == customerId && loan.Status == LoanStatus.Activo,
+                    loan => loan.PendingAmount);
+
+                var cardsDebt = await _creditCardsRepository.SumAsync(
+                    card => card.CustomerId == customerId && card.Status == CreditCardStatus.Activa,
+                    card => card.OwedAmount);
+
+                return loansDebt + cardsDebt;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al calcular la deuda total del cliente {CustomerId}", customerId);
+                return 0m;
+            }
+        }
+
+        //Paso 1 de la asignación: listado de clientes activos con su deuda total. La deuda ya
+        //está resuelta arriba; falta el project Identity para obtener los clientes activos con
+        //su cédula, nombre y correo. Descomentar cuando IUserServices exista.
+
+        //public async Task<ValidationResult<IReadOnlyCollection<ClientSavingsAccountDto>>> GetActiveClientsAsync()
+        //{
+        //    var customers = await _userServices.GetActiveCustomersAsync();
+        //    var clients = new List<ClientSavingsAccountDto>();
+
+        //    foreach (var customer in customers)
+        //    {
+        //        clients.Add(new ClientSavingsAccountDto
+        //        {
+        //            Id = customer.Id,
+        //            IdCard = customer.IdCard,
+        //            FullName = customer.FullName,
+        //            Email = customer.Email,
+        //            TotalDebtAmount = await GetCustomerTotalDebtAmountAsync(customer.Id)
+        //        });
+        //    }
+
+        //    return ValidationResult<IReadOnlyCollection<ClientSavingsAccountDto>>.Success(clients);
+        //}
         #endregion
 
         #region write methods
