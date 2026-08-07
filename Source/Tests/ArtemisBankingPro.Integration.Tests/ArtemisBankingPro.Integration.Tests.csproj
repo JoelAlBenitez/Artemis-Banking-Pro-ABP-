@@ -20,4 +20,10 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Core\Artemis Banking Pro.Core.Application\ArtemisBankingPro.Core.Application.csproj" />
+		<ProjectReference Include="..\..\Core\ArtemisBankingPro.Core.Domain\ArtemisBankingPro.Core.Domain.csproj" />
+		<ProjectReference Include="..\..\Infaestructure\ArtemisBankingPro.Infraestructrue.Persistence\ArtemisBankingPro.Infraestructrue.Persistence.csproj" />
+	</ItemGroup>
 </Project>

@@ -14,6 +14,7 @@ namespace ArtemisBankingPro.Core.Domain.Entities.Loans
         public  decimal TotalPayable {  get; set; }
         public  decimal PendingAmount { get; set; }
         public required LoanStatus Status { get; set; }
+        
 
         //Fecha en que todas las cuotas quedaron pagadas
         public DateTimeOffset? CompletedAt { get; set; }
