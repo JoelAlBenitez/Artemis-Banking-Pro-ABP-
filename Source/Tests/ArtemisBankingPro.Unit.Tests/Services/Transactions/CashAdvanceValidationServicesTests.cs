@@ -14,6 +14,9 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+using ArtemisBankingPro.Core.Application.DTOs.Users;
+
 namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
 {
     public sealed class CashAdvanceValidationServicesTests
@@ -22,6 +25,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
         private readonly Mock<ISavingsAccountsRepository> _savingsAccountsRepositoryMock;
         private readonly Mock<ICardConsumptionRepository> _cardConsumptionRepositoryMock;
         private readonly Mock<ILogger<CashAdvanceValidationServices>> _loggerMock;
+        private readonly Mock<IUserManagementService> _userManagementServiceMock;
         private readonly CashAdvanceValidationServices _validationServices;
 
         public CashAdvanceValidationServicesTests()
@@ -30,12 +34,17 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
             _savingsAccountsRepositoryMock = new Mock<ISavingsAccountsRepository>();
             _cardConsumptionRepositoryMock = new Mock<ICardConsumptionRepository>();
             _loggerMock = new Mock<ILogger<CashAdvanceValidationServices>>();
+            _userManagementServiceMock = new Mock<IUserManagementService>();
+
+            _userManagementServiceMock.Setup(u => u.ValidateUserExistsByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new UserExistenceDto { Exists = true, IsActive = true });
 
             _validationServices = new CashAdvanceValidationServices(
                 _creditCardsRepositoryMock.Object,
                 _savingsAccountsRepositoryMock.Object,
                 _cardConsumptionRepositoryMock.Object,
-                _loggerMock.Object
+                _loggerMock.Object,
+                _userManagementServiceMock.Object
             );
         }
 

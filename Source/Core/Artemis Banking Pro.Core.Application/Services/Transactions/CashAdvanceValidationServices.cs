@@ -1,5 +1,6 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros;
 using ArtemisBankingPro.Core.Domain.Common.Constants;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
@@ -18,17 +19,20 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
         private readonly ISavingsAccountsRepository _savingsAccountsRepository;
         private readonly ICardConsumptionRepository _cardConsumptionRepository;
         private readonly ILogger<CashAdvanceValidationServices> _logger;
+        private readonly IUserManagementService _userManagementService;
 
         public CashAdvanceValidationServices(
             ICreditCardsRepository creditCardsRepository,
             ISavingsAccountsRepository savingsAccountsRepository,
             ICardConsumptionRepository cardConsumptionRepository,
-            ILogger<CashAdvanceValidationServices> _logger)
+            ILogger<CashAdvanceValidationServices> _logger,
+            IUserManagementService userManagementService)
         {
             _creditCardsRepository = creditCardsRepository;
             _savingsAccountsRepository = savingsAccountsRepository;
             _cardConsumptionRepository = cardConsumptionRepository;
             this._logger = _logger;
+            _userManagementService = userManagementService;
         }
 
         public async Task<ValidationResult<(CreditCard Card, SavingsAccount Account, decimal InterestAmount, decimal TotalCharged)>> ValidateCashAdvanceAsync(
@@ -41,6 +45,13 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             {
                 _logger.LogWarning("Validación fallida: el monto solicitado {Amount} es inválido", dto.Amount);
                 return ValidationResult<(CreditCard, SavingsAccount, decimal, decimal)>.Failure(CashAdvanceError.AmountInvalid);
+            }
+
+            var userValidation = await _userManagementService.ValidateUserExistsByIdAsync(clientId);
+            if (!userValidation.Exists || !userValidation.IsActive)
+            {
+                _logger.LogWarning("Validación fallida: el cliente {ClientId} no existe o no está activo en el sistema", clientId);
+                return ValidationResult<(CreditCard, SavingsAccount, decimal, decimal)>.Failure(CashAdvanceError.AccountNotActive);
             }
 
             var card = await _creditCardsRepository.GetFirstAsync(c => c.Id == dto.CreditCardId && c.CustomerId == clientId);
