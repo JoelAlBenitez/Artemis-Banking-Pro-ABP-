@@ -1,3 +1,32 @@
+<<<<<<< HEAD
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center mt-5">
+    <h1 class="display-4 text-primary fw-bold">Artemis Banking Pro</h1>
+    <p class="lead">El motor de Identity y Base de Datos funciona correctamente.</p>
+
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <div class="alert alert-success mx-auto mt-4 shadow-sm" style="max-width: 600px;">
+            <h4>¡Has iniciado sesión con éxito! 🎉</h4>
+            <hr />
+            <div class="text-start">
+                <p class="mb-1"><strong>Nombre de usuario:</strong> @User.Identity.Name</p>
+                <p class="mb-1"><strong>Roles que posees:</strong> @string.Join(", ", User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value))</p>
+            </div>
+        </div>
+        <a href="/Account/Logout" class="btn btn-danger mt-3 fw-bold px-4">Cerrar Sesión</a>
+    }
+    else
+    {
+        <div class="alert alert-warning mx-auto mt-4 shadow-sm" style="max-width: 500px;">
+            <p class="mb-0 fs-5">Actualmente eres un visitante anónimo. No has iniciado sesión.</p>
+        </div>
+        <a href="/Account/Login" class="btn btn-primary mt-3 fw-bold px-4">Ir a Iniciar Sesión</a>
+    }
+=======
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
@@ -5,4 +34,5 @@
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+>>>>>>> origin/development
 </div>

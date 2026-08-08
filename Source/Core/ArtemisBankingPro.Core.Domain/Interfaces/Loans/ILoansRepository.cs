@@ -5,7 +5,7 @@ using ArtemisBankingPro.Core.Domain.Interfaces.Generic;
 
 namespace ArtemisBankingPro.Core.Domain.Interfaces.Loans
 {
-   
+
     public interface ILoansRepository :
         IGenericRepository<Loan, int>
     {
@@ -16,5 +16,6 @@ namespace ArtemisBankingPro.Core.Domain.Interfaces.Loans
             string? customerId);
 
         Task<string> GetNextLoanNumberAsync();
+
     }
 }

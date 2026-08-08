@@ -20,9 +20,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 {
-     public sealed class LoansServices :
-        GenericServices<LoansAssignmentDto, LoansDto, int, Loan>,
-        ILoansServices
+    public sealed class LoansServices :
+       GenericServices<LoansAssignmentDto, LoansDto, int, Loan>,
+       ILoansServices
     {
         private readonly ILoansRepository _loansRepository;
         private readonly ILoanInstallmentRepository _loanInstallmentRepository;

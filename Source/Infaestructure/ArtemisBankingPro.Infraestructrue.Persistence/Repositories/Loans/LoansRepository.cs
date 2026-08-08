@@ -59,6 +59,6 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans
             return new PagedResult<Loan>(items, page, pageSize, totalRecords);
         }
 
-       
+
     }
 }

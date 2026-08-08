@@ -29,15 +29,32 @@ namespace ArtemisBankingPro.IOC
     {
         public static IServiceCollection AddApplicationDependecies(this IServiceCollection services)
         {
+            services.AddAutoMapper(configuration => { }, Assembly.GetAssembly(typeof(ICreditCardsServices))!);
+
+
+
             #region Mappings
-            //Todos los perfiles de préstamos, tarjetas, cuentas de ahorro, transacciones y
-            //dashboard viven en la misma assembly: un único escaneo los registra todos.
-            //Repetir AddMaps sobre la misma assembly solo multiplica el trabajo de arranque.
             services.AddAutoMapper(configuration =>
             {
+                #region loans
+                configuration.AddMaps(typeof(LoansMappingDtoToViewModelAndReverse).Assembly);
+                configuration.AddMaps(typeof(LoansMappingEntitieToDtoAndReverse).Assembly);
+                #endregion
+
+                #region credit cards
+                configuration.AddMaps(typeof(CreditCardsMappingDtoToViewModelAndReverse).Assembly);
+                configuration.AddMaps(typeof(CreditCardsMappingEntitieToDtoAndReverse).Assembly);
+                #endregion
+
+                #region savings accounts
+                configuration.AddMaps(typeof(SavingsAccountsMappingDtoToViewModelAndReverse).Assembly);
                 configuration.AddMaps(typeof(SavingsAccountsMappingEntitieToDtoAndReverse).Assembly);
+                #endregion
+
+               
             });
             #endregion
+
 
             #region loans
             services.AddScoped<ILoansServices, LoansServices>();
@@ -45,6 +62,7 @@ namespace ArtemisBankingPro.IOC
             services.AddScoped<IAmortizationCalculator, AmortizationCalculator>();
             services.AddScoped<ILoansOverdueServices, LoansOverdueServices>();
             #endregion
+
 
             //Compartido: préstamos, tarjetas y dashboard consumen el mismo cálculo de deuda
             services.AddScoped<IDebtCalculator, DebtCalculator>();
@@ -61,10 +79,10 @@ namespace ArtemisBankingPro.IOC
 
 
             services.AddScoped<IDashboardService, DashboardService>();
-
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<ITransactionsValidationServices, TransactionsValidationServices>();
+
             services.AddScoped<IBeneficiaryServices, BeneficiaryServices>();
             services.AddScoped<IBeneficiaryValidationServices, BeneficiaryValidationServices>();
             services.AddScoped<ICashAdvanceServices, CashAdvanceServices>();
@@ -73,4 +91,5 @@ namespace ArtemisBankingPro.IOC
             return services;
         }
     }
+
 }

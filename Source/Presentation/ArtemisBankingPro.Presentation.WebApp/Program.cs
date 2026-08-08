@@ -1,4 +1,5 @@
 using ArtemisBankingPro.IOC;
+using ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguration;
 using ArtemisBankingPro.Presentation.WebApp.Extensions;
 using Serilog;
 
@@ -13,6 +14,19 @@ try
     builder.AddSerilogLogging();
     builder.AddGlobalExceptionHandling();
 
+    // Register all dependencies
+    builder.Services.AddApplicationDependecies();
+    builder.Services.AddInfraestructurePersistence(builder.Configuration);
+    builder.Services.AddInfraestructureDependencies(builder.Configuration);
+    builder.Services.AddWebAppIdentity(builder.Configuration);
+
+    // Add services to the container.
+    builder.Services.AddControllersWithViews();
+
+    var app = builder.Build();
+
+    // Run Identity Seeds (Roles and Default Users)
+    await app.Services.RunIdentitySeedsAsync();
     // Add services to the container.
     builder.Services.AddControllersWithViews();
 
@@ -20,7 +34,6 @@ try
     builder.Services.AddInfraestructurePersistence(builder.Configuration);
     builder.Services.AddInfraestructureDependencies(builder.Configuration);
 
-    var app = builder.Build();
 
     // Configure the HTTP request pipeline.
     app.UseLoggingAndExceptionHandling();
@@ -34,10 +47,14 @@ try
     app.UseHttpsRedirection();
     app.UseRouting();
 
+    app.UseAuthentication();
+    app.UseAuthorization();
+
     app.UseAuthorization();
 
     // Pendiente: habilitar cuando exista ICurrentUserService (proyecto Identity).
     //app.UseUserContextLogging();
+
 
     app.MapStaticAssets();
 

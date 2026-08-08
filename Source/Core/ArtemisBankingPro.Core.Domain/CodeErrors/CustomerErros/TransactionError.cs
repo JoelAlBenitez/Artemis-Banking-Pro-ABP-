@@ -64,6 +64,7 @@ namespace ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros
             "El beneficiario seleccionado no está registrado o no se encuentra activo."
         );
 
+
         public static readonly Error MinTwoAccountsRequired = new(
             "Transaction.MinTwoAccountsRequired", 
             "Debe tener al menos dos cuentas de ahorro activas para realizar una transferencia entre cuentas."

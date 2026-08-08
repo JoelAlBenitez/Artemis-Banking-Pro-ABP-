@@ -1,3 +1,5 @@
+using ArtemisBankingPro.IOC;
+using ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguration;
 using ArtemisBankingPro.Presentation.WebApi.Extensions;
 using Serilog;
 
@@ -13,6 +15,11 @@ try
     builder.AddGlobalExceptionHandling();
 
     // Add services to the container.
+    builder.Services.AddApplicationDependecies();
+    builder.Services.AddInfraestructurePersistence(builder.Configuration);
+    builder.Services.AddInfraestructureDependencies(builder.Configuration);
+    builder.Services.AddWebApiIdentity(builder.Configuration);
+
 
     builder.Services.AddControllers();
     // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -20,16 +27,22 @@ try
 
     var app = builder.Build();
 
+    // Run Identity Seeds (Roles and Default Users)
+    await app.Services.RunIdentitySeedsAsync();
+
+
     // Configure the HTTP request pipeline.
     app.UseLoggingAndExceptionHandling();
 
     if (app.Environment.IsDevelopment())
     {
+        app.MapOpenApi().AllowAnonymous();
         app.MapOpenApi();
     }
 
     app.UseHttpsRedirection();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     // Pendiente: habilitar cuando exista ICurrentUserService (proyecto Identity).

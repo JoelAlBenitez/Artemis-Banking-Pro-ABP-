@@ -156,7 +156,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
             }
             catch (Exception ex)
             {
-               
+
                 _logger.LogError(ex, "Error al verificar el estado de la cuenta {AccountNumber}", accountNumber);
                 return false;
             }
@@ -171,7 +171,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                     return 0m;
                 }
 
-             
+
                 var loansDebt = await _loansRepository.SumAsync(
                     loan => loan.CustomerId == customerId && loan.Status == LoanStatus.Activo,
                     loan => loan.PendingAmount);

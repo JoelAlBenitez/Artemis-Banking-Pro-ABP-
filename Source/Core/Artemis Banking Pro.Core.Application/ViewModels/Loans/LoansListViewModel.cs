@@ -1,5 +1,6 @@
 namespace Artemis_Banking_Pro.Core.Application.ViewModels.Loans
 {
+
     public sealed class LoansListViewModel
     {
         public required LoansFilterViewModel Filter { get; set; }
