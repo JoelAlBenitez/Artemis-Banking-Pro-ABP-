@@ -159,39 +159,48 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Registration
             return response;
         }
 
-        public async Task<string> ConfirmAccountAsync(string userId, string token)
+        public async Task<ConfirmAccountResponse> ConfirmAccountAsync(string userId, string token)
         {
             _logger.LogInformation("Iniciando la confirmación de la cuenta del usuario {UserId}", userId);
+
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
+                return ConfirmError("El enlace de activación no es válido.");
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 _logger.LogWarning("Confirmación fallida: el usuario {UserId} no existe.", userId);
-                return "El enlace de activación no es válido.";
+                return ConfirmError("El enlace de activación no es válido.");
             }
 
             //El token de activación es de un solo uso: una cuenta ya confirmada lo rechaza
             if (user.EmailConfirmed)
             {
                 _logger.LogWarning("Confirmación fallida: la cuenta del usuario {UserId} ya estaba activada.", userId);
-                return "Este enlace de activación ya fue utilizado.";
+                return ConfirmError("Este enlace de activación ya fue utilizado.");
             }
 
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (!result.Succeeded)
             {
                 _logger.LogWarning("Confirmación fallida: token inválido o expirado para el usuario {UserId}.", userId);
-                return "El enlace de activación no es válido.";
+                return ConfirmError("El enlace de activación no es válido.");
             }
 
             user.IsActive = true;
             await _userManager.UpdateAsync(user);
 
             _logger.LogInformation("Cuenta del usuario {UserId} activada correctamente.", userId);
-            return "Su cuenta ha sido activada correctamente. Ya puede iniciar sesión.";
+            return new ConfirmAccountResponse
+            {
+                Message = "Su cuenta ha sido activada correctamente. Ya puede iniciar sesión."
+            };
         }
 
         #region Helpers
+
+        private static ConfirmAccountResponse ConfirmError(string message)
+            => new() { HasError = true, Message = message };
 
         //Cuenta de ahorro principal: número único de 9 dígitos emitido por la secuencia del
         //módulo de cuentas, estado Activa y balance igual al monto inicial indicado.

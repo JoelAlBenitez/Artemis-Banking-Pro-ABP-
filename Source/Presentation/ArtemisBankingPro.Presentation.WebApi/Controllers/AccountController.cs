@@ -1,16 +1,16 @@
-using ArtemisBankingPro.Core.Application.DTOs.Account;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Registration;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Password;
-using ArtemisBankingPro.Core.Application.Contracts.Users.ExternalUsers;
 using ArtemisBankingPro.Core.Application.Contracts.Users.InternalUsers;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Tokens;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Password;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Registration;
+using ArtemisBankingPro.Core.Application.DTOs.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace ArtemisBankingPro.Presentation.WebApi.Controllers
 {
+    //Flujo de autenticación: ninguno de estos endpoints puede exigir un JWT previo, porque
+    //quien todavía no ha activado su cuenta o perdió su contraseña no puede tener uno.
     [Route("api/[controller]")]
     [ApiController]
     [AllowAnonymous]
@@ -55,10 +55,10 @@ namespace ArtemisBankingPro.Presentation.WebApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var resultMessage = await _accountRegistrationService.ConfirmAccountAsync(request.UserId, request.Token);
+            var response = await _accountRegistrationService.ConfirmAccountAsync(request.UserId, request.Token);
 
-            if (resultMessage.Contains("no es válido") || resultMessage.Contains("ya fue utilizado"))
-                return BadRequest(new { error = resultMessage });
+            if (response.HasError)
+                return BadRequest(new { error = response.Message });
 
             return NoContent();
         }
@@ -94,8 +94,12 @@ namespace ArtemisBankingPro.Presentation.WebApi.Controllers
 
     public class ConfirmAccountRequest
     {
+        //El token de Identity va cifrado y no permite recuperar al usuario: el identificador
+        //viaja junto a él y se envía en el mismo correo de activación.
+        [Required(AllowEmptyStrings = false)]
         public required string UserId { get; set; }
+
+        [Required(AllowEmptyStrings = false)]
         public required string Token { get; set; }
     }
 }
-

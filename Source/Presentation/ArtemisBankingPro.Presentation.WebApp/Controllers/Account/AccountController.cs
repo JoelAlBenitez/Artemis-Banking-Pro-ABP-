@@ -1,12 +1,9 @@
-using ArtemisBankingPro.Core.Application.DTOs.Account;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Registration;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Password;
 using ArtemisBankingPro.Core.Application.Contracts.Users.ExternalUsers;
-using ArtemisBankingPro.Core.Application.Contracts.Users.InternalUsers;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Tokens;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Password;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Registration;
+using ArtemisBankingPro.Core.Application.DTOs.Account;
+using ArtemisBankingPro.Core.Application.ViewModels.Account;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
-using ArtemisBankingPro.Presentation.WebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,15 +30,14 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
 
         public IActionResult Login()
         {
-            // Punto 4: usuario ya autenticado → redirigir a su Home real según rol
+            //El Login solo está disponible para usuarios no autenticados
             if (User.Identity != null && User.Identity.IsAuthenticated)
                 return RedirectToRoleHome();
 
-            // Punto 6: mensajes para acceso denegado / sesión expirada
             if (Request.Query.ContainsKey("denied"))
                 ModelState.AddModelError(string.Empty, "No tiene permiso para acceder a esta sección.");
             else if (Request.Query.ContainsKey("expired"))
-                ModelState.AddModelError(string.Empty, "Su sesión ha expirado. Por favor inicie sesión nuevamente.");
+                ModelState.AddModelError(string.Empty, "Su sesión ha expirado. Inicie sesión nuevamente.");
 
             return View(new AuthenticationRequest { UserName = "", Password = "" });
         }
@@ -60,7 +56,6 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
                 return View(request);
             }
 
-            // Punto 3: post-login redirigir al Home del rol
             return RedirectToRoleHome(response.Roles);
         }
 
@@ -70,7 +65,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
             return RedirectToAction(nameof(Login));
         }
 
-        // ─── FORGOT / RESET PASSWORD ─────────────────────────────────────────
+        // ─── RESTABLECIMIENTO DE CONTRASEÑA ──────────────────────────────────
 
         public IActionResult ForgotPassword()
         {
@@ -121,40 +116,45 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
                 return View(request);
             }
 
-            ViewBag.Message = "Su contraseña ha sido restablecida exitosamente. Ya puede iniciar sesión.";
-            return View(request);
+            //Tras restablecer correctamente, el usuario vuelve al Login ya activo
+            TempData["Message"] = "Su contraseña ha sido restablecida correctamente. Ya puede iniciar sesión.";
+            return RedirectToAction(nameof(Login));
         }
 
-        // ─── CONFIRM EMAIL ───────────────────────────────────────────────────
+        // ─── ACTIVACIÓN DE CUENTA ────────────────────────────────────────────
 
         public async Task<IActionResult> ConfirmAccountEmail(string userId, string token)
         {
-            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
-                return RedirectToAction(nameof(Login));
+            var response = await _accountRegistrationService.ConfirmAccountAsync(userId, token);
 
-            string response = await _accountRegistrationService.ConfirmAccountAsync(userId, token);
-            return View("ConfirmEmail", response);
+            //Una activación correcta envía al Login con el mensaje de confirmación
+            if (!response.HasError)
+            {
+                TempData["Message"] = response.Message;
+                return RedirectToAction(nameof(Login));
+            }
+
+            return View("ConfirmEmail", response.Message);
         }
 
-        // ─── ACCESS DENIED ───────────────────────────────────────────────────
+        // ─── ACCESO DENEGADO ─────────────────────────────────────────────────
 
         public IActionResult AccessDenied()
         {
             var homeController = "Account";
             var homeAction = "Login";
 
-            // Punto 2: controllers reales por rol
-            if (User.IsInRole(Roles.Administrador.ToString()))
+            if (User.IsInRole(nameof(Roles.Administrador)))
             {
                 homeController = "AdminHome";
                 homeAction = "Index";
             }
-            else if (User.IsInRole(Roles.Cajero.ToString()))
+            else if (User.IsInRole(nameof(Roles.Cajero)))
             {
                 homeController = "CashierHome";
                 homeAction = "Index";
             }
-            else if (User.IsInRole(Roles.Cliente.ToString()))
+            else if (User.IsInRole(nameof(Roles.Cliente)))
             {
                 homeController = "ClientHome";
                 homeAction = "Index";
@@ -162,7 +162,6 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
 
             return View(new AccessDeniedViewModel
             {
-                Message = "No posee permisos para acceder a esta sección.",
                 HomeController = homeController,
                 HomeAction = homeAction
             });
@@ -172,24 +171,22 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
 
         private IActionResult RedirectToRoleHome(List<string>? roles = null)
         {
-            // Si no se pasan roles, leerlos del claim del usuario autenticado
             var userRoles = roles ?? User.Claims
                 .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
                 .Select(c => c.Value)
                 .ToList();
 
-            if (userRoles.Contains(Roles.Administrador.ToString()))
+            if (userRoles.Contains(nameof(Roles.Administrador)))
                 return RedirectToAction("Index", "AdminHome");
 
-            if (userRoles.Contains(Roles.Cajero.ToString()))
+            if (userRoles.Contains(nameof(Roles.Cajero)))
                 return RedirectToAction("Index", "CashierHome");
 
-            if (userRoles.Contains(Roles.Cliente.ToString()))
+            if (userRoles.Contains(nameof(Roles.Cliente)))
                 return RedirectToAction("Index", "ClientHome");
 
-            // Fallback si el rol no es reconocido (ej. Comercio — solo usa la API)
+            //El rol Comercio no tiene Home en la aplicación web: solo consume la Web API
             return RedirectToAction(nameof(Login));
         }
     }
 }
-
