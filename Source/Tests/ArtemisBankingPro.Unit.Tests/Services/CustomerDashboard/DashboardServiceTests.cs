@@ -26,6 +26,9 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+using ArtemisBankingPro.Core.Application.DTOs.Users;
+
 namespace ArtemisBankingPro.Unit.Tests.Services.CustomerDashboard
 {
     public class DashboardServiceTests
@@ -36,6 +39,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.CustomerDashboard
         private readonly Mock<ITransactionRepository> _transactionRepositoryMock;
         private readonly Mock<ICardConsumptionRepository> _cardConsumptionRepositoryMock;
         private readonly Mock<IMapper> _mapperMock;
+        private readonly Mock<IUserManagementService> _userManagementServiceMock;
         private readonly DashboardService _dashboardService;
 
         public DashboardServiceTests()
@@ -46,6 +50,10 @@ namespace ArtemisBankingPro.Unit.Tests.Services.CustomerDashboard
             _transactionRepositoryMock = new Mock<ITransactionRepository>();
             _cardConsumptionRepositoryMock = new Mock<ICardConsumptionRepository>();
             _mapperMock = new Mock<IMapper>();
+            _userManagementServiceMock = new Mock<IUserManagementService>();
+
+            _userManagementServiceMock.Setup(u => u.ValidateUserExistsByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new UserExistenceDto { Exists = true, IsActive = true });
 
             _dashboardService = new DashboardService(
                 _savingsAccountRepositoryMock.Object,
@@ -53,7 +61,8 @@ namespace ArtemisBankingPro.Unit.Tests.Services.CustomerDashboard
                 _loansRepositoryMock.Object,
                 _transactionRepositoryMock.Object,
                 _cardConsumptionRepositoryMock.Object,
-                _mapperMock.Object);
+                _mapperMock.Object,
+                _userManagementServiceMock.Object);
         }
 
         [Fact]
