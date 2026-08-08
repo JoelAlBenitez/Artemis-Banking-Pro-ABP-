@@ -1,10 +1,5 @@
-using ArtemisBankingPro.Core.Application.DTOs.Account;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Registration;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Password;
 using ArtemisBankingPro.Core.Application.Contracts.Users.ExternalUsers;
-using ArtemisBankingPro.Core.Application.Contracts.Users.InternalUsers;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Tokens;
+using ArtemisBankingPro.Core.Application.DTOs.Account;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Infraestructrue.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -17,6 +12,14 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Auth
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<AuthWebAppService> _logger;
+
+        //Roles con acceso a la aplicación web. Comercio queda fuera: solo usa la Web API.
+        private static readonly string[] WebAppRoles =
+        {
+            nameof(Roles.Administrador),
+            nameof(Roles.Cajero),
+            nameof(Roles.Cliente)
+        };
 
         public AuthWebAppService(
             UserManager<ApplicationUser> userManager,
@@ -36,52 +39,54 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Auth
             var user = await _userManager.FindByNameAsync(request.UserName);
             if (user == null)
             {
-                _logger.LogWarning("Intento de login fallido: El usuario {UserName} no existe.", request.UserName);
+                _logger.LogWarning("Intento de login fallido: el usuario {UserName} no existe.", request.UserName);
                 response.HasError = true;
-                response.Error = "Los datos de acceso son invÃ¡lidos.";
+                response.Error = "Los datos de acceso son inválidos.";
                 return response;
             }
 
-            var rolesList = await _userManager.GetRolesAsync(user);
-            if (rolesList.Contains(Roles.Comercio.ToString()))
+            //La contraseña se verifica antes que el estado y el rol: así una credencial
+            //incorrecta nunca revela si la cuenta existe, está inactiva o qué rol tiene.
+            if (!await _userManager.CheckPasswordAsync(user, request.Password))
             {
-                _logger.LogWarning("Intento de login denegado: El usuario {UserName} es un comercio y no tiene acceso a WebApp.", request.UserName);
+                _logger.LogWarning("Intento de login fallido: contraseña incorrecta para el usuario {UserName}.", request.UserName);
                 response.HasError = true;
-                response.Error = "Este usuario no tiene permisos para acceder a la aplicaciÃ³n web.";
+                response.Error = "Los datos de acceso son inválidos.";
                 return response;
             }
 
             if (!user.IsActive)
             {
-                _logger.LogWarning("Intento de login denegado: La cuenta del usuario {UserName} estÃ¡ inactiva.", request.UserName);
+                _logger.LogWarning("Intento de login denegado: la cuenta del usuario {UserName} está inactiva.", request.UserName);
                 response.HasError = true;
-                response.Error = "Su cuenta se encuentra inactiva. Debe activar su cuenta mediante el enlace enviado a su correo electrÃ³nico registrado para poder acceder al sistema.";
+                response.Error = "Su cuenta se encuentra inactiva. Debe activar su cuenta mediante el enlace enviado a su correo electrónico registrado para poder acceder al sistema.";
                 return response;
             }
 
-            var result = await _signInManager.PasswordSignInAsync(user.UserName!, request.Password, false, lockoutOnFailure: false);
-            if (!result.Succeeded)
+            var rolesList = await _userManager.GetRolesAsync(user);
+            if (!rolesList.Any(role => WebAppRoles.Contains(role)))
             {
-                _logger.LogWarning("Intento de login fallido: ContraseÃ±a incorrecta para el usuario {UserName}.", request.UserName);
+                _logger.LogWarning("Intento de login denegado: el usuario {UserName} no tiene un rol permitido en la aplicación web.", request.UserName);
                 response.HasError = true;
-                response.Error = "Los datos de acceso son invÃ¡lidos.";
+                response.Error = "Este usuario no tiene permisos para acceder a la aplicación web.";
                 return response;
             }
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
 
             response.Id = user.Id;
             response.Email = user.Email!;
             response.UserName = user.UserName!;
             response.Roles = rolesList.ToList();
 
-            _logger.LogInformation("Login exitoso para el usuario {UserName} en WebApp.", request.UserName);
+            _logger.LogInformation("Login exitoso para el usuario {UserName} en la aplicación web.", request.UserName);
             return response;
         }
 
         public async Task LogoutAsync()
         {
-            _logger.LogInformation("Cerrando sesiÃ³n de usuario en WebApp.");
+            _logger.LogInformation("Cerrando la sesión del usuario en la aplicación web.");
             await _signInManager.SignOutAsync();
         }
     }
 }
-
