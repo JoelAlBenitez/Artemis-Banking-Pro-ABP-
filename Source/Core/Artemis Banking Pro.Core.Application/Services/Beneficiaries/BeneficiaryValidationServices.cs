@@ -1,5 +1,6 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.DTOs.Beneficiaries;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
@@ -17,15 +18,18 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Beneficiaries
         private readonly ISavingsAccountsRepository _savingsAccountsRepository;
         private readonly IBeneficiaryRepository _beneficiaryRepository;
         private readonly ILogger<BeneficiaryValidationServices> _logger;
+        private readonly IUserManagementService _userManagementService;
 
         public BeneficiaryValidationServices(
             ISavingsAccountsRepository savingsAccountsRepository,
             IBeneficiaryRepository beneficiaryRepository,
-            ILogger<BeneficiaryValidationServices> logger)
+            ILogger<BeneficiaryValidationServices> logger,
+            IUserManagementService userManagementService)
         {
             _savingsAccountsRepository = savingsAccountsRepository;
             _beneficiaryRepository = beneficiaryRepository;
             _logger = logger;
+            _userManagementService = userManagementService;
         }
 
         public async Task<ValidationResult<SavingsAccount>> ValidateCreationAsync(SaveBeneficiaryDto dto)
@@ -38,10 +42,24 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Beneficiaries
 
             try
             {
+                var ownerUser = await _userManagementService.ValidateUserExistsByIdAsync(dto.OwnerClientId);
+                if (!ownerUser.Exists || !ownerUser.IsActive)
+                {
+                    _logger.LogWarning("Validación fallida: el cliente propietario {ClientId} no existe o no está activo", dto.OwnerClientId);
+                    return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AccountNotFound);
+                }
+
                 var savingsAccount = await _savingsAccountsRepository.GetFirstAsync(a => a.AccountNumber == dto.AccountNumber);
                 if (savingsAccount is null)
                 {
                     _logger.LogWarning("Validación fallida: la cuenta de ahorros {AccountNumber} no existe", dto.AccountNumber);
+                    return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AccountNotFound);
+                }
+
+                var beneficiaryUser = await _userManagementService.ValidateUserExistsByIdAsync(savingsAccount.CustomerId);
+                if (!beneficiaryUser.Exists || !beneficiaryUser.IsActive)
+                {
+                    _logger.LogWarning("Validación fallida: el cliente beneficiario propietario de la cuenta {AccountNumber} no existe o no está activo", dto.AccountNumber);
                     return ValidationResult<SavingsAccount>.Failure(BeneficiaryError.AccountNotFound);
                 }
 
