@@ -1,10 +1,7 @@
 using Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
-<<<<<<< HEAD
-=======
 using ArtemisBankingPro.Core.Domain.Entities.Transactions;
->>>>>>> origin/development
 using AutoMapper;
 
 namespace Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.SavingsAccounts
@@ -14,25 +11,18 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.
         public SavingsAccountsMappingEntitieToDtoAndReverse()
         {
             //El nombre y la cédula del cliente provienen de Identity y los completa el servicio.
-<<<<<<< HEAD
-=======
             //El ReverseMap lo consume el Dashboard del módulo Cliente, que materializa la
             //entidad a partir del DTO: ambos sentidos viven en este único perfil.
->>>>>>> origin/development
             CreateMap<SavingsAccount, SavingsAccountDto>()
                 .ForMember(d => d.TypeSavingsAccount, o => o.MapFrom(s => s.AccountType))
                 .ForMember(d => d.StateSavingsAccount, o => o.MapFrom(s => s.Status))
                 .ForMember(d => d.FullNameCustomer, o => o.Ignore())
-<<<<<<< HEAD
-                .ForMember(d => d.IdCard, o => o.Ignore());
-=======
                 .ForMember(d => d.IdCard, o => o.Ignore())
                 .ReverseMap()
                 .ForMember(d => d.AccountType, o => o.MapFrom(s => s.TypeSavingsAccount))
                 .ForMember(d => d.Status, o => o.MapFrom(s => s.StateSavingsAccount))
                 .ForMember(d => d.StatusChangedAt, o => o.Ignore())
                 .ForMember(d => d.Transactions, o => o.Ignore());
->>>>>>> origin/development
 
             //Campos de solo sistema: número de cuenta, tipo, estado y auditoría.
             //Desde el módulo administrador toda cuenta se crea Secundaria y Activa.
@@ -46,12 +36,6 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.
                 .ForMember(d => d.CreatedAt, o => o.Ignore())
                 .ForMember(d => d.CreateByUserId, o => o.Ignore())
                 .ForMember(d => d.LastModifiedByIdUser, o => o.Ignore())
-<<<<<<< HEAD
-                .ForMember(d => d.ModifiedAt, o => o.Ignore());
-
-            //El mapeo de Transaction a TransactionDto se agrega cuando el módulo Cliente
-            //exponga la entidad; el contrato de lectura ya existe en este módulo.
-=======
                 .ForMember(d => d.ModifiedAt, o => o.Ignore())
                 //El historial lo escribe el servicio, nunca el mapeo de la asignación.
                 .ForMember(d => d.Transactions, o => o.Ignore());
@@ -64,7 +48,6 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.
                 .ForMember(d => d.TypeTransaction, o => o.MapFrom(s => s.TransactionType))
                 .ForMember(d => d.StateTransaction, o => o.MapFrom(s => s.Status))
                 .ForMember(d => d.Beneficiary, o => o.MapFrom(s => s.Beneficiary ?? string.Empty));
->>>>>>> origin/development
         }
     }
 }

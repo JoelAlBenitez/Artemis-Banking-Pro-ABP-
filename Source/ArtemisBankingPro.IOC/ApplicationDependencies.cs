@@ -31,7 +31,7 @@ namespace ArtemisBankingPro.IOC
         {
             services.AddAutoMapper(configuration => { }, Assembly.GetAssembly(typeof(ICreditCardsServices))!);
 
-           
+
 
             #region Mappings
             services.AddAutoMapper(configuration =>
@@ -51,12 +51,10 @@ namespace ArtemisBankingPro.IOC
                 configuration.AddMaps(typeof(SavingsAccountsMappingEntitieToDtoAndReverse).Assembly);
                 #endregion
 
-                #region customer dashboard
-                configuration.AddMaps(typeof(SavingsAccountMappingProfile).Assembly);
-                #endregion
+               
             });
+            #endregion
 
-          
 
             #region loans
             services.AddScoped<ILoansServices, LoansServices>();
@@ -93,4 +91,5 @@ namespace ArtemisBankingPro.IOC
             return services;
         }
     }
+
 }

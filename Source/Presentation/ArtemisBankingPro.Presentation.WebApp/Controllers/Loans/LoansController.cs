@@ -60,8 +60,6 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
         #endregion
 
         #region asignar prestamo
-<<<<<<< HEAD
-=======
         //Paso 1: clientes activos sin préstamo activo y monto promedio de deuda del sistema.
         [HttpGet]
         public async Task<IActionResult> Assign(string? idCard)
@@ -80,7 +78,6 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
             return View(vm);
         }
 
->>>>>>> origin/development
         //Paso 1: llega el cliente elegido en el formulario de selección y se muestra el paso 2.
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -89,11 +86,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
             if (string.IsNullOrWhiteSpace(customerId))
             {
                 _logger.LogWarning("Intento de asignacion de prestamo sin cliente seleccionado");
-<<<<<<< HEAD
-                return RedirectToAction(nameof(Index));
-=======
                 return RedirectToAction(nameof(Assign));
->>>>>>> origin/development
             }
 
             return View("Create", new LoansAssigmentViewModel
@@ -112,9 +105,6 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
         {
             if (!ModelState.IsValid) return View(vm);
 
-<<<<<<< HEAD
-            var result = await _loansServices.CreateAsync(_mapper.Map<LoansAssignmentDto>(vm));
-=======
             var dto = _mapper.Map<LoansAssignmentDto>(vm);
 
             //Antes de registrar se evalúa el riesgo: si el cliente es o se convierte en cliente de
@@ -158,7 +148,6 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
             dto.ConfirmHighRisk = true;
 
             var result = await _loansServices.CreateAsync(dto);
->>>>>>> origin/development
 
             if (!result.IsValid)
             {

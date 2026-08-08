@@ -77,7 +77,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 }
 
                 _logger.LogInformation("Transferencia express procesada y guardada correctamente para el cliente {ClientId}", clientId);
-                
+
                 var emailSent = await SendExpressNotificationEmailsAsync(originAccount, destAccount, dto.Amount, clientId);
                 if (!emailSent)
                 {
@@ -121,7 +121,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 }
 
                 _logger.LogInformation("Transferencia a beneficiario procesada y guardada correctamente para el cliente {ClientId}", clientId);
-                
+
                 var emailSent = await SendExpressNotificationEmailsAsync(originAccount, destAccount, dto.Amount, clientId);
                 if (!emailSent)
                 {
@@ -401,7 +401,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             try
             {
                 _logger.LogInformation("Enviando correos de notificación de transferencia desde la cuenta ****{LastFourOrig} a la cuenta ****{LastFourDest}", lastFourOrig, lastFourDest);
-                
+
                 var sent1 = await _emailServices.SendNotification(new MessageDto
                 {
                     To = emisorEmail,
@@ -425,8 +425,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             }
         }
 
-<<<<<<< HEAD
-=======
         public async Task<bool> ProcessDepositAsync(DepositDto depositData)
         {
             _logger.LogInformation("Procesando depósito de RD${Amount} en cuenta {AccountNumber} por el cajero {CashierId}", depositData.Amount, depositData.AccountNumber, depositData.CashierId);
@@ -696,7 +694,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             }
         }
 
->>>>>>> origin/development
         #endregion
     }
 }

@@ -6,10 +6,7 @@ using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
 using ArtemisBankingPro.Infraestructrue.Persistence.Context;
 using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Generic;
 using Microsoft.EntityFrameworkCore;
-<<<<<<< HEAD
-=======
 using System.Globalization;
->>>>>>> origin/development
 
 namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans
 {
@@ -17,10 +14,6 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans
         GenericRepository<Loan, int>,
         ILoansRepository
     {
-<<<<<<< HEAD
-        public LoansRepository(DbContextArtemisBanking context) : base(context) { }
-
-=======
         private const string LoanNumberSequence = "LoanNumberSequence";
 
         public LoansRepository(DbContextArtemisBanking context) : base(context) { }
@@ -38,7 +31,6 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans
                 .PadLeft(DomainConstants.LoanNumberLength, '0');
         }
 
->>>>>>> origin/development
         public async Task<PagedResult<Loan>> GetPagedLoansAsync(
             int page,
             int pageSize,
@@ -67,6 +59,6 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans
             return new PagedResult<Loan>(items, page, pageSize, totalRecords);
         }
 
-       
+
     }
 }

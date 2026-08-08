@@ -12,10 +12,7 @@ namespace Artemis_Banking_Pro.Core.Application.ViewModels.Loans
         public required decimal PendientAmount { get; set; }
         public required decimal AnnualInterestRate { get; set; }
         public required int Term { get; set; }
-<<<<<<< HEAD
-        //Etiquetas de presentación: Activo / Completado y Al día / En mora
-=======
->>>>>>> origin/development
+
         public required string StateLoans { get; set; }
         public required string StateCustomer { get; set; }
 

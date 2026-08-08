@@ -1,9 +1,6 @@
 namespace Artemis_Banking_Pro.Core.Application.ViewModels.Loans
 {
-<<<<<<< HEAD
-    //Modelo de la pantalla del listado: filtro aplicado + préstamos de la página + paginación.
-=======
->>>>>>> origin/development
+
     public sealed class LoansListViewModel
     {
         public required LoansFilterViewModel Filter { get; set; }

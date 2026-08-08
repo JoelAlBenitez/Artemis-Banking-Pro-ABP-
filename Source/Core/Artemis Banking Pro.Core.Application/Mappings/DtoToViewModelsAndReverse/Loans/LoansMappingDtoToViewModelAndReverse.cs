@@ -21,8 +21,7 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndRevers
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.LoansId));
 
             CreateMap<ClientLoansDto, ClientLoansViewModel>();
-<<<<<<< HEAD
-=======
+
 
             //paso 1 de la asignacion: promedio de deuda y clientes elegibles
             CreateMap<ClientsForLoanAssignmentDto, ClientsForLoanAssignmentViewModel>()
@@ -44,7 +43,6 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndRevers
 
             CreateMap<RiskWarningViewModel, LoansAssignmentDto>()
                 .ForMember(d => d.ConfirmHighRisk, o => o.Ignore());
->>>>>>> origin/development
             //ventana principal de prestamo
             CreateMap<LoansDto, LoansViewModel>()
                 .ForMember(d => d.StateLoans,

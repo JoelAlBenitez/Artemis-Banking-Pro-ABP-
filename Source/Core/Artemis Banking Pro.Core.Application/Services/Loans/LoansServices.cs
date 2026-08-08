@@ -559,7 +559,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 Message = BuildRateUpdateBody(rateUpdated, customerFullName)
             };
 
-            var sent = await _emailServices.SendNotification(message)
+            var sent = await _emailServices.SendNotification(message);
 
             if (!sent)
             {

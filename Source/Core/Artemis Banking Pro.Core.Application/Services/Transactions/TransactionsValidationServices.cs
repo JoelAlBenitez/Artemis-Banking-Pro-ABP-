@@ -251,8 +251,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 return ValidationResult<(SavingsAccount, Loan, List<LoanInstallment>, decimal)>.Failure(GeneralError.UnexpectedError);
             }
         }
-<<<<<<< HEAD
-=======
 
         public async Task<ValidationResult<(SavingsAccount Origin, SavingsAccount Destination)>> ValidateAccountTransferAsync(AccountTransferDto dto, string clientId)
         {
@@ -308,6 +306,5 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(GeneralError.UnexpectedError);
             }
         }
->>>>>>> origin/development
     }
 }
