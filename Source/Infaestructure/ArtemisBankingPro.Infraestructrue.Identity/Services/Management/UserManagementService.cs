@@ -247,14 +247,14 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
             {
                 var userWithSameEmail = await _userManager.FindByEmailAsync(dto.Email);
                 if (userWithSameEmail != null && userWithSameEmail.Id != user.Id)
-                    return Failure("Ya existe otro usuario registrado con este correo electrónico.");
+                    return Conflict("Ya existe otro usuario registrado con este correo electrónico.");
             }
 
             if (!string.Equals(user.UserName, dto.UserName, StringComparison.OrdinalIgnoreCase))
             {
                 var userWithSameUserName = await _userManager.FindByNameAsync(dto.UserName);
                 if (userWithSameUserName != null && userWithSameUserName.Id != user.Id)
-                    return Failure("Ya existe otro usuario registrado con este nombre de usuario.");
+                    return Conflict("Ya existe otro usuario registrado con este nombre de usuario.");
             }
 
             if (user.IDCARD != dto.IDCARD)
@@ -262,7 +262,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
                 var userWithSameIdCard = await _userManager.Users
                     .FirstOrDefaultAsync(u => u.IDCARD == dto.IDCARD && u.Id != user.Id);
                 if (userWithSameIdCard != null)
-                    return Failure("Ya existe otro usuario registrado con esta cédula.");
+                    return Conflict("Ya existe otro usuario registrado con esta cédula.");
             }
 
             user.FirstName = dto.Name;
@@ -415,6 +415,9 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
 
         private static UserOperationResponseDto Failure(string error)
             => new() { HasError = true, Error = error };
+
+        private static UserOperationResponseDto Conflict(string error)
+            => new() { HasError = true, Conflict = true, Error = error };
 
         private static UserOperationResponseDto NotFoundResponse()
             => new() { HasError = true, NotFound = true, Error = "El usuario seleccionado no existe." };

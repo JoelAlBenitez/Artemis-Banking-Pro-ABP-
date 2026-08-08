@@ -1,14 +1,10 @@
-using ArtemisBankingPro.Core.Application.DTOs.Account;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Registration;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Password;
-using ArtemisBankingPro.Core.Application.Contracts.Users.ExternalUsers;
-using ArtemisBankingPro.Core.Application.Contracts.Users.InternalUsers;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Tokens;
-using ArtemisBankingPro.Infraestructrue.Identity.Entities;
-using ArtemisBankingPro.Infraestructrue.Identity.Interfaces;
 using Artemis_Banking_Pro.Core.Application.Contracts.EmailSerives;
 using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Password;
+using ArtemisBankingPro.Core.Application.DTOs.Account;
+using ArtemisBankingPro.Core.Domain.Common.Enum;
+using ArtemisBankingPro.Infraestructrue.Identity.Entities;
+using ArtemisBankingPro.Infraestructrue.Identity.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
@@ -27,6 +23,22 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
         private const string TokenDateKey = "TokenDate";
         private const string TokenUsedKey = "TokenUsed";
 
+        //Vigencia máxima del enlace de restablecimiento exigida por el documento funcional
+        private const int TokenLifetimeInMinutes = 30;
+
+        private static readonly string[] WebAppRoles =
+        {
+            nameof(Roles.Administrador),
+            nameof(Roles.Cajero),
+            nameof(Roles.Cliente)
+        };
+
+        private static readonly string[] WebApiRoles =
+        {
+            nameof(Roles.Administrador),
+            nameof(Roles.Comercio)
+        };
+
         public PasswordRecoveryService(
             UserManager<ApplicationUser> userManager,
             IEmailServices emailServices,
@@ -41,45 +53,38 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
 
         public async Task<ForgotPasswordResponse> ForgotPasswordAsync(ForgotPasswordRequest request, string origin)
         {
-            _logger.LogInformation("Iniciando solicitud de restablecimiento de contraseña para el usuario {UserName}", request.UserName);
+            _logger.LogInformation("Iniciando la solicitud de restablecimiento de contraseña del usuario {UserName}", request.UserName);
             var response = new ForgotPasswordResponse();
+
             var user = await _userManager.FindByNameAsync(request.UserName);
-
-            if (user == null || string.IsNullOrEmpty(user.Email))
+            if (user == null)
             {
-                _logger.LogWarning("Restablecimiento fallido: El usuario {UserName} no existe o no tiene correo registrado.", request.UserName);
-                // Retornar éxito ficticio para evitar la enumeración de usuarios
-                return response;
-            }
-
-            // Invalida tokens anteriores cambiando el SecurityStamp
-            var stampResult = await _userManager.UpdateSecurityStampAsync(user);
-            if (!stampResult.Succeeded)
-            {
-                _logger.LogError("Error al actualizar SecurityStamp para el usuario {UserId}.", user.Id);
+                _logger.LogWarning("Restablecimiento fallido: el usuario {UserName} no existe.", request.UserName);
                 response.HasError = true;
-                response.Error = "No fue posible procesar la solicitud. Intente nuevamente.";
+                response.Error = "No existe un usuario registrado con este nombre de usuario.";
                 return response;
             }
 
-            var token = await _generateTokens.GenerateTokenResetPasswordAsync(user, origin);
-            user.IsActive = false;
-            var updateResult = await _userManager.UpdateAsync(user);
-            if (!updateResult.Succeeded)
+            if (string.IsNullOrWhiteSpace(user.Email))
             {
-                _logger.LogError("Error al desactivar la cuenta durante restablecimiento para {UserId}.", user.Id);
+                _logger.LogWarning("Restablecimiento fallido: el usuario {UserName} no tiene correo registrado.", request.UserName);
                 response.HasError = true;
-                response.Error = "No fue posible procesar la solicitud. Intente nuevamente.";
+                response.Error = "Este usuario no tiene un correo electrónico registrado. No es posible enviar la solicitud de restablecimiento.";
                 return response;
             }
 
-            // Guarda metadata del token (fecha de creación y estado de uso)
-            var tokenDateResult = await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, TokenDateKey, DateTime.UtcNow.ToString("o"));
-            var tokenUsedResult = await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, TokenUsedKey, "false");
-            
-            if (!tokenDateResult.Succeeded || !tokenUsedResult.Succeeded)
+            var roles = await _userManager.GetRolesAsync(user);
+            if (!roles.Any(role => WebAppRoles.Contains(role)))
             {
-                _logger.LogError("Error al guardar metadata del token para el usuario {UserId}.", user.Id);
+                _logger.LogWarning("Restablecimiento denegado: el usuario {UserName} no tiene un rol permitido en la aplicación web.", request.UserName);
+                response.HasError = true;
+                response.Error = "Este usuario no tiene permisos para acceder a la aplicación web.";
+                return response;
+            }
+
+            var token = await PrepareResetTokenAsync(user);
+            if (token == null)
+            {
                 response.HasError = true;
                 response.Error = "No fue posible procesar la solicitud. Intente nuevamente.";
                 return response;
@@ -92,70 +97,172 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
             {
                 To = user.Email!,
                 Subject = "Restablecimiento de contraseña",
-                Message = $"<p>Hola {user.FirstName},</p><p>Hemos recibido una solicitud para restablecer la contraseña de su cuenta.</p><p>Para continuar, haga clic en el siguiente enlace:</p><p><a href='{verificationUri}'>{verificationUri}</a></p><p>Este enlace tendrá una vigencia de 30 minutos.</p><p>Si usted no solicitó este cambio, ignore este mensaje.</p>"
+                Message = $"<p>Hola {user.FirstName},</p>" +
+                          "<p>Hemos recibido una solicitud para restablecer la contraseña de su cuenta.</p>" +
+                          "<p>Para continuar, haga clic en el siguiente enlace:</p>" +
+                          $"<p><a href='{verificationUri}'>{verificationUri}</a></p>" +
+                          $"<p>Este enlace tendrá una vigencia de {TokenLifetimeInMinutes} minutos.</p>" +
+                          "<p>Si usted no solicitó este cambio, ignore este mensaje.</p>"
             });
 
-            _logger.LogInformation("Correo de restablecimiento enviado exitosamente a {Email} para {UserName}", user.Email, user.UserName);
+            _logger.LogInformation("Correo de restablecimiento enviado a {Email} para el usuario {UserName}", user.Email, user.UserName);
             return response;
         }
 
         public async Task<ResetPasswordResponse> ResetPasswordAsync(ResetPasswordRequest request)
         {
-            _logger.LogInformation("Iniciando confirmación de nueva contraseña para la cuenta con email {Email}", request.Email);
+            _logger.LogInformation("Iniciando el cambio de contraseña de la cuenta con correo {Email}", request.Email);
+
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            return await CompleteResetAsync(user, request.Token, request.Password, request.ConfirmPassword);
+        }
+
+        // --- Web API ---
+
+        public async Task<ForgotPasswordResponse> ForgotPasswordApiAsync(ForgotPasswordRequest request)
+        {
+            var response = new ForgotPasswordResponse();
+
+            var user = await _userManager.FindByNameAsync(request.UserName);
+            if (user == null)
+            {
+                response.HasError = true;
+                response.Error = "No existe un usuario registrado con este nombre de usuario.";
+                return response;
+            }
+
+            if (string.IsNullOrWhiteSpace(user.Email))
+            {
+                response.HasError = true;
+                response.Error = "Este usuario no tiene un correo electrónico registrado. No es posible enviar la solicitud de restablecimiento.";
+                return response;
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            if (!roles.Any(role => WebApiRoles.Contains(role)))
+            {
+                response.HasError = true;
+                response.Error = "Acceso denegado. No tiene permisos para utilizar este recurso.";
+                return response;
+            }
+
+            var token = await PrepareResetTokenAsync(user);
+            if (token == null)
+            {
+                response.HasError = true;
+                response.Error = "No fue posible procesar la solicitud. Intente nuevamente.";
+                return response;
+            }
+
+            //Desde la API el correo no lleva enlace: el token viaja en el cuerpo para
+            //utilizarse en el endpoint de reseteo.
+            await _emailServices.SendNotification(new MessageDto
+            {
+                To = user.Email!,
+                Subject = "Token de restablecimiento de contraseña",
+                Message = $"<p>Hola {user.FirstName},</p>" +
+                          "<p>Se ha generado un token para restablecer la contraseña de su cuenta.</p>" +
+                          $"<p>Token de restablecimiento:<br><strong>{token}</strong></p>" +
+                          $"<p>Identificador de usuario: <strong>{user.Id}</strong></p>" +
+                          "<p>Utilice este token en el endpoint correspondiente para completar el cambio de contraseña.</p>" +
+                          "<p>Si usted no solicitó este cambio, ignore este mensaje.</p>"
+            });
+
+            return response;
+        }
+
+        public async Task<ResetPasswordResponse> ResetPasswordApiAsync(ResetPasswordApiRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(request.UserId);
+            return await CompleteResetAsync(user, request.Token, request.Password, request.ConfirmPassword);
+        }
+
+        #region Helpers
+
+        //Inactiva la cuenta, invalida los tokens anteriores y registra la fecha de emisión
+        //y el estado de uso del nuevo token. Devuelve null si algo falló.
+        private async Task<string?> PrepareResetTokenAsync(ApplicationUser user)
+        {
+            var stampResult = await _userManager.UpdateSecurityStampAsync(user);
+            if (!stampResult.Succeeded)
+            {
+                _logger.LogError("Error al actualizar el SecurityStamp del usuario {UserId}.", user.Id);
+                return null;
+            }
+
+            var token = await _generateTokens.GenerateTokenResetPasswordAsync(user, string.Empty);
+
+            user.IsActive = false;
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                _logger.LogError("Error al inactivar temporalmente la cuenta del usuario {UserId}.", user.Id);
+                return null;
+            }
+
+            var tokenDateResult = await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, TokenDateKey, DateTime.UtcNow.ToString("o"));
+            var tokenUsedResult = await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, TokenUsedKey, "false");
+
+            if (!tokenDateResult.Succeeded || !tokenUsedResult.Succeeded)
+            {
+                _logger.LogError("Error al guardar los datos del token del usuario {UserId}.", user.Id);
+                return null;
+            }
+
+            return token;
+        }
+
+        //Validaciones y efectos comunes a la aplicación web y a la Web API: token existente,
+        //no expirado, no utilizado, contraseñas coincidentes y reactivación de la cuenta.
+        private async Task<ResetPasswordResponse> CompleteResetAsync(
+            ApplicationUser? user, string token, string password, string confirmPassword)
+        {
             var response = new ResetPasswordResponse();
 
-            if (request.Password != request.ConfirmPassword)
+            if (password != confirmPassword)
             {
-                _logger.LogWarning("Fallo al restablecer contraseña: Las contraseñas no coinciden para el email {Email}.", request.Email);
                 response.HasError = true;
                 response.Error = "La contraseña y la confirmación de contraseña deben coincidir.";
                 return response;
             }
 
-            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                _logger.LogWarning("Fallo al restablecer contraseña: El usuario con email {Email} no existe.", request.Email);
                 response.HasError = true;
                 response.Error = "El enlace de restablecimiento no es válido.";
                 return response;
             }
 
-            // 1. Verificar si el token ya fue utilizado
             var tokenUsed = await _userManager.GetAuthenticationTokenAsync(user, TokenProvider, TokenUsedKey);
             if (tokenUsed == "true")
             {
-                _logger.LogWarning("Fallo al restablecer contraseña: El token ya fue usado para {UserId}.", user.Id);
+                _logger.LogWarning("Restablecimiento fallido: el token ya fue utilizado por el usuario {UserId}.", user.Id);
                 response.HasError = true;
                 response.Error = "Este enlace de restablecimiento ya fue utilizado.";
                 return response;
             }
 
-            // 2. Verificar si el token expiró (30 minutos)
             var tokenDateStr = await _userManager.GetAuthenticationTokenAsync(user, TokenProvider, TokenDateKey);
             if (!string.IsNullOrEmpty(tokenDateStr) &&
-                DateTime.TryParse(tokenDateStr, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var tokenDate))
+                DateTime.TryParse(tokenDateStr, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var tokenDate) &&
+                (DateTime.UtcNow - tokenDate).TotalMinutes > TokenLifetimeInMinutes)
             {
-                if ((DateTime.UtcNow - tokenDate).TotalMinutes > 30)
-                {
-                    _logger.LogWarning("Fallo al restablecer contraseña: El token expiró para {UserId}.", user.Id);
-                    response.HasError = true;
-                    response.Error = "El enlace de restablecimiento ha expirado.";
-                    return response;
-                }
+                _logger.LogWarning("Restablecimiento fallido: el token del usuario {UserId} expiró.", user.Id);
+                response.HasError = true;
+                response.Error = "El enlace de restablecimiento ha expirado. Solicite un nuevo restablecimiento de contraseña.";
+                return response;
             }
 
-            // 3. Ejecutar el restablecimiento en Identity
-            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.Password);
+            var result = await _userManager.ResetPasswordAsync(user, token, password);
             if (!result.Succeeded)
             {
-                _logger.LogWarning("Fallo al restablecer contraseña: Token inválido o error de Identity para {UserId}.", user.Id);
+                _logger.LogWarning("Restablecimiento fallido: token inválido para el usuario {UserId}.", user.Id);
                 response.HasError = true;
                 response.Error = "El enlace de restablecimiento no es válido.";
                 return response;
             }
 
-            // Marcar el token como usado e invalidar el SecurityStamp
+            //El token queda inválido tras el cambio y la cuenta vuelve a estar activa
             var setTokenResult = await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, TokenUsedKey, "true");
             var stampResult = await _userManager.UpdateSecurityStampAsync(user);
 
@@ -165,123 +272,16 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Password
 
             if (!setTokenResult.Succeeded || !stampResult.Succeeded || !updateResult.Succeeded)
             {
-                _logger.LogError("Error crítico al guardar el restablecimiento (SetToken/SecurityStamp/Update) para {UserId}.", user.Id);
+                _logger.LogError("Error al finalizar el restablecimiento del usuario {UserId}.", user.Id);
                 response.HasError = true;
                 response.Error = "Ocurrió un error al finalizar el restablecimiento. Intente nuevamente.";
                 return response;
             }
 
-            _logger.LogInformation("Contraseña restablecida y cuenta reactivada exitosamente para {UserId}.", user.Id);
+            _logger.LogInformation("Contraseña restablecida y cuenta reactivada para el usuario {UserId}.", user.Id);
             return response;
         }
 
-        // --- API METHODS ---
-
-        public async Task<ForgotPasswordResponse> ForgotPasswordApiAsync(ForgotPasswordRequest request)
-        {
-            var response = new ForgotPasswordResponse();
-            var user = await _userManager.FindByNameAsync(request.UserName);
-
-            if (user == null || string.IsNullOrEmpty(user.Email))
-            {
-                // Retornar éxito ficticio para evitar la enumeración de usuarios
-                return response;
-            }
-
-            // Invalida tokens anteriores cambiando el SecurityStamp
-            var stampResult = await _userManager.UpdateSecurityStampAsync(user);
-            if (!stampResult.Succeeded)
-            {
-                response.HasError = true;
-                response.Error = "No fue posible procesar la solicitud. Intente nuevamente.";
-                return response;
-            }
-
-            var token = await _generateTokens.GenerateTokenResetPasswordAsync(user, "");
-            user.IsActive = false;
-            await _userManager.UpdateAsync(user);
-
-            // Guarda metadata del token (fecha de creación y estado de uso)
-            await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, TokenDateKey, DateTime.UtcNow.ToString("o"));
-            await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, TokenUsedKey, "false");
-
-            await _emailServices.SendNotification(new MessageDto
-            {
-                To = user.Email!,
-                Subject = "Token de restablecimiento de contraseña",
-                Message = $"<p>Hola {user.FirstName},</p><p>Se ha generado un token para restablecer la contraseña de su cuenta.</p><p>Token de restablecimiento:<br><strong>{token}</strong></p><p>Utilice este token en el endpoint correspondiente para completar el cambio de contraseña.</p><p>Si usted no solicitó este cambio, ignore este mensaje.</p>"
-            });
-
-            return response;
-        }
-
-        public async Task<ResetPasswordResponse> ResetPasswordApiAsync(ResetPasswordApiRequest request)
-        {
-            var response = new ResetPasswordResponse();
-
-            if (request.Password != request.ConfirmPassword)
-            {
-                response.HasError = true;
-                response.Error = "La contraseña y la confirmación de contraseña deben coincidir.";
-                return response;
-            }
-
-            var user = await _userManager.FindByIdAsync(request.UserId);
-            if (user == null)
-            {
-                response.HasError = true;
-                response.Error = "El enlace de restablecimiento no es válido.";
-                return response;
-            }
-
-            // 1. Verificar si el token ya fue utilizado
-            var tokenUsed = await _userManager.GetAuthenticationTokenAsync(user, TokenProvider, TokenUsedKey);
-            if (tokenUsed == "true")
-            {
-                response.HasError = true;
-                response.Error = "Este enlace de restablecimiento ya fue utilizado.";
-                return response;
-            }
-
-            // 2. Verificar si el token expiró (30 minutos)
-            var tokenDateStr = await _userManager.GetAuthenticationTokenAsync(user, TokenProvider, TokenDateKey);
-            if (!string.IsNullOrEmpty(tokenDateStr) &&
-                DateTime.TryParse(tokenDateStr, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var tokenDate))
-            {
-                if ((DateTime.UtcNow - tokenDate).TotalMinutes > 30)
-                {
-                    response.HasError = true;
-                    response.Error = "El enlace de restablecimiento ha expirado.";
-                    return response;
-                }
-            }
-
-            // 3. Ejecutar el restablecimiento en Identity
-            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.Password);
-            if (!result.Succeeded)
-            {
-                response.HasError = true;
-                response.Error = "El enlace de restablecimiento no es válido.";
-                return response;
-            }
-
-            // Marcar el token como usado e invalidar el SecurityStamp
-            await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, TokenUsedKey, "true");
-            var stampResult = await _userManager.UpdateSecurityStampAsync(user);
-
-            user.IsActive = true;
-            user.EmailConfirmed = true;
-            var updateResult = await _userManager.UpdateAsync(user);
-
-            if (!stampResult.Succeeded || !updateResult.Succeeded)
-            {
-                response.HasError = true;
-                response.Error = "Ocurrió un error al finalizar el restablecimiento. Intente nuevamente.";
-                return response;
-            }
-
-            return response;
-        }
+        #endregion
     }
 }
-
