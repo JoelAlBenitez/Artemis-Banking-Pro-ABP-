@@ -389,8 +389,9 @@ namespace ArtemisBankingPro.Integration.Tests.Identity
         [Fact]
         public async Task UpdateUserAsync_WithAnIdCardThatBelongsToAnotherUser_ShouldReportAConflict()
         {
-            await _host.GivenUserAsync(Roles.Cliente, "cliente01", idCard: "00187654321");
-            var target = await _host.GivenUserAsync(Roles.Cliente, "cliente02", idCard: "00100000009");
+            //El otro usuario solo debe chocar por cédula: correo y nombre de usuario distintos
+            await _host.GivenUserAsync(Roles.Cliente, "otro", email: "otro@artemisbank.com", idCard: "00187654321");
+            var target = await _host.GivenUserAsync(Roles.Cliente, "cliente01", idCard: "00100000009");
 
             var dto = BuildEdit(target.Id, idCard: "00187654321");
             var response = await _service.UpdateUserAsync(target.Id, dto);
