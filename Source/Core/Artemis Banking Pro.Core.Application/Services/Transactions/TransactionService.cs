@@ -3,6 +3,7 @@ using Artemis_Banking_Pro.Core.Application.Contracts.EmailSerives;
 using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
 using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
@@ -30,6 +31,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
         private readonly IEmailServices _emailServices;
         private readonly IMapper _mapper;
         private readonly ILogger<TransactionService> _logger;
+        private readonly IUserManagementService _userManagementService;
 
         public TransactionService(
             ISavingsAccountsRepository savingsAccountRepository,
@@ -40,7 +42,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             ITransactionsValidationServices validationServices,
             IEmailServices emailServices,
             IMapper mapper,
-            ILogger<TransactionService> logger)
+            ILogger<TransactionService> logger,
+            IUserManagementService userManagementService)
         {
             _savingsAccountRepository = savingsAccountRepository;
             _transactionRepository = transactionRepository;
@@ -51,6 +54,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             _emailServices = emailServices;
             _mapper = mapper;
             _logger = logger;
+            _userManagementService = userManagementService;
         }
 
         public async Task<ValidationResult<TransactionResultDto>> ProcessExpressAsync(ExpressTransactionDto dto, string clientId)
@@ -672,7 +676,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
 
         private async Task<bool> SendAccountTransferEmailAsync(SavingsAccount source, SavingsAccount dest, decimal amount, string clientId)
         {
-            var email = $"{clientId}@artemis.com";
+            var user = await _userManagementService.GetUserByIdAsync(clientId);
+            var email = user?.Email ?? $"{clientId}@artemis.com";
             var lastFourSource = source.AccountNumber.Length >= 4 ? source.AccountNumber.Substring(source.AccountNumber.Length - 4) : source.AccountNumber;
             var lastFourDest = dest.AccountNumber.Length >= 4 ? dest.AccountNumber.Substring(dest.AccountNumber.Length - 4) : dest.AccountNumber;
 
