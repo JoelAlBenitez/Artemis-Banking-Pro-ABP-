@@ -26,6 +26,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+
 namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
 {
     public class AccountTransferServiceTests
@@ -36,6 +38,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
         private readonly Mock<IEmailServices> _emailServicesMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<ILogger<TransactionService>> _loggerMock;
+        private readonly Mock<IUserManagementService> _userManagementServiceMock;
         private readonly TransactionService _transactionService;
 
         public AccountTransferServiceTests()
@@ -46,6 +49,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
             _emailServicesMock = new Mock<IEmailServices>();
             _mapperMock = new Mock<IMapper>();
             _loggerMock = new Mock<ILogger<TransactionService>>();
+            _userManagementServiceMock = new Mock<IUserManagementService>();
 
             _transactionService = new TransactionService(
                 _savingsAccountRepositoryMock.Object,
@@ -56,7 +60,8 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
                 _validationServicesMock.Object,
                 _emailServicesMock.Object,
                 _mapperMock.Object,
-                _loggerMock.Object);
+                _loggerMock.Object,
+                _userManagementServiceMock.Object);
         }
 
         [Fact]

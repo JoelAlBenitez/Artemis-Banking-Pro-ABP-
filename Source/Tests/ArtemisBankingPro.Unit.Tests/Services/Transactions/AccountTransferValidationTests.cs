@@ -17,18 +17,22 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+
 namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
 {
     public class AccountTransferValidationTests
     {
         private readonly Mock<ISavingsAccountsRepository> _savingsAccountRepositoryMock;
         private readonly Mock<ILogger<TransactionsValidationServices>> _loggerMock;
+        private readonly Mock<IUserManagementService> _userManagementServiceMock;
         private readonly TransactionsValidationServices _validationService;
 
         public AccountTransferValidationTests()
         {
             _savingsAccountRepositoryMock = new Mock<ISavingsAccountsRepository>();
             _loggerMock = new Mock<ILogger<TransactionsValidationServices>>();
+            _userManagementServiceMock = new Mock<IUserManagementService>();
 
             _validationService = new TransactionsValidationServices(
                 _savingsAccountRepositoryMock.Object,
@@ -36,7 +40,8 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
                 new Mock<ILoansRepository>().Object,
                 new Mock<IBeneficiaryRepository>().Object,
                 new Mock<ILoanInstallmentRepository>().Object,
-                _loggerMock.Object);
+                _loggerMock.Object,
+                _userManagementServiceMock.Object);
         }
 
         [Theory]
