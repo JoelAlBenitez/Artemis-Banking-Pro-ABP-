@@ -211,7 +211,11 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
 
             await _transactionRepository.AddAsync(debitTx);
 
+<<<<<<< HEAD
             ApplyInstallmentPayments(installments, effectiveAmount, clientId);
+=======
+            ApplyInstallmentPayments(installments, requestedAmount, effectiveAmount, clientId, debitTx);
+>>>>>>> origin/development
 
             loan.PendingAmount -= effectiveAmount;
             if (loan.PendingAmount <= 0)
@@ -240,7 +244,11 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             return ValidationResult<TransactionResultDto>.Success(resultDto);
         }
 
+<<<<<<< HEAD
         private void ApplyInstallmentPayments(List<LoanInstallment> installments, decimal effectiveAmount, string clientId)
+=======
+        private void ApplyInstallmentPayments(List<LoanInstallment> installments, decimal requestedAmount, decimal effectiveAmount, string clientId, Transaction debitTx)
+>>>>>>> origin/development
         {
             var remainingPayment = effectiveAmount;
             var now = DateTimeOffset.UtcNow;
@@ -266,10 +274,21 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 {
                     LoandId = inst.LoanId,
                     LoanInstallmentId = inst.Id,
+<<<<<<< HEAD
                     EffectiveAmount = paymentToApply,
                     PaidAt = now,
                     Channel = ChannelPayment.Cliente,
                     PerformedByUserId = clientId
+=======
+                    RequestedAmount = requestedAmount,
+                    EffectiveAmount = paymentToApply,
+                    PaidAt = now,
+                    Channel = ChannelPayment.Cliente,
+                    PerformedByUserId = clientId,
+                    Transaction = debitTx,
+                    CreatedAt = now,
+                    CreateByUserId = clientId  
+>>>>>>> origin/development
                 };
 
                 _loansPaymentRepository.AddAsync(loanPayment);

@@ -26,4 +26,5 @@
     <ProjectReference Include="..\..\Core\Artemis Banking Pro.Core.Application\ArtemisBankingPro.Core.Application.csproj" />
   </ItemGroup>
 
+
 </Project>

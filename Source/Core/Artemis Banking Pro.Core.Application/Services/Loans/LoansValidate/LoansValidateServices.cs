@@ -1,133 +1,194 @@
-﻿using Artemis_Banking_Pro.Core.Application.Contracts.Loans;
+using Artemis_Banking_Pro.Core.Application.Contracts.Loans;
 using Artemis_Banking_Pro.Core.Application.DTOs.Loans;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.CodeErrors.LoansErros;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
+using ArtemisBankingPro.Core.Domain.Common.Errors;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
+using ArtemisBankingPro.Core.Domain.Entities.Loans;
 using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
+using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
 using Microsoft.Extensions.Logging;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.Loans.LoansValidate
 {
-    public class LoansValidateServices : ILoansValidateServices
+
+    public sealed class LoansValidateServices : ILoansValidateServices
     {
         private readonly ILoansRepository _loansRepository;
+        private readonly ISavingsAccountsRepository _savingsAccountsRepository;
         private readonly ILogger<LoansValidateServices> _logger;
-        //integrar el ICurrentUserServices 
-        //
 
-        public LoansValidateServices(ILogger<LoansValidateServices> logger, 
-            ILoansRepository loansRepository)
+        //integrar el ICurrentUserServices para el administrador responsable y su rol
+
+        public LoansValidateServices(
+            ILogger<LoansValidateServices> logger,
+            ILoansRepository loansRepository,
+            ISavingsAccountsRepository savingsAccountsRepository)
         {
             _loansRepository = loansRepository;
+            _savingsAccountsRepository = savingsAccountsRepository;
             _logger = logger;
-
         }
 
         public async Task<ValidationResult> AssigmentLoansValidateAsync(LoansAssignmentDto assignment)
         {
-
-           if(assignment is null)
-           {
+            if (assignment is null)
+            {
                 _logger.LogWarning("Datos de asignacion invalidos");
                 return ValidationResult.Failure(GeneralError.DataInvalid);
-           }
-            //agregar aqui existencia del usuario del assigment
-            _logger.LogInformation("Verificaciones de prestamos activos del cliente con ID {ID}", assignment.CustomerId);
-            var exist =  await _loansRepository.ExistElementByConsult(x => x.CustomerId == assignment.CustomerId 
-            && x.Status == LoanStatus.Activo);
-            if (exist)
-            {
-                _logger.LogWarning("Cliente con ID {ID} ya posee un prestamo activo", assignment.CustomerId);
-                return ValidationResult.Failure(LoansError.CustomerWithLoanExist);
-            }
-            if((int)assignment.TermLoans > 60 || (int)assignment.TermLoans < 6)
-            {
-                ValidationResult.Failure(LoansError.InvalidTerm);
-            } // agregar _logger.LogWarrning
-            bool termIsDefined = Enum.IsDefined(typeof(TermMonths), assignment.TermLoans);
-            if (!termIsDefined)
-            {
-                ValidationResult.Failure(LoansError.InvalidTerm);
-            }  //agregar _logger
-
-            return ValidationResult.Success();
-        }
-
-        public async Task<ValidationResult> EditValidateAnnualInterestRateAsync(int Id)
-        {
-            var loan = await _loansRepository.GetFirstAsync(x => x.Id == Id);
-            if (loan is null)
-            {
-                _logger.LogWarning("Prestamo con el ID {ID} no encontrado", Id);
-                return ValidationResult<EditAnnualInterestRateDto>.Failure(LoansError.NonExistsLoan);
-            }
-            if (loan.Status != LoanStatus.Activo)
-            {
-                _logger.LogWarning("Prestamo con el ID {ID} no posee un estado de consulta valido {Estado}",
-                    loan.Id, loan.Status.ToString()
-                  );
-                return ValidationResult<EditAnnualInterestRateDto>.Failure(LoansError.LoanIsNotActive);
             }
 
-            _logger.LogInformation("Recuperando las cuotas futuros del prestamo con ID {ID}", Id);
-            var today = DateTimeOffset.UtcNow;
-            var futureInstallments = loan.loanInstallments
-                .Where(i => i.paymentStatus == PaymentStatus.Pendiente && i.DueDate > today)
-                .ToList();
-            if (futureInstallments.Count == 0)
+            if (string.IsNullOrWhiteSpace(assignment.CustomerId))
             {
-                _logger.LogWarning("Inexistencia de cutoas futurass del prestamo con ID {ID} ", Id);
-                return ValidationResult<LoanRateUpdatedDto>.Failure(LoansError.NonExistsFutureInstallments);
+                _logger.LogWarning("Intento de asignacion de prestamo sin cliente seleccionado");
+                return ValidationResult.Failure(LoansError.NonSelectedCustomer);
             }
-            _logger.LogInformation("Prestamo con ID {ID} encontrado y valido para ser operado", loan.Id);
-            return ValidationResult.Success();
-        }
 
-        public async Task<ValidationResult> GetLoansByCustomerValidateAsync(LoansFilterDto dto)
-        {
-
-            if (!string.IsNullOrWhiteSpace(dto.IdCard))
+            try
             {
-                //modificar cuando se integre el ICurrentUserServices por parte de adrian 
-                //agregar aqui obtencion de cliente por su cedula obtener cliente y proceder con las consultas por su id asociado
+                //La existencia del cliente y su estado activo se validan contra el project Identity.
+                //Cuando el servicio de consulta de usuarios esté disponible, esta validación debe
+                //consultarlo y agregar LoansError.NonExistsCustomerByIdCard o LoansError.CustomerIsNotActive.
+                //var customer = await _userServices.GetCustomerByIdAsync(assignment.CustomerId);
+                //if (customer is null) return ValidationResult.Failure(LoansError.NonExistsCustomerByIdCard);
+                //if (!customer.IsActive) return ValidationResult.Failure(LoansError.CustomerIsNotActive);
 
-                _logger.LogInformation("Verificando existencia de prestamos del cliente con la cédula {ID}", 0);
-                var existLoansByUser = await _loansRepository.ExistElementByConsult(x => x.CustomerId == "");
-                if (!existLoansByUser)
+                _logger.LogInformation("Verificaciones de prestamos activos del cliente con ID {ID}", assignment.CustomerId);
+                var exist = await _loansRepository.ExistElementByConsult(x => x.CustomerId == assignment.CustomerId
+                    && x.Status == LoanStatus.Activo);
+
+                if (exist)
                 {
-                    _logger.LogWarning("Existencia de prestamos del cliente con ID {ID} es inexistente", 0);
-                    return ValidationResult.Failure(LoansError.NonExistsLoans);
+                    _logger.LogWarning("Cliente con ID {ID} ya posee un prestamo activo", assignment.CustomerId);
+                    return ValidationResult.Failure(LoansError.CustomerWithLoanExist);
                 }
 
-                //por modificar ICurrentUserServices pendiente | en espera
-                _logger.LogInformation("Verificando existencia de prestamos del cliente con ID {ID}" +
-                    " por parte del estado indicado, estado {Status}", 0, "");
-                if (dto.Status != LoanStatusFilter.Todos)
+                var errors = new List<Error>();
+
+                //Plazos permitidos: 6 a 60 meses en intervalos de 6
+                var term = (int)assignment.TermLoans;
+                if (term < 6 || term > 60 || !Enum.IsDefined(typeof(TermMonths), assignment.TermLoans))
                 {
-                    LoanStatus value =
-                        dto.Status == LoanStatusFilter.Activos
-                        ? LoanStatus.Activo : LoanStatus.Completado;
+                    _logger.LogWarning("Plazo {Plazo} invalido para el prestamo del cliente con ID {ID}",
+                        term, assignment.CustomerId);
 
-                    _logger.LogInformation("Consulta de la existencia de prestamos con el estado" +
-                        " {Status} del cliente con ID {ID}", dto.Status.ToString(), 0); //por modificar
-                    var existLoansByUserInByStatus = await
-                        _loansRepository.ExistElementByConsult(x => x.CustomerId == "" && x.Status == value); //por modificar 
-                    if (!existLoansByUserInByStatus)
-                    {
-                        _logger.LogWarning("Inexistencia de prestamos con el estado {Status} para el cliente con ID {ID}",
-                            dto.Status.ToString(), 0); //por modificar
-                        return ValidationResult.Failure(LoansError.NonExistLoansByIndicateState);
-                    }
-
+                    errors.Add(LoansError.InvalidTerm);
                 }
-            }
 
-            return ValidationResult.Success();
+                if (assignment.AmmountLoans <= 0m)
+                {
+                    _logger.LogWarning("Monto {Monto} invalido para el prestamo del cliente con ID {ID}",
+                        assignment.AmmountLoans, assignment.CustomerId);
+
+                    errors.Add(LoansError.InvalidAmount);
+                }
+
+                if (assignment.AnnualInterestRate < 0m)
+                {
+                    _logger.LogWarning("Tasa {Tasa} negativa para el prestamo del cliente con ID {ID}",
+                        assignment.AnnualInterestRate, assignment.CustomerId);
+
+                    errors.Add(LoansError.NegativeAnnualInterestRate);
+                }
+
+                if (errors.Count > 0)
+                {
+                    return ValidationResult.Failure(errors);
+                }
+
+                //Sin cuenta principal activa la operación no debe iniciarse: no habría dónde
+                //desembolsar el capital aprobado.
+                var hasActivePrimaryAccount = await _savingsAccountsRepository.ExistElementByConsult(
+                    account => account.CustomerId == assignment.CustomerId
+                        && account.AccountType == SavingsAccountType.Principal
+                        && account.Status == SavingsAccountStatus.Activa);
+
+                if (!hasActivePrimaryAccount)
+                {
+                    _logger.LogWarning("El cliente con ID {ID} no posee una cuenta de ahorro principal activa receptora",
+                        assignment.CustomerId);
+
+                    return ValidationResult.Failure(LoansError.NonExistAccountFirstActive);
+                }
+
+                return ValidationResult.Success();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al validar la asignacion del prestamo al cliente con ID {ID}",
+                    assignment.CustomerId);
+
+                return ValidationResult.Failure(GeneralError.UnexpectedError);
+            }
         }
 
-      
+        public async Task<ValidationResult<Loan>> EditValidateAnnualInterestRateAsync(int Id)
+        {
+            try
+            {
+                //Sin las cuotas la colección llega vacía y ninguna cuota futura sería visible
+                var loan = await _loansRepository.GetFirstAsync(x => x.Id == Id, x => x.loanInstallments);
 
-        //agregar private metodo que determine si el current user tiene Role -> Administrador
+                if (loan is null)
+                {
+                    _logger.LogWarning("Prestamo con el ID {ID} no encontrado", Id);
+                    return ValidationResult<Loan>.Failure(LoansError.NonExistsLoan);
+                }
+
+                if (loan.Status != LoanStatus.Activo)
+                {
+                    _logger.LogWarning("Prestamo con el ID {ID} no posee un estado de consulta valido {Estado}",
+                        loan.Id, loan.Status.ToString());
+
+                    return ValidationResult<Loan>.Failure(LoansError.LoanIsNotActive);
+                }
+
+                _logger.LogInformation("Recuperando las cuotas futuras del prestamo con ID {ID}", Id);
+                var today = DateTimeOffset.UtcNow;
+                var futureInstallments = loan.loanInstallments
+                    .Where(i => i.paymentStatus == PaymentStatus.Pendiente && i.DueDate > today)
+                    .ToList();
+
+                if (futureInstallments.Count == 0)
+                {
+                    _logger.LogWarning("Inexistencia de cuotas futuras del prestamo con ID {ID}", Id);
+                    return ValidationResult<Loan>.Failure(LoansError.NonExistsFutureInstallments);
+                }
+
+                _logger.LogInformation("Prestamo con ID {ID} encontrado y valido para ser operado", loan.Id);
+                return ValidationResult<Loan>.Success(loan);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al validar la edicion de tasa del prestamo con ID {ID}", Id);
+                return ValidationResult<Loan>.Failure(GeneralError.UnexpectedError);
+            }
+        }
+
+        public Task<ValidationResult> GetLoansByCustomerValidateAsync(LoansFilterDto dto)
+        {
+            if (dto is null)
+            {
+                _logger.LogWarning("Filtros de consulta de prestamos invalidos");
+                return Task.FromResult(ValidationResult.Failure(GeneralError.DataInvalid));
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.IdCard))
+            {
+                return Task.FromResult(ValidationResult.Success());
+            }
+
+            //La cédula identifica al cliente dentro del project Identity. Cuando el servicio de
+            //consulta de usuarios esté disponible, esta validación debe traducirla a su ID y
+            //devolver LoansError.NonExistsCustomerByIdCard cuando no exista. La inexistencia de
+            //préstamos del cliente se resuelve en el servicio, ya con el listado en la mano.
+            //var customer = await _userServices.GetCustomerByIdCardAsync(dto.IdCard);
+            //if (customer is null) return ValidationResult.Failure(LoansError.NonExistsCustomerByIdCard);
+
+            _logger.LogInformation("Consulta de prestamos por la cedula {IdCard}", dto.IdCard);
+
+            return Task.FromResult(ValidationResult.Success());
+        }
     }
 }

@@ -8,6 +8,11 @@ namespace Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts
         public required string AccountNumber { get; set; }
         public required string CustomerId { get; set; }
 
+<<<<<<< HEAD
+=======
+        //Provienen del project Identity, no de la entidad: el perfil de AutoMapper los ignora
+        //y el servicio los completa al armar el listado.
+>>>>>>> origin/development
         public required string FullNameCustomer { get; set; }
         public required string IdCard { get; set; }
 

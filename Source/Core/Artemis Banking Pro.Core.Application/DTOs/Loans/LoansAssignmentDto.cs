@@ -8,5 +8,7 @@ namespace Artemis_Banking_Pro.Core.Application.DTOs.Loans
         public required TermMonths TermLoans { get; set; }
         public required decimal AmmountLoans { get; set; }
         public required decimal AnnualInterestRate { get; set; }
+
+        public bool ConfirmHighRisk { get; set; }
     }
 }

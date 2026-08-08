@@ -18,6 +18,10 @@ using Artemis_Banking_Pro.Core.Application.Contracts.Dashboard;
 using Artemis_Banking_Pro.Core.Application.Services.Dashboard;
 using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Artemis_Banking_Pro.Core.Application.Services.Transactions;
+using Artemis_Banking_Pro.Core.Application.Contracts.Beneficiaries;
+using Artemis_Banking_Pro.Core.Application.Services.Beneficiaries;
+using Artemis_Banking_Pro.Core.Application.Contracts.Debts;
+using Artemis_Banking_Pro.Core.Application.Services.Debts;
 
 namespace ArtemisBankingPro.IOC
 {
@@ -52,7 +56,7 @@ namespace ArtemisBankingPro.IOC
                 #endregion
             });
 
-            #endregion
+          
 
             #region loans
             services.AddScoped<ILoansServices, LoansServices>();
@@ -60,6 +64,10 @@ namespace ArtemisBankingPro.IOC
             services.AddScoped<IAmortizationCalculator, AmortizationCalculator>();
             services.AddScoped<ILoansOverdueServices, LoansOverdueServices>();
             #endregion
+
+
+            //Compartido: préstamos, tarjetas y dashboard consumen el mismo cálculo de deuda
+            services.AddScoped<IDebtCalculator, DebtCalculator>();
 
             #region credit cards
             services.AddScoped<ICreditCardsServices, CreditCardsServices>();
@@ -73,10 +81,14 @@ namespace ArtemisBankingPro.IOC
 
 
             services.AddScoped<IDashboardService, DashboardService>();
-
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<ITransactionsValidationServices, TransactionsValidationServices>();
+
+            services.AddScoped<IBeneficiaryServices, BeneficiaryServices>();
+            services.AddScoped<IBeneficiaryValidationServices, BeneficiaryValidationServices>();
+            services.AddScoped<ICashAdvanceServices, CashAdvanceServices>();
+            services.AddScoped<ICashAdvanceValidationServices, CashAdvanceValidationServices>();
 
             return services;
         }

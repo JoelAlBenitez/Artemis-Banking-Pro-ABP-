@@ -12,6 +12,12 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.Loans
             builder.ToTable("LoanPayments");
             builder.HasKey(p => p.Id);
 
+<<<<<<< HEAD
+=======
+            builder.Property(p => p.RequestedAmount)
+                .HasPrecision(DomainConstants.MoneyPrecision, DomainConstants.MoneyScale);
+
+>>>>>>> origin/development
             builder.Property(p => p.EffectiveAmount)
                 .HasPrecision(DomainConstants.MoneyPrecision, DomainConstants.MoneyScale);
 
@@ -23,6 +29,21 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.Loans
                 .IsRequired()
                 .HasMaxLength(DomainConstants.IdentityUserIdLength);
 
+<<<<<<< HEAD
+=======
+            builder.Property(p => p.CreateByUserId)
+                .IsRequired()
+                .HasMaxLength(DomainConstants.IdentityUserIdLength);
+
+            builder.Property(p => p.LastModifiedByIdUser)
+                .HasMaxLength(DomainConstants.IdentityUserIdLength);
+
+            builder.HasOne(p => p.Transaction)
+                .WithMany()
+                .HasForeignKey(p => p.TransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+>>>>>>> origin/development
             builder.HasOne(p => p.Loans)
                 .WithMany()
                 .HasForeignKey(p => p.LoandId)

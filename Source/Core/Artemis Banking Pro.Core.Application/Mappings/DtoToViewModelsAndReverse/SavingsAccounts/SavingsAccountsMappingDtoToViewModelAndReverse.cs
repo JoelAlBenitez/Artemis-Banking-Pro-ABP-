@@ -10,7 +10,16 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndRevers
         public SavingsAccountsMappingDtoToViewModelAndReverse()
         {
             CreateMap<ClientSavingsAccountDto, ClientSavingsAccountViewModel>().ReverseMap();
+<<<<<<< HEAD
             CreateMap<SavingsAccountAssignmentDto, SavingsAccountAssignmentViewModel>().ReverseMap();
+=======
+
+            //FullNameCustomer solo existe en el ViewModel: el controlador lo completa con el
+            //cliente elegido en el paso 1 para mostrarlo en el formulario.
+            CreateMap<SavingsAccountAssignmentDto, SavingsAccountAssignmentViewModel>()
+                .ForMember(d => d.FullNameCustomer, o => o.Ignore())
+                .ReverseMap();
+>>>>>>> origin/development
             CreateMap<SavingsAccountFilterDto, SavingsAccountFilterViewModel>().ReverseMap();
 
             //Solo las secundarias activas muestran la acción Cancelar

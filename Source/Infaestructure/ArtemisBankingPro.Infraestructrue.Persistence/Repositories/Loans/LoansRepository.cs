@@ -6,6 +6,10 @@ using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
 using ArtemisBankingPro.Infraestructrue.Persistence.Context;
 using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Generic;
 using Microsoft.EntityFrameworkCore;
+<<<<<<< HEAD
+=======
+using System.Globalization;
+>>>>>>> origin/development
 
 namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans
 {
@@ -13,8 +17,28 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans
         GenericRepository<Loan, int>,
         ILoansRepository
     {
+<<<<<<< HEAD
         public LoansRepository(DbContextArtemisBanking context) : base(context) { }
 
+=======
+        private const string LoanNumberSequence = "LoanNumberSequence";
+
+        public LoansRepository(DbContextArtemisBanking context) : base(context) { }
+
+        //El rango de la secuencia arranca en 9 dígitos, así que el valor emitido ya tiene el
+        //largo exigido. El PadLeft solo protege el formato de texto del contrato.
+        public async Task<string> GetNextLoanNumberAsync()
+        {
+            var nextValue = await _context.Database
+                .SqlQueryRaw<int>($"SELECT NEXT VALUE FOR [{LoanNumberSequence}] AS [Value]")
+                .FirstAsync();
+
+            return nextValue
+                .ToString(CultureInfo.InvariantCulture)
+                .PadLeft(DomainConstants.LoanNumberLength, '0');
+        }
+
+>>>>>>> origin/development
         public async Task<PagedResult<Loan>> GetPagedLoansAsync(
             int page,
             int pageSize,

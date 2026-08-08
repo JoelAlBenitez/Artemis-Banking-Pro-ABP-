@@ -10,7 +10,7 @@ using ArtemisBankingPro.Presentation.WebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ArtemisBankingPro.Presentation.WebApp.Controllers
+namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
 {
     [AllowAnonymous]
     public class AccountController : Controller

@@ -16,4 +16,5 @@
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.17" />
 		<PackageReference Include="MimeKit" Version="4.17.0" />
 	</ItemGroup>
+
 </Project>

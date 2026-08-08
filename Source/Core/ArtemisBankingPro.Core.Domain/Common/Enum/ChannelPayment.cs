@@ -3,6 +3,8 @@
     public enum ChannelPayment
     {
         Cliente = 1,
-        Cajero = 2
+        Cajero = 2,
+
+        Administrador = 3
     }
 }

@@ -4,6 +4,7 @@ bin/
 obj/
 .claudes/
 <<<<<<< HEAD
+<<<<<<< HEAD
 .claude/
 <<<<<<< HEAD
 Logs/
@@ -13,4 +14,15 @@ Logs/
 .claude/
 Logs/
 >>>>>>> origin/development
+>>>>>>> origin/development
+=======
+.claude/
+.gemini/
+Logs/
+.agents/
+*.user
+*.suo
+.idea/
+obj/
+/.agents
 >>>>>>> origin/development
