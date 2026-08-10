@@ -64,4 +64,15 @@ namespace Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm
         public bool IsActive { get; set; }
         public decimal Debt { get; set; }
     }
+
+    public class AtmLoanDetailsDto
+    {
+        public string LoanNumber { get; set; } = string.Empty;
+        public string CustomerId { get; set; } = string.Empty;
+        public string OwnerName { get; set; } = string.Empty;
+        public string OwnerEmail { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
+        public decimal PendingAmount { get; set; }
+        public bool HasPendingInstallments { get; set; }
+    }
 }

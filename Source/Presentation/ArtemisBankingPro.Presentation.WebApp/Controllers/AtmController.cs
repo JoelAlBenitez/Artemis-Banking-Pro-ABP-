@@ -273,92 +273,81 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
                 return View(model);
             }
 
-            // TODO: Validate account with IAccountServices
-            // bool isAccountActive = await _accountServices.IsAccountActiveAsync(model.OriginAccountNumber);
-            bool isAccountActive = true; // Placeholder
-
-            if (!isAccountActive)
+            if (model.Amount <= 0)
             {
-                ModelState.AddModelError("OriginAccountNumber", "The account number entered does not correspond to a valid account.");
+                ModelState.AddModelError("Amount", "El monto a pagar debe ser mayor que cero.");
                 return View(model);
             }
 
-            // TODO: Validate loan with ILoanServices
-            // bool isLoanActive = await _loanServices.IsLoanActiveAsync(model.LoanNumber);
-            bool isLoanActive = true; // Placeholder
-
-            if (!isLoanActive)
+            var accountResult = await _transactionService.GetAtmAccountDetailsAsync(model.OriginAccountNumber);
+            if (!accountResult.IsValid || !accountResult.Value!.IsActive)
             {
-                ModelState.AddModelError("LoanNumber", "The loan number entered does not correspond to a valid loan.");
+                ModelState.AddModelError("OriginAccountNumber", "El número de cuenta ingresado no corresponde a una cuenta válida.");
                 return View(model);
             }
 
-            // TODO: Validate loan has pending installments
-            // bool hasPendingInstallments = await _loanServices.HasPendingInstallmentsAsync(model.LoanNumber);
-            bool hasPendingInstallments = true; // Placeholder
-
-            if (!hasPendingInstallments)
+            var loanResult = await _transactionService.GetAtmLoanDetailsAsync(model.LoanNumber);
+            if (!loanResult.IsValid || !loanResult.Value!.IsActive)
             {
-                ModelState.AddModelError("LoanNumber", "The selected loan has no pending installments.");
+                ModelState.AddModelError("LoanNumber", "El número de préstamo ingresado no corresponde a un préstamo válido.");
                 return View(model);
             }
 
-            // TODO: Validate total pending debt
-            // decimal totalPendingDebt = await _loanServices.GetTotalPendingDebtAsync(model.LoanNumber);
-            decimal totalPendingDebt = 2000.00m; // Placeholder debt
-
-            // Rule: Effective amount cannot exceed total pending debt
-            decimal effectiveAmount = System.Math.Min(model.Amount, totalPendingDebt);
-
-            // TODO: Validate sufficient balance with IAccountServices
-            // bool hasSufficientBalance = await _accountServices.HasSufficientBalanceAsync(model.OriginAccountNumber, effectiveAmount);
-            bool hasSufficientBalance = true; // Placeholder
-
-            if (!hasSufficientBalance)
+            if (!loanResult.Value.HasPendingInstallments || loanResult.Value.PendingAmount <= 0)
             {
-                ModelState.AddModelError("Amount", "The entered amount exceeds the available balance of the account.");
+                ModelState.AddModelError("LoanNumber", "El préstamo seleccionado no tiene cuotas pendientes de pago.");
                 return View(model);
             }
 
-            // TODO: Get account holder names
-            // var originAccountHolder = await _accountServices.GetAccountHolderNameAsync(model.OriginAccountNumber);
-            // var loanHolder = await _loanServices.GetLoanHolderNameAsync(model.LoanNumber);
-            var originAccountHolder = "Origin Placeholder Name"; 
-            var loanHolder = "Loan Placeholder Name";
+            decimal effectiveAmount = Math.Min(model.Amount, loanResult.Value.PendingAmount);
 
-            var confirmationModel = new LoanPaymentConfirmationViewModel
+            if (accountResult.Value!.Balance < effectiveAmount)
+            {
+                ModelState.AddModelError("Amount", "El monto ingresado excede el saldo disponible de la cuenta.");
+                return View(model);
+            }
+
+            var confirmModel = new LoanPaymentConfirmationViewModel
             {
                 OriginAccountNumber = model.OriginAccountNumber,
+                OriginAccountHolderName = accountResult.Value.OwnerName,
                 LoanNumber = model.LoanNumber,
+                LoanHolderName = loanResult.Value.OwnerName,
                 Amount = model.Amount,
-                EffectiveAmount = effectiveAmount,
-                OriginAccountHolderName = originAccountHolder,
-                LoanHolderName = loanHolder
+                EffectiveAmount = effectiveAmount
             };
 
-            return View("ConfirmLoanPayment", confirmationModel);
+            return View("ConfirmLoanPayment", confirmModel);
+        }
+
+        [HttpGet]
+        public IActionResult ConfirmLoanPayment()
+        {
+            return RedirectToAction(nameof(LoanPayment));
         }
 
         [HttpPost]
-        public async Task<IActionResult> ConfirmLoanPayment(LoanPaymentConfirmationViewModel model)
+        public async Task<IActionResult> ExecuteLoanPayment(LoanPaymentConfirmationViewModel model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
-            _logger.LogInformation("Iniciando pago a préstamo. Cajero: {UserId}, Préstamo: {Prestamo}, Monto Efectivo: {Monto}", userId, model.LoanNumber, model.EffectiveAmount);
+            var result = await _transactionService.ProcessAtmLoanPaymentAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanPaymentDto
+            {
+                SourceAccountNumber = model.OriginAccountNumber,
+                LoanNumber = model.LoanNumber,
+                Amount = model.EffectiveAmount,
+                CashierId = userId
+            });
 
-            var result = await _transactionService.ProcessAtmLoanPaymentAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanPaymentDto { SourceAccountNumber = model.OriginAccountNumber, LoanNumber = model.LoanNumber, Amount = model.EffectiveAmount, CashierId = userId });
-            
             if (!result.IsValid)
             {
-                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar el pago al préstamo";
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar el pago de préstamo.";
+                return RedirectToAction("Index");
             }
 
-            TempData["SuccessMessage"] = "Pago a préstamo realizado correctamente.";
-            return RedirectToAction(nameof(Index));
+            TempData["SuccessMessage"] = "Pago de préstamo realizado correctamente.";
+            return RedirectToAction("Index");
         }
-
-
 
         [HttpGet]
         public IActionResult ThirdPartyTransfer()

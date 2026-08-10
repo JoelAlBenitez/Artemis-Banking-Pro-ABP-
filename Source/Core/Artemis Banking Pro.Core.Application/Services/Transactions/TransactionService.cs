@@ -624,6 +624,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                     CreatedAt = DateTimeOffset.UtcNow
                 };
                 await _transactionRepository.AddAsync(transaction);
+                await _transactionRepository.SaveChangesAsync();
 
                 // Enviar correo(s)
                 try
@@ -667,8 +668,140 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
 
         public async Task<ValidationResult> ProcessAtmLoanPaymentAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanPaymentDto dto)
         {
-            // Placeholder real for Loan payment
-            return ValidationResult.Success();
+            try
+            {
+                var account = await _savingsAccountRepository.GetFirstAsync(a => a.AccountNumber == dto.SourceAccountNumber);
+                if (account == null || !account.IsActive)
+                    return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.Account", "La cuenta origen no es válida o está inactiva."));
+
+                // Include loanInstallments to update them
+                var loan = await _loansRepository.GetFirstAsync(l => l.LoanNumber == dto.LoanNumber, l => l.loanInstallments);
+                if (loan == null || loan.Status != ArtemisBankingPro.Core.Domain.Common.Enum.LoanStatus.Activo)
+                    return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.Loan", "El préstamo destino no es válido o está completado."));
+
+                if (loan.PendingAmount <= 0)
+                    return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.NoPendingAmount", "El préstamo seleccionado no tiene cuotas pendientes de pago."));
+
+                decimal effectiveAmount = Math.Min(dto.Amount, loan.PendingAmount);
+
+                if (account.Balance < effectiveAmount)
+                {
+                    // Registrar intento rechazado
+                    var rejected = new Transaction
+                    {
+                        SavingsAccountId = account.Id,
+                        Amount = effectiveAmount,
+                        TransactionType = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionType.Debito,
+                        OperationType = ArtemisBankingPro.Core.Domain.Common.Enum.OperationType.PagoPrestamo,
+                        Origin = dto.SourceAccountNumber,
+                        Beneficiary = loan.LoanNumber,
+                        Status = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionStatus.Rechazada,
+                        PerformedByUserId = dto.CashierId,
+                        Channel = ArtemisBankingPro.Core.Domain.Common.Enum.ChannelPayment.Cajero,
+                        CreateByUserId = dto.CashierId,
+                        CreatedAt = DateTimeOffset.UtcNow,
+                        RejectionReason = "Fondos insuficientes"
+                    };
+                    await _transactionRepository.AddAsync(rejected);
+                    await _transactionRepository.SaveChangesAsync();
+                    return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.InsufficientFunds", "Fondos insuficientes en la cuenta origen."));
+                }
+
+                // Descontar balance de la cuenta
+                account.Balance -= effectiveAmount;
+                await _savingsAccountRepository.UpdateAsync(account);
+
+                // Aplicar el pago a las cuotas
+                decimal remainingToApply = effectiveAmount;
+                var pendingInstallments = loan.loanInstallments
+                    .Where(i => i.paymentStatus != ArtemisBankingPro.Core.Domain.Common.Enum.PaymentStatus.Pagada)
+                    .OrderBy(i => i.InstallmentNumber)
+                    .ToList();
+
+                foreach (var installment in pendingInstallments)
+                {
+                    if (remainingToApply <= 0)
+                        break;
+
+                    if (remainingToApply >= installment.PendingBalance)
+                    {
+                        remainingToApply -= installment.PendingBalance;
+                        installment.PendingBalance = 0;
+                        installment.paymentStatus = ArtemisBankingPro.Core.Domain.Common.Enum.PaymentStatus.Pagada;
+                        installment.PaidAt = DateTimeOffset.UtcNow;
+                        installment.IsOverdue = false;
+                    }
+                    else
+                    {
+                        installment.PendingBalance -= remainingToApply;
+                        installment.paymentStatus = ArtemisBankingPro.Core.Domain.Common.Enum.PaymentStatus.ParcialmentePagada;
+                        remainingToApply = 0;
+                    }
+                }
+
+                loan.PendingAmount -= effectiveAmount;
+                
+                if (loan.PendingAmount <= 0)
+                {
+                    loan.Status = ArtemisBankingPro.Core.Domain.Common.Enum.LoanStatus.Completado;
+                    loan.CompletedAt = DateTimeOffset.UtcNow;
+                }
+
+                await _loansRepository.UpdateAsync(loan);
+
+                var transaction = new Transaction
+                {
+                    SavingsAccountId = account.Id,
+                    Amount = effectiveAmount,
+                    TransactionType = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionType.Debito,
+                    OperationType = ArtemisBankingPro.Core.Domain.Common.Enum.OperationType.PagoPrestamo,
+                    Origin = dto.SourceAccountNumber,
+                    Beneficiary = loan.LoanNumber,
+                    Status = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionStatus.Aprobada,
+                    PerformedByUserId = dto.CashierId,
+                    Channel = ArtemisBankingPro.Core.Domain.Common.Enum.ChannelPayment.Cajero,
+                    CreateByUserId = dto.CashierId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+                await _transactionRepository.AddAsync(transaction);
+                await _transactionRepository.SaveChangesAsync();
+
+                // Enviar correo(s)
+                try
+                {
+                    string accountLast4 = account.AccountNumber.Length >= 4 ? account.AccountNumber.Substring(account.AccountNumber.Length - 4) : account.AccountNumber;
+                    
+                    var loanMessage = new Artemis_Banking_Pro.Core.Application.DTOs.Messages.MessageDto
+                    {
+                        To = $"{loan.CustomerId}@artemis.com",
+                        Subject = $"Pago realizado al préstamo {loan.LoanNumber}",
+                        Message = $"Hola Cliente {loan.CustomerId},\n\nSe ha realizado un pago a su préstamo {loan.LoanNumber}.\n\nMonto pagado: RD${effectiveAmount:N2}\nCuenta origen terminada en: {accountLast4}\nFecha y hora: {transaction.CreatedAt:dd/MM/yyyy HH:mm:ss}\n\nSi usted no reconoce esta operación, comuníquese con la entidad bancaria."
+                    };
+                    await _emailServices.SendNotification(loanMessage);
+
+                    if (account.CustomerId != loan.CustomerId)
+                    {
+                        var accountMessage = new Artemis_Banking_Pro.Core.Application.DTOs.Messages.MessageDto
+                        {
+                            To = $"{account.CustomerId}@artemis.com",
+                            Subject = $"Débito para pago de préstamo",
+                            Message = $"Hola Cliente {account.CustomerId},\n\nSe ha debitado dinero de su cuenta terminada en {accountLast4} para realizar un pago al préstamo {loan.LoanNumber}.\n\nMonto debitado: RD${effectiveAmount:N2}\nFecha y hora: {transaction.CreatedAt:dd/MM/yyyy HH:mm:ss}\n\nSi usted no reconoce esta operación, comuníquese con la entidad bancaria."
+                        };
+                        await _emailServices.SendNotification(accountMessage);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "El pago fue realizado correctamente, pero no fue posible enviar el correo de notificación.");
+                }
+
+                return ValidationResult.Success();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al procesar el pago a préstamo en ATM.");
+                return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.LoanPaymentError", "Error interno al procesar el pago."));
+            }
         }
 
         public async Task<ValidationResult> ProcessAtmThirdPartyTransferAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmThirdPartyTransferDto dto)
@@ -741,6 +874,26 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             };
 
             return ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardDetailsDto>.Success(dto);
+        }
+
+        public async Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanDetailsDto>> GetAtmLoanDetailsAsync(string loanNumber)
+        {
+            var loan = await _loansRepository.GetFirstAsync(l => l.LoanNumber == loanNumber, l => l.loanInstallments);
+            if (loan == null)
+                return ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanDetailsDto>.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.LoanNotFound", "El número de préstamo ingresado no corresponde a un préstamo válido."));
+
+            var dto = new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanDetailsDto
+            {
+                LoanNumber = loan.LoanNumber,
+                CustomerId = loan.CustomerId,
+                OwnerName = $"Cliente {loan.CustomerId}", // Mock until real Identity connection
+                OwnerEmail = $"{loan.CustomerId}@artemis.com", // Mock until real Identity connection
+                IsActive = loan.Status == ArtemisBankingPro.Core.Domain.Common.Enum.LoanStatus.Activo,
+                PendingAmount = loan.PendingAmount,
+                HasPendingInstallments = loan.loanInstallments.Any(i => i.paymentStatus != ArtemisBankingPro.Core.Domain.Common.Enum.PaymentStatus.Pagada)
+            };
+
+            return ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanDetailsDto>.Success(dto);
         }
 
         #endregion

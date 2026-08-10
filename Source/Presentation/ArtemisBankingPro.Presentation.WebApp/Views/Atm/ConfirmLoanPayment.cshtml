@@ -42,18 +42,14 @@
                         </li>
                     </ul>
 
-                    <form asp-action="ConfirmLoanPayment" method="post">
+                    <form asp-action="ExecuteLoanPayment" method="post" class="d-flex justify-content-between">
                         <input type="hidden" asp-for="OriginAccountNumber" />
                         <input type="hidden" asp-for="LoanNumber" />
                         <input type="hidden" asp-for="Amount" />
                         <input type="hidden" asp-for="EffectiveAmount" />
-                        <input type="hidden" asp-for="OriginAccountHolderName" />
-                        <input type="hidden" asp-for="LoanHolderName" />
                         
-                        <div class="d-flex justify-content-between">
-                            <a asp-action="Index" class="btn btn-secondary px-4">Cancel</a>
-                            <button type="submit" class="btn btn-primary px-4">Confirm</button>
-                        </div>
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-medium">Cancelar</a>
+                        <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill fw-medium shadow-sm">Confirmar</button>
                     </form>
                 </div>
             </div>
