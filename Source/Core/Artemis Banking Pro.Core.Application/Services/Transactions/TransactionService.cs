@@ -19,7 +19,7 @@ using AutoMapper;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
 {
-    public sealed class TransactionService : ITransactionService
+    public sealed class TransactionService : ITransactionService, IAtmTransactionService
     {
         private readonly ISavingsAccountsRepository _savingsAccountRepository;
         private readonly ITransactionRepository _transactionRepository;

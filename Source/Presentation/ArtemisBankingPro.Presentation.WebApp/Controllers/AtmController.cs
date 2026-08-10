@@ -1,4 +1,5 @@
 using ArtemisBankingPro.Core.Application.ViewModels.Atm;
+using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,12 +17,12 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
     public class AtmController : Controller
     {
         private readonly ILogger<AtmController> _logger;
-        private readonly Artemis_Banking_Pro.Core.Application.Contracts.Transactions.ITransactionService _transactionService;
+        private readonly IAtmTransactionService _transactionService;
         // private readonly IEmailServices _emailService;
 
         public AtmController(
             ILogger<AtmController> logger,
-            Artemis_Banking_Pro.Core.Application.Contracts.Transactions.ITransactionService transactionService
+            IAtmTransactionService transactionService
             // IEmailServices emailService
             )
         {
