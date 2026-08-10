@@ -2,3 +2,7 @@
 docs/
 bin/
 obj/
+.claudes/
+.claude/
+Logs/
+/.agents
