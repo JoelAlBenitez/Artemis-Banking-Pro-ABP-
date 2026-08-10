@@ -363,76 +363,77 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
                 return View(model);
             }
 
-            // Rule: Origin and Destination cannot be the same
+            if (model.Amount <= 0)
+            {
+                ModelState.AddModelError("Amount", "El monto de la transacción debe ser mayor que cero.");
+                return View(model);
+            }
+
             if (model.OriginAccountNumber == model.DestinationAccountNumber)
             {
-                ModelState.AddModelError("DestinationAccountNumber", "The origin account and the destination account cannot be the same.");
+                ModelState.AddModelError("DestinationAccountNumber", "La cuenta origen y la cuenta destino no pueden ser la misma.");
                 return View(model);
             }
 
-            // TODO: Validate origin account with IAccountServices
-            // bool isOriginActive = await _accountServices.IsAccountActiveAsync(model.OriginAccountNumber);
-            bool isOriginActive = true; // Placeholder
-
-            if (!isOriginActive)
+            var originResult = await _transactionService.GetAtmAccountDetailsAsync(model.OriginAccountNumber);
+            if (!originResult.IsValid || !originResult.Value!.IsActive)
             {
-                ModelState.AddModelError("OriginAccountNumber", "The origin account number entered does not correspond to a valid account.");
+                ModelState.AddModelError("OriginAccountNumber", "El número de cuenta origen ingresado no corresponde a una cuenta válida.");
                 return View(model);
             }
 
-            // TODO: Validate destination account with IAccountServices
-            // bool isDestinationActive = await _accountServices.IsAccountActiveAsync(model.DestinationAccountNumber);
-            bool isDestinationActive = true; // Placeholder
-
-            if (!isDestinationActive)
+            var destResult = await _transactionService.GetAtmAccountDetailsAsync(model.DestinationAccountNumber);
+            if (!destResult.IsValid || !destResult.Value!.IsActive)
             {
-                ModelState.AddModelError("DestinationAccountNumber", "The destination account number entered does not correspond to a valid account.");
+                ModelState.AddModelError("DestinationAccountNumber", "El número de cuenta destino ingresado no corresponde a una cuenta válida.");
                 return View(model);
             }
 
-            // TODO: Validate sufficient balance with IAccountServices
-            // bool hasSufficientBalance = await _accountServices.HasSufficientBalanceAsync(model.OriginAccountNumber, model.Amount);
-            bool hasSufficientBalance = true; // Placeholder
-
-            if (!hasSufficientBalance)
+            if (originResult.Value!.Balance < model.Amount)
             {
-                ModelState.AddModelError("Amount", "The entered amount exceeds the available balance of the account.");
+                ModelState.AddModelError("Amount", "El monto ingresado excede el saldo disponible de la cuenta.");
                 return View(model);
             }
 
-            // TODO: Get account holder names
-            // var originAccountHolder = await _accountServices.GetAccountHolderNameAsync(model.OriginAccountNumber);
-            // var destinationAccountHolder = await _accountServices.GetAccountHolderNameAsync(model.DestinationAccountNumber);
-            var originAccountHolder = "Origin Placeholder Name"; 
-            var destinationAccountHolder = "Destination Placeholder Name";
-
-            var confirmationModel = new ThirdPartyTransferConfirmationViewModel
+            var confirmModel = new ThirdPartyTransferConfirmationViewModel
             {
                 OriginAccountNumber = model.OriginAccountNumber,
                 DestinationAccountNumber = model.DestinationAccountNumber,
                 Amount = model.Amount,
-                OriginAccountHolderName = originAccountHolder,
-                DestinationAccountHolderName = destinationAccountHolder
+                OriginAccountHolderName = originResult.Value.OwnerName,
+                DestinationAccountHolderName = destResult.Value.OwnerName
             };
 
-            return View("ConfirmThirdPartyTransfer", confirmationModel);
+            return View("ConfirmThirdPartyTransfer", confirmModel);
+        }
+
+        [HttpGet]
+        public IActionResult ConfirmThirdPartyTransfer()
+        {
+            return RedirectToAction(nameof(ThirdPartyTransfer));
         }
 
         [HttpPost]
-        public async Task<IActionResult> ConfirmThirdPartyTransfer(ThirdPartyTransferConfirmationViewModel model)
+        public async Task<IActionResult> ExecuteThirdPartyTransfer(ThirdPartyTransferConfirmationViewModel model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
-            
-            var result = await _transactionService.ProcessAtmThirdPartyTransferAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmThirdPartyTransferDto { SourceAccountNumber = model.OriginAccountNumber, DestinationAccountNumber = model.DestinationAccountNumber, Amount = model.Amount, CashierId = userId });
-            
+
+            var result = await _transactionService.ProcessAtmThirdPartyTransferAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmThirdPartyTransferDto
+            {
+                SourceAccountNumber = model.OriginAccountNumber,
+                DestinationAccountNumber = model.DestinationAccountNumber,
+                Amount = model.Amount,
+                CashierId = userId
+            });
+
             if (!result.IsValid)
             {
-                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar la transferencia a terceros";
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar la transferencia.";
+                return RedirectToAction("Index");
             }
 
-            TempData["SuccessMessage"] = "Transferencia a terceros realizada correctamente.";
-            return RedirectToAction(nameof(Index));
+            TempData["SuccessMessage"] = "Transferencia realizada correctamente.";
+            return RedirectToAction("Index");
         }
     }
 }

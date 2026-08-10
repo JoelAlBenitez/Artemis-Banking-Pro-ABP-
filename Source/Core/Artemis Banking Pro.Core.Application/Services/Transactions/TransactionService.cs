@@ -806,8 +806,120 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
 
         public async Task<ValidationResult> ProcessAtmThirdPartyTransferAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmThirdPartyTransferDto dto)
         {
-            // Placeholder real for Third Party Transfer
-            return ValidationResult.Success();
+            try
+            {
+                var originAccount = await _savingsAccountRepository.GetFirstAsync(a => a.AccountNumber == dto.SourceAccountNumber);
+                if (originAccount == null || !originAccount.IsActive)
+                    return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.OriginAccount", "El número de cuenta origen ingresado no corresponde a una cuenta válida."));
+
+                var destinationAccount = await _savingsAccountRepository.GetFirstAsync(a => a.AccountNumber == dto.DestinationAccountNumber);
+                if (destinationAccount == null || !destinationAccount.IsActive)
+                    return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.DestinationAccount", "El número de cuenta destino ingresado no corresponde a una cuenta válida."));
+
+                if (originAccount.AccountNumber == destinationAccount.AccountNumber)
+                    return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.SameAccount", "La cuenta origen y la cuenta destino no pueden ser la misma."));
+
+                if (originAccount.Balance < dto.Amount)
+                {
+                    // Registrar intento rechazado en cuenta origen
+                    var rejected = new Transaction
+                    {
+                        SavingsAccountId = originAccount.Id,
+                        Amount = dto.Amount,
+                        TransactionType = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionType.Debito,
+                        OperationType = ArtemisBankingPro.Core.Domain.Common.Enum.OperationType.TransferenciaEntreCuentas,
+                        Origin = dto.SourceAccountNumber,
+                        Beneficiary = dto.DestinationAccountNumber,
+                        Status = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionStatus.Rechazada,
+                        PerformedByUserId = dto.CashierId,
+                        Channel = ArtemisBankingPro.Core.Domain.Common.Enum.ChannelPayment.Cajero,
+                        CreateByUserId = dto.CashierId,
+                        CreatedAt = DateTimeOffset.UtcNow,
+                        RejectionReason = "Fondos insuficientes"
+                    };
+                    await _transactionRepository.AddAsync(rejected);
+                    await _transactionRepository.SaveChangesAsync();
+                    return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.InsufficientFunds", "El monto ingresado excede el saldo disponible de la cuenta."));
+                }
+
+                // Descontar y Acreditar
+                originAccount.Balance -= dto.Amount;
+                destinationAccount.Balance += dto.Amount;
+
+                await _savingsAccountRepository.UpdateAsync(originAccount);
+                await _savingsAccountRepository.UpdateAsync(destinationAccount);
+
+                // Registrar Débito
+                var debitTransaction = new Transaction
+                {
+                    SavingsAccountId = originAccount.Id,
+                    Amount = dto.Amount,
+                    TransactionType = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionType.Debito,
+                    OperationType = ArtemisBankingPro.Core.Domain.Common.Enum.OperationType.TransferenciaEntreCuentas,
+                    Origin = originAccount.AccountNumber,
+                    Beneficiary = destinationAccount.AccountNumber,
+                    Status = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionStatus.Aprobada,
+                    PerformedByUserId = dto.CashierId,
+                    Channel = ArtemisBankingPro.Core.Domain.Common.Enum.ChannelPayment.Cajero,
+                    CreateByUserId = dto.CashierId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+
+                // Registrar Crédito
+                var creditTransaction = new Transaction
+                {
+                    SavingsAccountId = destinationAccount.Id,
+                    Amount = dto.Amount,
+                    TransactionType = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionType.Credito,
+                    OperationType = ArtemisBankingPro.Core.Domain.Common.Enum.OperationType.TransferenciaEntreCuentas,
+                    Origin = originAccount.AccountNumber,
+                    Beneficiary = destinationAccount.AccountNumber,
+                    Status = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionStatus.Aprobada,
+                    PerformedByUserId = dto.CashierId,
+                    Channel = ArtemisBankingPro.Core.Domain.Common.Enum.ChannelPayment.Cajero,
+                    CreateByUserId = dto.CashierId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+
+                await _transactionRepository.AddAsync(debitTransaction);
+                await _transactionRepository.AddAsync(creditTransaction);
+                
+                await _transactionRepository.SaveChangesAsync();
+
+                // Enviar correos
+                try
+                {
+                    string originLast4 = originAccount.AccountNumber.Length >= 4 ? originAccount.AccountNumber.Substring(originAccount.AccountNumber.Length - 4) : originAccount.AccountNumber;
+                    string destLast4 = destinationAccount.AccountNumber.Length >= 4 ? destinationAccount.AccountNumber.Substring(destinationAccount.AccountNumber.Length - 4) : destinationAccount.AccountNumber;
+
+                    var originMessage = new Artemis_Banking_Pro.Core.Application.DTOs.Messages.MessageDto
+                    {
+                        To = $"{originAccount.CustomerId}@artemis.com",
+                        Subject = $"Transacción realizada a la cuenta {destLast4}",
+                        Message = $"Hola Cliente {originAccount.CustomerId},\n\nSe ha realizado una transferencia desde su cuenta.\n\nMonto transferido: RD${dto.Amount:N2}\nCuenta origen terminada en: {originLast4}\nCuenta destino terminada en: {destLast4}\nFecha y hora: {debitTransaction.CreatedAt:dd/MM/yyyy HH:mm:ss}\n\nSi usted no reconoce esta operación, comuníquese con la entidad bancaria."
+                    };
+                    await _emailServices.SendNotification(originMessage);
+
+                    var destMessage = new Artemis_Banking_Pro.Core.Application.DTOs.Messages.MessageDto
+                    {
+                        To = $"{destinationAccount.CustomerId}@artemis.com",
+                        Subject = $"Transacción enviada desde la cuenta {originLast4}",
+                        Message = $"Hola Cliente {destinationAccount.CustomerId},\n\nSe ha recibido una transferencia en su cuenta.\n\nMonto recibido: RD${dto.Amount:N2}\nCuenta origen terminada en: {originLast4}\nCuenta destino terminada en: {destLast4}\nFecha y hora: {creditTransaction.CreatedAt:dd/MM/yyyy HH:mm:ss}"
+                    };
+                    await _emailServices.SendNotification(destMessage);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "La transacción fue realizada correctamente, pero no fue posible enviar una o más notificaciones por correo.");
+                }
+
+                return ValidationResult.Success();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al procesar transferencia a terceros en ATM.");
+                return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.TransferError", "Error interno al procesar la transferencia."));
+            }
         }
 
         public async Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmIndicatorsDto>> GetCashierDailyIndicatorsAsync(string cashierId)
