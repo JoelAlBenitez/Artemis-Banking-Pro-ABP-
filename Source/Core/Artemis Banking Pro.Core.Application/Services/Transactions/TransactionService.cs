@@ -565,8 +565,104 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
 
         public async Task<ValidationResult> ProcessAtmCreditCardPaymentAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardPaymentDto dto)
         {
-            // Placeholder real for CC payment
-            return ValidationResult.Success();
+            try
+            {
+                var account = await _savingsAccountRepository.GetFirstAsync(a => a.AccountNumber == dto.SourceAccountNumber);
+                if (account == null || !account.IsActive)
+                    return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.Account", "La cuenta origen no es válida o está inactiva."));
+
+                var card = await _creditCardRepository.GetFirstAsync(c => c.CardNumber == dto.CreditCardNumber);
+                if (card == null || card.Status != ArtemisBankingPro.Core.Domain.Common.Enum.CreditCardStatus.Activa)
+                    return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.CreditCard", "La tarjeta destino no es válida o está inactiva."));
+
+                if (card.OwedAmount <= 0)
+                    return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.NoDebt", "La tarjeta seleccionada no tiene deuda pendiente."));
+
+                decimal effectiveAmount = Math.Min(dto.Amount, card.OwedAmount);
+
+                if (account.Balance < effectiveAmount)
+                {
+                    // Registrar intento rechazado
+                    var rejected = new Transaction
+                    {
+                        SavingsAccountId = account.Id,
+                        Amount = effectiveAmount,
+                        TransactionType = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionType.Debito,
+                        OperationType = ArtemisBankingPro.Core.Domain.Common.Enum.OperationType.PagoTarjeta,
+                        Origin = dto.SourceAccountNumber,
+                        Beneficiary = "****" + card.LastFourDigits,
+                        Status = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionStatus.Rechazada,
+                        PerformedByUserId = dto.CashierId,
+                        Channel = ArtemisBankingPro.Core.Domain.Common.Enum.ChannelPayment.Cajero,
+                        CreateByUserId = dto.CashierId,
+                        CreatedAt = DateTimeOffset.UtcNow,
+                        RejectionReason = "Fondos insuficientes"
+                    };
+                    await _transactionRepository.AddAsync(rejected);
+                    return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.InsufficientFunds", "Fondos insuficientes en la cuenta origen."));
+                }
+
+                // Aplicar el pago
+                account.Balance -= effectiveAmount;
+                await _savingsAccountRepository.UpdateAsync(account);
+
+                card.OwedAmount -= effectiveAmount;
+                await _creditCardRepository.UpdateAsync(card);
+
+                var transaction = new Transaction
+                {
+                    SavingsAccountId = account.Id,
+                    Amount = effectiveAmount,
+                    TransactionType = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionType.Debito,
+                    OperationType = ArtemisBankingPro.Core.Domain.Common.Enum.OperationType.PagoTarjeta,
+                    Origin = dto.SourceAccountNumber,
+                    Beneficiary = "****" + card.LastFourDigits,
+                    Status = ArtemisBankingPro.Core.Domain.Common.Enum.TransactionStatus.Aprobada,
+                    PerformedByUserId = dto.CashierId,
+                    Channel = ArtemisBankingPro.Core.Domain.Common.Enum.ChannelPayment.Cajero,
+                    CreateByUserId = dto.CashierId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                };
+                await _transactionRepository.AddAsync(transaction);
+
+                // Enviar correo(s)
+                try
+                {
+                    string accountLast4 = account.AccountNumber.Length >= 4 ? account.AccountNumber.Substring(account.AccountNumber.Length - 4) : account.AccountNumber;
+                    
+                    // Notificar al dueño de la tarjeta
+                    var cardMessage = new Artemis_Banking_Pro.Core.Application.DTOs.Messages.MessageDto
+                    {
+                        To = $"{card.CustomerId}@artemis.com",
+                        Subject = $"Pago realizado a la tarjeta {card.LastFourDigits}",
+                        Message = $"Hola Cliente {card.CustomerId},\n\nSe ha realizado un pago a su tarjeta de crédito terminada en {card.LastFourDigits}.\n\nMonto pagado: RD${effectiveAmount:N2}\nCuenta origen terminada en: {accountLast4}\nFecha y hora: {transaction.CreatedAt:dd/MM/yyyy HH:mm:ss}\n\nSi usted no reconoce esta operación, comuníquese con la entidad bancaria."
+                    };
+                    await _emailServices.SendNotification(cardMessage);
+
+                    // Si el dueño de la cuenta origen es distinto, notificarlo también
+                    if (account.CustomerId != card.CustomerId)
+                    {
+                        var accountMessage = new Artemis_Banking_Pro.Core.Application.DTOs.Messages.MessageDto
+                        {
+                            To = $"{account.CustomerId}@artemis.com",
+                            Subject = $"Débito para pago de tarjeta",
+                            Message = $"Hola Cliente {account.CustomerId},\n\nSe ha debitado dinero de su cuenta terminada en {accountLast4} para realizar un pago a la tarjeta de crédito terminada en {card.LastFourDigits}.\n\nMonto debitado: RD${effectiveAmount:N2}\nFecha y hora: {transaction.CreatedAt:dd/MM/yyyy HH:mm:ss}\n\nSi usted no reconoce esta operación, comuníquese con la entidad bancaria."
+                        };
+                        await _emailServices.SendNotification(accountMessage);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "El pago fue realizado correctamente, pero no fue posible enviar el correo de notificación.");
+                }
+
+                return ValidationResult.Success();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al procesar el pago a tarjeta de crédito en ATM.");
+                return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.CreditCardPaymentError", "Error interno al procesar el pago."));
+            }
         }
 
         public async Task<ValidationResult> ProcessAtmLoanPaymentAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanPaymentDto dto)
@@ -626,6 +722,25 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             };
 
             return ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmAccountDetailsDto>.Success(dto);
+        }
+
+        public async Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardDetailsDto>> GetAtmCreditCardDetailsAsync(string cardNumber)
+        {
+            var card = await _creditCardRepository.GetFirstAsync(c => c.CardNumber == cardNumber);
+            if (card == null)
+                return ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardDetailsDto>.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.CreditCardNotFound", "El número de tarjeta ingresado no corresponde a una tarjeta válida."));
+
+            var dto = new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardDetailsDto
+            {
+                CreditCardNumber = card.CardNumber,
+                CustomerId = card.CustomerId,
+                OwnerName = $"Cliente {card.CustomerId}", // Mock until real Identity connection
+                OwnerEmail = $"{card.CustomerId}@artemis.com", // Mock until real Identity connection
+                IsActive = card.Status == ArtemisBankingPro.Core.Domain.Common.Enum.CreditCardStatus.Activa,
+                Debt = card.OwedAmount
+            };
+
+            return ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardDetailsDto>.Success(dto);
         }
 
         #endregion

@@ -24,6 +24,7 @@
 
                     <form asp-action="ExecuteCreditCardPayment" method="post" class="d-flex justify-content-between">
                         <input type="hidden" asp-for="SourceAccountNumber" />
+                        <input type="hidden" asp-for="CreditCardNumber" />
                         <input type="hidden" asp-for="CardLastFourDigits" />
                         <input type="hidden" asp-for="EffectiveAmount" />
                         

@@ -178,73 +178,60 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
                 return View(model);
             }
 
-            /*
-             * COMMENTED LOGIC WAITING FOR OTHER TEAMS' SERVICES
-             * 
-             * var account = await _accountService.GetByNumberAsync(model.SourceAccountNumber);
-             * if (account == null || !account.IsActive)
-             * {
-             *     ModelState.AddModelError("SourceAccountNumber", "El número de cuenta ingresado no corresponde a una cuenta válida.");
-             *     return View(model);
-             * }
-             * 
-             * var card = await _creditCardService.GetByNumberAsync(model.CreditCardNumber);
-             * if (card == null || !card.IsActive)
-             * {
-             *     ModelState.AddModelError("CreditCardNumber", "El número de tarjeta ingresado no corresponde a una tarjeta válida.");
-             *     return View(model);
-             * }
-             * 
-             * if (card.Debt <= 0)
-             * {
-             *     ModelState.AddModelError("CreditCardNumber", "La tarjeta seleccionada no tiene deuda pendiente.");
-             *     return View(model);
-             * }
-             * 
-             * decimal effectiveAmount = Math.Min(model.Amount, card.Debt);
-             * 
-             * if (effectiveAmount > account.Balance)
-             * {
-             *     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-             *     _logger.LogWarning("Intento rechazado por fondos insuficientes. Cajero: {UserId}, Cuenta Origen: {Cuenta}, Monto efectivo: {Monto}", userId, model.SourceAccountNumber, effectiveAmount);
-             *     
-             *     var rejectedTransaction = new TransactionDto { Status = "RECHAZADO", Amount = effectiveAmount, Origin = model.SourceAccountNumber, Type = "DÉBITO" ... };
-             *     await _transactionService.RegisterTransactionAsync(rejectedTransaction);
-             *     
-             *     ModelState.AddModelError("Amount", "El monto ingresado excede el saldo disponible de la cuenta.");
-             *     return View(model);
-             * }
-             */
-
-            // TEMPORARY MOCK FOR UI TESTING
-            decimal mockEffectiveAmount = model.Amount; 
-            
-            return RedirectToAction(nameof(ConfirmCreditCardPayment), new 
-            { 
-                sourceAccount = model.SourceAccountNumber, 
-                cardLastFour = model.CreditCardNumber.Substring(model.CreditCardNumber.Length - 4),
-                enteredAmount = model.Amount,
-                effectiveAmount = mockEffectiveAmount
-            });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ConfirmCreditCardPayment(string sourceAccount, string cardLastFour, decimal enteredAmount, decimal effectiveAmount)
-        {
-            // var account = await _accountService.GetByNumberAsync(sourceAccount);
-            // var card = await _creditCardService.GetCardByLastFourAsync(cardLastFour);
-
-            var model = new ConfirmCreditCardPaymentViewModel
+            if (model.Amount <= 0)
             {
-                SourceAccountNumber = sourceAccount,
-                AccountOwnerName = "John Doe (Mock)", // account.OwnerName
-                CreditCardOwnerName = "Jane Doe (Mock)", // card.OwnerName
-                CardLastFourDigits = cardLastFour,
-                EnteredAmount = enteredAmount,
+                ModelState.AddModelError("Amount", "El monto a pagar debe ser mayor que cero.");
+                return View(model);
+            }
+
+            var accountResult = await _transactionService.GetAtmAccountDetailsAsync(model.SourceAccountNumber);
+            if (!accountResult.IsValid || !accountResult.Value!.IsActive)
+            {
+                ModelState.AddModelError("SourceAccountNumber", "El número de cuenta ingresado no corresponde a una cuenta válida.");
+                return View(model);
+            }
+
+            var cardResult = await _transactionService.GetAtmCreditCardDetailsAsync(model.CreditCardNumber);
+            if (!cardResult.IsValid || !cardResult.Value!.IsActive)
+            {
+                ModelState.AddModelError("CreditCardNumber", "El número de tarjeta ingresado no corresponde a una tarjeta válida.");
+                return View(model);
+            }
+
+            if (cardResult.Value!.Debt <= 0)
+            {
+                ModelState.AddModelError("CreditCardNumber", "La tarjeta seleccionada no tiene deuda pendiente.");
+                return View(model);
+            }
+
+            decimal effectiveAmount = Math.Min(model.Amount, cardResult.Value.Debt);
+
+            if (accountResult.Value!.Balance < effectiveAmount)
+            {
+                ModelState.AddModelError("Amount", "El monto ingresado excede el saldo disponible de la cuenta.");
+                return View(model);
+            }
+            
+            var confirmModel = new ConfirmCreditCardPaymentViewModel
+            {
+                SourceAccountNumber = model.SourceAccountNumber,
+                AccountOwnerName = accountResult.Value.OwnerName,
+                CreditCardNumber = model.CreditCardNumber,
+                CreditCardOwnerName = cardResult.Value.OwnerName,
+                CardLastFourDigits = model.CreditCardNumber.Substring(model.CreditCardNumber.Length - 4),
+                EnteredAmount = model.Amount,
                 EffectiveAmount = effectiveAmount
             };
 
-            return View(model);
+            // Pasamos el modelo directamente a la vista de confirmación
+            return View("ConfirmCreditCardPayment", confirmModel);
+        }
+
+        [HttpGet]
+        public IActionResult ConfirmCreditCardPayment()
+        {
+            // Este método GET solo existe por si el usuario recarga la página, lo devolvemos al inicio.
+            return RedirectToAction(nameof(CreditCardPayment));
         }
 
         [HttpPost]
@@ -254,7 +241,13 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
             
             _logger.LogInformation("Iniciando proceso de pago a tarjeta. Cajero: {UserId}, Cuenta Origen: {Cuenta}, Monto Efectivo: {Monto}", userId, model.SourceAccountNumber, model.EffectiveAmount);
             
-            var result = await _transactionService.ProcessAtmCreditCardPaymentAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardPaymentDto { SourceAccountNumber = model.SourceAccountNumber, CreditCardNumber = model.CardLastFourDigits, Amount = model.EffectiveAmount, CashierId = userId });
+            var result = await _transactionService.ProcessAtmCreditCardPaymentAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardPaymentDto 
+            { 
+                SourceAccountNumber = model.SourceAccountNumber, 
+                CreditCardNumber = model.CreditCardNumber, 
+                Amount = model.EffectiveAmount, 
+                CashierId = userId 
+            });
 
             if (!result.IsValid)
             {
