@@ -4,6 +4,7 @@ using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
 using Artemis_Banking_Pro.Core.Application.DTOs.CreditCards;
 using Artemis_Banking_Pro.Core.Application.DTOs.Loans;
 using Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 using ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
@@ -23,6 +24,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
         private readonly ITransactionRepository _transactionRepository;
         private readonly ICardConsumptionRepository _cardConsumptionRepository;
         private readonly IMapper _mapper;
+        private readonly IUserManagementService _userManagementService;
 
         public DashboardService(
             ISavingsAccountsRepository savingsAccountRepository,
@@ -30,7 +32,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
             ILoansRepository loansRepository,
             ITransactionRepository transactionRepository,
             ICardConsumptionRepository cardConsumptionRepository,
-            IMapper mapper)
+            IMapper mapper,
+            IUserManagementService userManagementService)
         {
             _savingsAccountRepository = savingsAccountRepository;
             _creditCardRepository = creditCardRepository;
@@ -38,12 +41,23 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
             _transactionRepository = transactionRepository;
             _cardConsumptionRepository = cardConsumptionRepository;
             _mapper = mapper;
+            _userManagementService = userManagementService;
         }
 
         public async Task<ValidationResult<ClientDashboardViewModel>> GetClientDashboardAsync(string clientId)
         {
             try
             {
+                var userValidation = await _userManagementService.ValidateUserExistsByIdAsync(clientId);
+                if (!userValidation.Exists || !userValidation.IsActive)
+                {
+                    return ValidationResult<ClientDashboardViewModel>.Failure(DashboardError.UnauthorizedAccess);
+                }
+
+                var user = await _userManagementService.GetUserByIdAsync(clientId);
+                var clientName = user != null ? $"{user.Name} {user.LastName}" : "Cliente";
+                var clientEmail = user?.Email;
+
                 var accounts = await _savingsAccountRepository.GetAllFindAsync(
                     a => a.CustomerId == clientId && a.Status == SavingsAccountStatus.Activa
                 );
@@ -70,7 +84,9 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
                 {
                     SavingsAccounts = accountsMapped,
                     Loans = loansMapped,
-                    CreditCards = cardsMapped
+                    CreditCards = cardsMapped,
+                    ClientName = clientName,
+                    ClientEmail = clientEmail
                 };
 
                 return ValidationResult<ClientDashboardViewModel>.Success(dashboardViewModel);
