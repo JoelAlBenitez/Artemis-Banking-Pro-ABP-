@@ -1,4 +1,5 @@
 using ArtemisBankingPro.Core.Application.ViewModels.Atm;
+using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,12 +17,12 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
     public class AtmController : Controller
     {
         private readonly ILogger<AtmController> _logger;
-        private readonly Artemis_Banking_Pro.Core.Application.Contracts.Transactions.ITransactionService _transactionService;
+        private readonly IAtmTransactionService _transactionService;
         // private readonly IEmailServices _emailService;
 
         public AtmController(
             ILogger<AtmController> logger,
-            Artemis_Banking_Pro.Core.Application.Contracts.Transactions.ITransactionService transactionService
+            IAtmTransactionService transactionService
             // IEmailServices emailService
             )
         {
@@ -116,29 +117,29 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
                 return View(model);
             }
 
-            // TODO: Validate account exists and is active
-            // var account = await _savingsAccountService.GetByNumberAsync(model.OriginAccountNumber);
-            // if (account == null || !account.IsActive)
-            // {
-            //     ModelState.AddModelError("OriginAccountNumber", "El número de cuenta ingresado no corresponde a una cuenta válida.");
-            //     return View(model);
-            // }
+            if (model.Amount <= 0)
+            {
+                ModelState.AddModelError("Amount", "El monto a retirar debe ser mayor que cero.");
+                return View(model);
+            }
 
-            // TODO: Validate sufficient funds
-            // if (account.Balance < model.Amount)
-            // {
-            //     ModelState.AddModelError("Amount", "El monto ingresado excede el saldo disponible de la cuenta.");
-            //     return View(model);
-            // }
+            var accountResult = await _transactionService.GetAtmAccountDetailsAsync(model.OriginAccountNumber);
+            if (!accountResult.IsValid)
+            {
+                ModelState.AddModelError("OriginAccountNumber", "El número de cuenta ingresado no corresponde a una cuenta válida.");
+                return View(model);
+            }
 
-            // TODO: Get account owner full name
-            // var ownerName = await _userManagementService.GetFullNameByIdAsync(account.ClientId);
-            var ownerName = "Titular Ejemplo (Mock)";
+            if (accountResult.Value!.Balance < model.Amount)
+            {
+                ModelState.AddModelError("Amount", "El monto ingresado excede el saldo disponible de la cuenta.");
+                return View(model);
+            }
 
             var confirmModel = new ConfirmWithdrawalViewModel
             {
                 OriginAccountNumber = model.OriginAccountNumber,
-                AccountOwnerName = ownerName,
+                AccountOwnerName = accountResult.Value.OwnerName,
                 Amount = model.Amount
             };
 
@@ -152,9 +153,13 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
 
             _logger.LogInformation("Iniciando retiro. Cajero: {UserId}, Cuenta Origen: {Cuenta}, Monto: {Monto}", userId, model.OriginAccountNumber, model.Amount);
 
-            // TODO: Process withdrawal transaction using TransactionService
-            // var result = await _transactionService.ProcessAtmWithdrawalAsync(...);
-            // if (!result.IsSuccess) ...
+            var result = await _transactionService.ProcessAtmWithdrawalAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmWithdrawalDto { SourceAccountNumber = model.OriginAccountNumber, Amount = model.Amount, CashierId = userId });
+            
+            if (!result.IsValid)
+            {
+                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar el retiro";
+                return RedirectToAction(nameof(Index));
+            }
 
             TempData["SuccessMessage"] = "Retiro realizado correctamente.";
             return RedirectToAction(nameof(Index));
@@ -174,73 +179,60 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
                 return View(model);
             }
 
-            /*
-             * COMMENTED LOGIC WAITING FOR OTHER TEAMS' SERVICES
-             * 
-             * var account = await _accountService.GetByNumberAsync(model.SourceAccountNumber);
-             * if (account == null || !account.IsActive)
-             * {
-             *     ModelState.AddModelError("SourceAccountNumber", "El número de cuenta ingresado no corresponde a una cuenta válida.");
-             *     return View(model);
-             * }
-             * 
-             * var card = await _creditCardService.GetByNumberAsync(model.CreditCardNumber);
-             * if (card == null || !card.IsActive)
-             * {
-             *     ModelState.AddModelError("CreditCardNumber", "El número de tarjeta ingresado no corresponde a una tarjeta válida.");
-             *     return View(model);
-             * }
-             * 
-             * if (card.Debt <= 0)
-             * {
-             *     ModelState.AddModelError("CreditCardNumber", "La tarjeta seleccionada no tiene deuda pendiente.");
-             *     return View(model);
-             * }
-             * 
-             * decimal effectiveAmount = Math.Min(model.Amount, card.Debt);
-             * 
-             * if (effectiveAmount > account.Balance)
-             * {
-             *     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-             *     _logger.LogWarning("Intento rechazado por fondos insuficientes. Cajero: {UserId}, Cuenta Origen: {Cuenta}, Monto efectivo: {Monto}", userId, model.SourceAccountNumber, effectiveAmount);
-             *     
-             *     var rejectedTransaction = new TransactionDto { Status = "RECHAZADO", Amount = effectiveAmount, Origin = model.SourceAccountNumber, Type = "DÉBITO" ... };
-             *     await _transactionService.RegisterTransactionAsync(rejectedTransaction);
-             *     
-             *     ModelState.AddModelError("Amount", "El monto ingresado excede el saldo disponible de la cuenta.");
-             *     return View(model);
-             * }
-             */
-
-            // TEMPORARY MOCK FOR UI TESTING
-            decimal mockEffectiveAmount = model.Amount; 
-            
-            return RedirectToAction(nameof(ConfirmCreditCardPayment), new 
-            { 
-                sourceAccount = model.SourceAccountNumber, 
-                cardLastFour = model.CreditCardNumber.Substring(model.CreditCardNumber.Length - 4),
-                enteredAmount = model.Amount,
-                effectiveAmount = mockEffectiveAmount
-            });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ConfirmCreditCardPayment(string sourceAccount, string cardLastFour, decimal enteredAmount, decimal effectiveAmount)
-        {
-            // var account = await _accountService.GetByNumberAsync(sourceAccount);
-            // var card = await _creditCardService.GetCardByLastFourAsync(cardLastFour);
-
-            var model = new ConfirmCreditCardPaymentViewModel
+            if (model.Amount <= 0)
             {
-                SourceAccountNumber = sourceAccount,
-                AccountOwnerName = "John Doe (Mock)", // account.OwnerName
-                CreditCardOwnerName = "Jane Doe (Mock)", // card.OwnerName
-                CardLastFourDigits = cardLastFour,
-                EnteredAmount = enteredAmount,
+                ModelState.AddModelError("Amount", "El monto a pagar debe ser mayor que cero.");
+                return View(model);
+            }
+
+            var accountResult = await _transactionService.GetAtmAccountDetailsAsync(model.SourceAccountNumber);
+            if (!accountResult.IsValid || !accountResult.Value!.IsActive)
+            {
+                ModelState.AddModelError("SourceAccountNumber", "El número de cuenta ingresado no corresponde a una cuenta válida.");
+                return View(model);
+            }
+
+            var cardResult = await _transactionService.GetAtmCreditCardDetailsAsync(model.CreditCardNumber);
+            if (!cardResult.IsValid || !cardResult.Value!.IsActive)
+            {
+                ModelState.AddModelError("CreditCardNumber", "El número de tarjeta ingresado no corresponde a una tarjeta válida.");
+                return View(model);
+            }
+
+            if (cardResult.Value!.Debt <= 0)
+            {
+                ModelState.AddModelError("CreditCardNumber", "La tarjeta seleccionada no tiene deuda pendiente.");
+                return View(model);
+            }
+
+            decimal effectiveAmount = Math.Min(model.Amount, cardResult.Value.Debt);
+
+            if (accountResult.Value!.Balance < effectiveAmount)
+            {
+                ModelState.AddModelError("Amount", "El monto ingresado excede el saldo disponible de la cuenta.");
+                return View(model);
+            }
+            
+            var confirmModel = new ConfirmCreditCardPaymentViewModel
+            {
+                SourceAccountNumber = model.SourceAccountNumber,
+                AccountOwnerName = accountResult.Value.OwnerName,
+                CreditCardNumber = model.CreditCardNumber,
+                CreditCardOwnerName = cardResult.Value.OwnerName,
+                CardLastFourDigits = model.CreditCardNumber.Substring(model.CreditCardNumber.Length - 4),
+                EnteredAmount = model.Amount,
                 EffectiveAmount = effectiveAmount
             };
 
-            return View(model);
+            // Pasamos el modelo directamente a la vista de confirmación
+            return View("ConfirmCreditCardPayment", confirmModel);
+        }
+
+        [HttpGet]
+        public IActionResult ConfirmCreditCardPayment()
+        {
+            // Este método GET solo existe por si el usuario recarga la página, lo devolvemos al inicio.
+            return RedirectToAction(nameof(CreditCardPayment));
         }
 
         [HttpPost]
@@ -250,7 +242,13 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
             
             _logger.LogInformation("Iniciando proceso de pago a tarjeta. Cajero: {UserId}, Cuenta Origen: {Cuenta}, Monto Efectivo: {Monto}", userId, model.SourceAccountNumber, model.EffectiveAmount);
             
-            var result = await _transactionService.ProcessAtmCreditCardPaymentAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardPaymentDto { SourceAccountNumber = model.SourceAccountNumber, CreditCardNumber = model.CardLastFourDigits, Amount = model.EffectiveAmount, CashierId = userId });
+            var result = await _transactionService.ProcessAtmCreditCardPaymentAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardPaymentDto 
+            { 
+                SourceAccountNumber = model.SourceAccountNumber, 
+                CreditCardNumber = model.CreditCardNumber, 
+                Amount = model.EffectiveAmount, 
+                CashierId = userId 
+            });
 
             if (!result.IsValid)
             {
@@ -276,92 +274,81 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
                 return View(model);
             }
 
-            // TODO: Validate account with IAccountServices
-            // bool isAccountActive = await _accountServices.IsAccountActiveAsync(model.OriginAccountNumber);
-            bool isAccountActive = true; // Placeholder
-
-            if (!isAccountActive)
+            if (model.Amount <= 0)
             {
-                ModelState.AddModelError("OriginAccountNumber", "The account number entered does not correspond to a valid account.");
+                ModelState.AddModelError("Amount", "El monto a pagar debe ser mayor que cero.");
                 return View(model);
             }
 
-            // TODO: Validate loan with ILoanServices
-            // bool isLoanActive = await _loanServices.IsLoanActiveAsync(model.LoanNumber);
-            bool isLoanActive = true; // Placeholder
-
-            if (!isLoanActive)
+            var accountResult = await _transactionService.GetAtmAccountDetailsAsync(model.OriginAccountNumber);
+            if (!accountResult.IsValid || !accountResult.Value!.IsActive)
             {
-                ModelState.AddModelError("LoanNumber", "The loan number entered does not correspond to a valid loan.");
+                ModelState.AddModelError("OriginAccountNumber", "El número de cuenta ingresado no corresponde a una cuenta válida.");
                 return View(model);
             }
 
-            // TODO: Validate loan has pending installments
-            // bool hasPendingInstallments = await _loanServices.HasPendingInstallmentsAsync(model.LoanNumber);
-            bool hasPendingInstallments = true; // Placeholder
-
-            if (!hasPendingInstallments)
+            var loanResult = await _transactionService.GetAtmLoanDetailsAsync(model.LoanNumber);
+            if (!loanResult.IsValid || !loanResult.Value!.IsActive)
             {
-                ModelState.AddModelError("LoanNumber", "The selected loan has no pending installments.");
+                ModelState.AddModelError("LoanNumber", "El número de préstamo ingresado no corresponde a un préstamo válido.");
                 return View(model);
             }
 
-            // TODO: Validate total pending debt
-            // decimal totalPendingDebt = await _loanServices.GetTotalPendingDebtAsync(model.LoanNumber);
-            decimal totalPendingDebt = 2000.00m; // Placeholder debt
-
-            // Rule: Effective amount cannot exceed total pending debt
-            decimal effectiveAmount = System.Math.Min(model.Amount, totalPendingDebt);
-
-            // TODO: Validate sufficient balance with IAccountServices
-            // bool hasSufficientBalance = await _accountServices.HasSufficientBalanceAsync(model.OriginAccountNumber, effectiveAmount);
-            bool hasSufficientBalance = true; // Placeholder
-
-            if (!hasSufficientBalance)
+            if (!loanResult.Value.HasPendingInstallments || loanResult.Value.PendingAmount <= 0)
             {
-                ModelState.AddModelError("Amount", "The entered amount exceeds the available balance of the account.");
+                ModelState.AddModelError("LoanNumber", "El préstamo seleccionado no tiene cuotas pendientes de pago.");
                 return View(model);
             }
 
-            // TODO: Get account holder names
-            // var originAccountHolder = await _accountServices.GetAccountHolderNameAsync(model.OriginAccountNumber);
-            // var loanHolder = await _loanServices.GetLoanHolderNameAsync(model.LoanNumber);
-            var originAccountHolder = "Origin Placeholder Name"; 
-            var loanHolder = "Loan Placeholder Name";
+            decimal effectiveAmount = Math.Min(model.Amount, loanResult.Value.PendingAmount);
 
-            var confirmationModel = new LoanPaymentConfirmationViewModel
+            if (accountResult.Value!.Balance < effectiveAmount)
+            {
+                ModelState.AddModelError("Amount", "El monto ingresado excede el saldo disponible de la cuenta.");
+                return View(model);
+            }
+
+            var confirmModel = new LoanPaymentConfirmationViewModel
             {
                 OriginAccountNumber = model.OriginAccountNumber,
+                OriginAccountHolderName = accountResult.Value.OwnerName,
                 LoanNumber = model.LoanNumber,
+                LoanHolderName = loanResult.Value.OwnerName,
                 Amount = model.Amount,
-                EffectiveAmount = effectiveAmount,
-                OriginAccountHolderName = originAccountHolder,
-                LoanHolderName = loanHolder
+                EffectiveAmount = effectiveAmount
             };
 
-            return View("ConfirmLoanPayment", confirmationModel);
+            return View("ConfirmLoanPayment", confirmModel);
+        }
+
+        [HttpGet]
+        public IActionResult ConfirmLoanPayment()
+        {
+            return RedirectToAction(nameof(LoanPayment));
         }
 
         [HttpPost]
-        public async Task<IActionResult> ConfirmLoanPayment(LoanPaymentConfirmationViewModel model)
+        public async Task<IActionResult> ExecuteLoanPayment(LoanPaymentConfirmationViewModel model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
-            _logger.LogInformation("Iniciando pago a préstamo. Cajero: {UserId}, Préstamo: {Prestamo}, Monto Efectivo: {Monto}", userId, model.LoanNumber, model.EffectiveAmount);
+            var result = await _transactionService.ProcessAtmLoanPaymentAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanPaymentDto
+            {
+                SourceAccountNumber = model.OriginAccountNumber,
+                LoanNumber = model.LoanNumber,
+                Amount = model.EffectiveAmount,
+                CashierId = userId
+            });
 
-            var result = await _transactionService.ProcessAtmLoanPaymentAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanPaymentDto { SourceAccountNumber = model.OriginAccountNumber, LoanNumber = model.LoanNumber, Amount = model.EffectiveAmount, CashierId = userId });
-            
             if (!result.IsValid)
             {
-                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar el pago al préstamo";
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar el pago de préstamo.";
+                return RedirectToAction("Index");
             }
 
-            TempData["SuccessMessage"] = "Pago a préstamo realizado correctamente.";
-            return RedirectToAction(nameof(Index));
+            TempData["SuccessMessage"] = "Pago de préstamo realizado correctamente.";
+            return RedirectToAction("Index");
         }
-
-
 
         [HttpGet]
         public IActionResult ThirdPartyTransfer()
@@ -377,76 +364,77 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
                 return View(model);
             }
 
-            // Rule: Origin and Destination cannot be the same
+            if (model.Amount <= 0)
+            {
+                ModelState.AddModelError("Amount", "El monto de la transacción debe ser mayor que cero.");
+                return View(model);
+            }
+
             if (model.OriginAccountNumber == model.DestinationAccountNumber)
             {
-                ModelState.AddModelError("DestinationAccountNumber", "The origin account and the destination account cannot be the same.");
+                ModelState.AddModelError("DestinationAccountNumber", "La cuenta origen y la cuenta destino no pueden ser la misma.");
                 return View(model);
             }
 
-            // TODO: Validate origin account with IAccountServices
-            // bool isOriginActive = await _accountServices.IsAccountActiveAsync(model.OriginAccountNumber);
-            bool isOriginActive = true; // Placeholder
-
-            if (!isOriginActive)
+            var originResult = await _transactionService.GetAtmAccountDetailsAsync(model.OriginAccountNumber);
+            if (!originResult.IsValid || !originResult.Value!.IsActive)
             {
-                ModelState.AddModelError("OriginAccountNumber", "The origin account number entered does not correspond to a valid account.");
+                ModelState.AddModelError("OriginAccountNumber", "El número de cuenta origen ingresado no corresponde a una cuenta válida.");
                 return View(model);
             }
 
-            // TODO: Validate destination account with IAccountServices
-            // bool isDestinationActive = await _accountServices.IsAccountActiveAsync(model.DestinationAccountNumber);
-            bool isDestinationActive = true; // Placeholder
-
-            if (!isDestinationActive)
+            var destResult = await _transactionService.GetAtmAccountDetailsAsync(model.DestinationAccountNumber);
+            if (!destResult.IsValid || !destResult.Value!.IsActive)
             {
-                ModelState.AddModelError("DestinationAccountNumber", "The destination account number entered does not correspond to a valid account.");
+                ModelState.AddModelError("DestinationAccountNumber", "El número de cuenta destino ingresado no corresponde a una cuenta válida.");
                 return View(model);
             }
 
-            // TODO: Validate sufficient balance with IAccountServices
-            // bool hasSufficientBalance = await _accountServices.HasSufficientBalanceAsync(model.OriginAccountNumber, model.Amount);
-            bool hasSufficientBalance = true; // Placeholder
-
-            if (!hasSufficientBalance)
+            if (originResult.Value!.Balance < model.Amount)
             {
-                ModelState.AddModelError("Amount", "The entered amount exceeds the available balance of the account.");
+                ModelState.AddModelError("Amount", "El monto ingresado excede el saldo disponible de la cuenta.");
                 return View(model);
             }
 
-            // TODO: Get account holder names
-            // var originAccountHolder = await _accountServices.GetAccountHolderNameAsync(model.OriginAccountNumber);
-            // var destinationAccountHolder = await _accountServices.GetAccountHolderNameAsync(model.DestinationAccountNumber);
-            var originAccountHolder = "Origin Placeholder Name"; 
-            var destinationAccountHolder = "Destination Placeholder Name";
-
-            var confirmationModel = new ThirdPartyTransferConfirmationViewModel
+            var confirmModel = new ThirdPartyTransferConfirmationViewModel
             {
                 OriginAccountNumber = model.OriginAccountNumber,
                 DestinationAccountNumber = model.DestinationAccountNumber,
                 Amount = model.Amount,
-                OriginAccountHolderName = originAccountHolder,
-                DestinationAccountHolderName = destinationAccountHolder
+                OriginAccountHolderName = originResult.Value.OwnerName,
+                DestinationAccountHolderName = destResult.Value.OwnerName
             };
 
-            return View("ConfirmThirdPartyTransfer", confirmationModel);
+            return View("ConfirmThirdPartyTransfer", confirmModel);
+        }
+
+        [HttpGet]
+        public IActionResult ConfirmThirdPartyTransfer()
+        {
+            return RedirectToAction(nameof(ThirdPartyTransfer));
         }
 
         [HttpPost]
-        public async Task<IActionResult> ConfirmThirdPartyTransfer(ThirdPartyTransferConfirmationViewModel model)
+        public async Task<IActionResult> ExecuteThirdPartyTransfer(ThirdPartyTransferConfirmationViewModel model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
-            
-            var result = await _transactionService.ProcessAtmThirdPartyTransferAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmThirdPartyTransferDto { SourceAccountNumber = model.OriginAccountNumber, DestinationAccountNumber = model.DestinationAccountNumber, Amount = model.Amount, CashierId = userId });
-            
+
+            var result = await _transactionService.ProcessAtmThirdPartyTransferAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmThirdPartyTransferDto
+            {
+                SourceAccountNumber = model.OriginAccountNumber,
+                DestinationAccountNumber = model.DestinationAccountNumber,
+                Amount = model.Amount,
+                CashierId = userId
+            });
+
             if (!result.IsValid)
             {
-                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar la transferencia a terceros";
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar la transferencia.";
+                return RedirectToAction("Index");
             }
 
-            TempData["SuccessMessage"] = "Transferencia a terceros realizada correctamente.";
-            return RedirectToAction(nameof(Index));
+            TempData["SuccessMessage"] = "Transferencia realizada correctamente.";
+            return RedirectToAction("Index");
         }
     }
 }

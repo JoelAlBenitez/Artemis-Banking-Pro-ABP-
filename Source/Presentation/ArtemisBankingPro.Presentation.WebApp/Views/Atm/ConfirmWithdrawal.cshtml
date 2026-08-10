@@ -1,0 +1,50 @@
+@model ArtemisBankingPro.Core.Application.ViewModels.Atm.ConfirmWithdrawalViewModel
+@{
+    ViewData["Title"] = "Confirmar Retiro";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-warning text-dark text-center py-3">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i> Confirmar Retiro</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-center fs-5 fw-semibold text-secondary mb-4">¿Está seguro que desea realizar este retiro?</p>
+
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th class="table-light w-50">Titular de la cuenta</th>
+                                <td>@Model.AccountOwnerName</td>
+                            </tr>
+                            <tr>
+                                <th class="table-light">Número de cuenta origen</th>
+                                <td>@Model.OriginAccountNumber</td>
+                            </tr>
+                            <tr>
+                                <th class="table-light">Monto a retirar</th>
+                                <td class="fw-bold text-danger">RD$ @Model.Amount.ToString("N2")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <form asp-action="ConfirmWithdrawal" method="post" class="mt-3">
+                        <input type="hidden" asp-for="OriginAccountNumber" />
+                        <input type="hidden" asp-for="AccountOwnerName" />
+                        <input type="hidden" asp-for="Amount" />
+                        <div class="d-flex gap-3">
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg flex-fill">
+                                <i class="bi bi-x-circle me-2"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg flex-fill">
+                                <i class="bi bi-check-circle me-2"></i> Confirmar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
