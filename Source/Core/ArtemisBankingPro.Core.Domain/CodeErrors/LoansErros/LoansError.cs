@@ -2,7 +2,7 @@ using ArtemisBankingPro.Core.Domain.Common.Errors;
 
 namespace ArtemisBankingPro.Core.Domain.CodeErrors.LoansErros
 {
-    public static class LoandError
+    public static class LoansError
     {
         public static readonly Error NonExistsLoans
             = new("Error", "Este cliente no tiene préstamos registrados.");
@@ -39,5 +39,8 @@ namespace ArtemisBankingPro.Core.Domain.CodeErrors.LoansErros
 
         public static readonly Error RateUpdatedWithoutNotification
             = new("Advertencia", "La tasa fue modificada correctamente, pero no fue posible enviar el correo de notificación.");
+
+        public static readonly Error NonExistLoansByIndicateState
+            = new("Advertencia", "No existen prestamos para el estado indicado.");
     }
 }

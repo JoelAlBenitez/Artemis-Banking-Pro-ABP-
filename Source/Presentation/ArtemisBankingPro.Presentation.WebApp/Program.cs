@@ -1,3 +1,4 @@
+using ArtemisBankingPro.IOC;
 using ArtemisBankingPro.Presentation.WebApp.Extensions;
 using Serilog;
 
@@ -14,6 +15,10 @@ try
 
     // Add services to the container.
     builder.Services.AddControllersWithViews();
+
+    builder.Services.AddApplicationDependecies();
+    builder.Services.AddInfraestructurePersistence(builder.Configuration);
+    builder.Services.AddInfraestructureDependencies(builder.Configuration);
 
     var app = builder.Build();
 

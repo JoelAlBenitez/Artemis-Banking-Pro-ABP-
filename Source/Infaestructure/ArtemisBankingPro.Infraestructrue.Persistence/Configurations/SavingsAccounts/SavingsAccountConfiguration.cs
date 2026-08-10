@@ -1,0 +1,61 @@
+using ArtemisBankingPro.Core.Domain.Common.Constants;
+using ArtemisBankingPro.Core.Domain.Common.Enum;
+using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.SavingsAccounts
+{
+    public sealed class SavingsAccountConfiguration : IEntityTypeConfiguration<SavingsAccount>
+    {
+        public void Configure(EntityTypeBuilder<SavingsAccount> builder)
+        {
+            builder.ToTable("SavingsAccounts");
+            builder.HasKey(a => a.Id);
+
+            //Texto y no numÃ©rico para no perder los ceros iniciales del nÃºmero de 9 dÃ­gitos
+            builder.Property(a => a.AccountNumber)
+                .IsRequired()
+                .HasMaxLength(DomainConstants.AccountNumberLength)
+                .IsUnicode(false);
+
+            builder.HasIndex(a => a.AccountNumber).IsUnique();
+
+            builder.Property(a => a.CustomerId)
+                .IsRequired()
+                .HasMaxLength(DomainConstants.IdentityUserIdLength);
+
+            builder.Property(a => a.Balance)
+                .HasPrecision(DomainConstants.MoneyPrecision, DomainConstants.MoneyScale);
+
+            builder.Property(a => a.AccountType)
+                .HasConversion<int>()
+                .IsRequired();
+
+            builder.Property(a => a.Status)
+                .HasConversion<int>()
+                .IsRequired();
+
+            builder.Property(a => a.CreateByUserId)
+                .IsRequired()
+                .HasMaxLength(DomainConstants.IdentityUserIdLength);
+
+            builder.Property(a => a.LastModifiedByIdUser)
+                .HasMaxLength(DomainConstants.IdentityUserIdLength);
+
+            builder.HasIndex(a => a.CustomerId);
+
+            //Una sola cuenta principal activa por cliente
+            builder.HasIndex(a => a.CustomerId)
+                .IsUnique()
+                .HasFilter($"[AccountType] = {(int)SavingsAccountType.Principal} " +
+                           $"AND [Status] = {(int)SavingsAccountStatus.Activa}");
+
+            builder.Ignore(a => a.IsPrimary);
+            builder.Ignore(a => a.IsActive);
+
+            //La relación con el historial de transacciones se configura cuando el módulo
+            //Cliente exponga la entidad Transaction (OnDelete Restrict, sin borrado físico).
+        }
+    }
+}
