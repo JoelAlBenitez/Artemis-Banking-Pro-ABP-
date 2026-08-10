@@ -4,15 +4,15 @@ namespace ArtemisBankingPro.Core.Application.ViewModels.Atm
 {
     public class LoanPaymentViewModel
     {
-        [Required(ErrorMessage = "El número de cuenta origen es requerido.")]
-        public string SourceAccountNumber { get; set; }
+        [Required(ErrorMessage = "The origin account number is required.")]
+        public string OriginAccountNumber { get; set; }
 
-        [Required(ErrorMessage = "El número del préstamo es requerido.")]
-        [StringLength(9, MinimumLength = 9, ErrorMessage = "El número de préstamo debe contener 9 dígitos.")]
+        [Required(ErrorMessage = "The loan number is required.")]
+        [StringLength(9, MinimumLength = 9, ErrorMessage = "The loan number must contain exactly 9 digits.")]
         public string LoanNumber { get; set; }
 
-        [Required(ErrorMessage = "El monto a pagar es requerido.")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "El monto a pagar debe ser mayor que cero.")]
+        [Required(ErrorMessage = "The amount to pay is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "The amount to pay must be greater than zero.")]
         public decimal Amount { get; set; }
     }
 }

@@ -9,28 +9,33 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndRevers
     {
         public LoansMappingDtoToViewModelAndReverse()
         {
-            CreateMap<ClientLoansDto, ClientLoansViewModel>().ReverseMap();
-            CreateMap<ConsultClientByIdCardDto, ConsultClientByIdCardViewModel>().ReverseMap();
-            CreateMap<LoansAssignmentDto, LoansAssigmentViewModel>().ReverseMap();
-            CreateMap<LoansFilterDto, LoansFilterViewModel>().ReverseMap();
 
+            //write loans
+            CreateMap<LoansAssignmentDto, LoansAssigmentViewModel>().ReverseMap();
+
+            CreateMap<LoansFilterDto, LoansFilterViewModel>().ReverseMap();
+            
             CreateMap<EditAnnualInterestRateDto, EditAnnualInterestRateViewModel>()
                 .ForMember(d => d.LoansId, o => o.MapFrom(s => s.Id))
                 .ReverseMap()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.LoansId));
 
+            CreateMap<ClientLoansDto, ClientLoansViewModel>();
+            //ventana principal de prestamo
             CreateMap<LoansDto, LoansViewModel>()
                 .ForMember(d => d.StateLoans,
                     o => o.MapFrom(s => s.StateLoans == LoanStatus.Activo ? "Activo" : "Completado"))
                 .ForMember(d => d.StateCustomer,
                     o => o.MapFrom(s => s.CustomerInArrears ? "En mora" : "Al día"));
 
+            //detalles del prestamo
             CreateMap<DetailLoansDto, DetailsLoansViewModel>()
                 .ForMember(d => d.StateLoans,
                     o => o.MapFrom(s => s.StateLoans == LoanStatus.Activo ? "Activo" : "Completado"))
                 .ForMember(d => d.loasInstallmentViewModels,
                     o => o.MapFrom(s => s.loansInstallmentDtos));
 
+            //cuotas de cada prestamo -> visualizada en los detalles 
             CreateMap<LoansInstallmentDto, LoasInstallmentViewModel>()
                 .ForMember(d => d.StateInstallment,
                     o => o.MapFrom(s => s.StateInstallment == PaymentStatus.Pendiente

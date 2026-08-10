@@ -1,6 +1,6 @@
-@model ArtemisBankingPro.Core.Application.ViewModels.Atm.ConfirmLoanPaymentViewModel
+@model ArtemisBankingPro.Core.Application.ViewModels.Atm.LoanPaymentConfirmationViewModel
 @{
-    ViewData["Title"] = "Confirmar Pago a Préstamo";
+    ViewData["Title"] = "Confirm Loan Payment";
 }
 
 <div class="container mt-5">
@@ -8,27 +8,48 @@
         <div class="col-md-6">
             <div class="card shadow-sm border-warning">
                 <div class="card-header bg-warning text-dark">
-                    <h4 class="mb-0">Confirmar Operación</h4>
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Confirm Payment</h4>
                 </div>
-                <div class="card-body text-center">
-                    <p class="lead mb-4">¿Está seguro que desea realizar este pago?</p>
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                     
-                    <ul class="list-group list-group-flush text-start mb-4">
-                        <li class="list-group-item"><strong>Titular de la cuenta origen:</strong> @Model.AccountOwnerName</li>
-                        <li class="list-group-item"><strong>Número de cuenta origen:</strong> @Model.SourceAccountNumber</li>
-                        <li class="list-group-item"><strong>Titular del préstamo:</strong> @Model.LoanOwnerName</li>
-                        <li class="list-group-item"><strong>Número del préstamo:</strong> @Model.LoanNumber</li>
-                        <li class="list-group-item"><strong>Monto ingresado:</strong> RD$ @Model.EnteredAmount</li>
-                        <li class="list-group-item"><strong>Monto efectivo a pagar:</strong> RD$ @Model.EffectiveAmount</li>
+                    <h5 class="card-title text-center mb-4">Are you sure you want to make this payment?</h5>
+                    
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Origin Account Holder:</strong>
+                            <span>@Model.OriginAccountHolderName</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Origin Account Number:</strong>
+                            <span>@Model.OriginAccountNumber</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center mt-2 border-top pt-3">
+                            <strong>Loan Holder:</strong>
+                            <span>@Model.LoanHolderName</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Loan Number:</strong>
+                            <span>@Model.LoanNumber</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center mt-2 border-top pt-3">
+                            <strong>Entered Amount:</strong>
+                            <span>RD$ @Model.Amount.ToString("N2")</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
+                            <strong>Effective Amount to Pay:</strong>
+                            <span class="text-danger fw-bold">- RD$ @Model.EffectiveAmount.ToString("N2")</span>
+                        </li>
                     </ul>
 
                     <form asp-action="ExecuteLoanPayment" method="post" class="d-flex justify-content-between">
-                        <input type="hidden" asp-for="SourceAccountNumber" />
+                        <input type="hidden" asp-for="OriginAccountNumber" />
                         <input type="hidden" asp-for="LoanNumber" />
+                        <input type="hidden" asp-for="Amount" />
                         <input type="hidden" asp-for="EffectiveAmount" />
                         
-                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary px-4">Cancelar</a>
-                        <button type="submit" class="btn btn-success px-4">Confirmar</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-medium">Cancelar</a>
+                        <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill fw-medium shadow-sm">Confirmar</button>
                     </form>
                 </div>
             </div>
