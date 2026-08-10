@@ -8,6 +8,8 @@ using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
 using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
 using Artemis_Banking_Pro.Core.Application.Services.Transactions;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+using ArtemisBankingPro.Core.Application.DTOs.Users;
 using ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
@@ -160,6 +162,20 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
             _emailServicesMock.Setup(e => e.SendNotification(It.IsAny<MessageDto>()))
                 .ReturnsAsync(true);
 
+            _userManagementServiceMock.Setup(u => u.GetUserByIdAsync(clientId))
+                .ReturnsAsync(new UserDetailDto
+                {
+                    Id = clientId,
+                    UserName = clientId,
+                    Name = "Carlos",
+                    LastName = "Wilfredo",
+                    IDCARD = "001-0000000-1",
+                    Email = "carlos@artemis.com",
+                    TypeUser = Roles.Cliente,
+                    State = true,
+                    IsClient = true
+                });
+
             var result = await _transactionService.ProcessAccountTransferAsync(dto, clientId);
 
             result.IsValid.Should().BeTrue();
@@ -174,7 +190,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
             _savingsAccountRepositoryMock.Verify(r => r.UpdateAsync(destAccount), Times.Once);
             _transactionRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Exactly(2));
             _emailServicesMock.Verify(e => e.SendNotification(It.Is<MessageDto>(m =>
-                m.To == "client-123@artemis.com" &&
+                m.To == "carlos@artemis.com" &&
                 m.Subject == "Transferencia entre cuentas realizada"
             )), Times.Once);
         }
@@ -220,6 +236,20 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
 
             _emailServicesMock.Setup(e => e.SendNotification(It.IsAny<MessageDto>()))
                 .ReturnsAsync(false);
+
+            _userManagementServiceMock.Setup(u => u.GetUserByIdAsync(clientId))
+                .ReturnsAsync(new UserDetailDto
+                {
+                    Id = clientId,
+                    UserName = clientId,
+                    Name = "Carlos",
+                    LastName = "Wilfredo",
+                    IDCARD = "001-0000000-1",
+                    Email = "carlos@artemis.com",
+                    TypeUser = Roles.Cliente,
+                    State = true,
+                    IsClient = true
+                });
 
             var result = await _transactionService.ProcessAccountTransferAsync(dto, clientId);
 
