@@ -176,14 +176,17 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
                 .Select(c => c.Value)
                 .ToList();
 
+            //El nombre del controlador, no el de la pantalla: AdminController expone el Home
+            //del administrador. "AdminHome" no existe y la redirección terminaba en 404.
             if (userRoles.Contains(nameof(Roles.Administrador)))
-                return RedirectToAction("Index", "AdminHome");
+                return RedirectToAction("Index", "Admin");
 
+            //Pendiente: el módulo Cajero todavía no tiene su controlador en la WebApp
             if (userRoles.Contains(nameof(Roles.Cajero)))
                 return RedirectToAction("Index", "CashierHome");
 
             if (userRoles.Contains(nameof(Roles.Cliente)))
-                return RedirectToAction("Index", "ClientHome");
+                return RedirectToAction("Index", "Customer");
 
             //El rol Comercio no tiene Home en la aplicación web: solo consume la Web API
             return RedirectToAction(nameof(Login));

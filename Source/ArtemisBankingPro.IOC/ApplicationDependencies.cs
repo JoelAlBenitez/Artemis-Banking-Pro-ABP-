@@ -22,6 +22,9 @@ using Artemis_Banking_Pro.Core.Application.Contracts.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.Services.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.Contracts.Debts;
 using Artemis_Banking_Pro.Core.Application.Services.Debts;
+using Artemis_Banking_Pro.Core.Application.Contracts.AdminDashboard;
+using Artemis_Banking_Pro.Core.Application.Services.AdminDashboard;
+using Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndReverse.AdminDashboard;
 
 namespace ArtemisBankingPro.IOC
 {
@@ -51,6 +54,11 @@ namespace ArtemisBankingPro.IOC
                 configuration.AddMaps(typeof(SavingsAccountsMappingEntitieToDtoAndReverse).Assembly);
                 #endregion
 
+       
+                #region admin dashboard
+                configuration.AddMaps(typeof(AdminDashboardMappingDtoToViewModel).Assembly);
+                #endregion
+
                
             });
             #endregion
@@ -67,6 +75,8 @@ namespace ArtemisBankingPro.IOC
             //Compartido: préstamos, tarjetas y dashboard consumen el mismo cálculo de deuda
             services.AddScoped<IDebtCalculator, DebtCalculator>();
 
+            //compartido dashboar de admin
+            services.AddScoped<IAdminDashboardServices, AdminDashboardServices>();
             #region credit cards
             services.AddScoped<ICreditCardsServices, CreditCardsServices>();
             services.AddScoped<ICreditCardsValidationServices, CreditCardsValidationServices>();
@@ -78,15 +88,23 @@ namespace ArtemisBankingPro.IOC
             #endregion
 
 
+            #region transactions 
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<ITransactionsValidationServices, TransactionsValidationServices>();
+            #endregion
+
+            #region beneficiaries 
 
             services.AddScoped<IBeneficiaryServices, BeneficiaryServices>();
             services.AddScoped<IBeneficiaryValidationServices, BeneficiaryValidationServices>();
+            #endregion
+
+            #region cash advances
             services.AddScoped<ICashAdvanceServices, CashAdvanceServices>();
             services.AddScoped<ICashAdvanceValidationServices, CashAdvanceValidationServices>();
+            #endregion
 
             return services;
         }
