@@ -1,6 +1,9 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.EmailSerives;
 using Artemis_Banking_Pro.Core.Application.Contracts.SavingsAccounts;
+using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
 using Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+using ArtemisBankingPro.Core.Application.DTOs.Users;
 using Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.SavingsAccounts;
 using Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
@@ -33,12 +36,14 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
         private readonly Mock<ILoansRepository> _loansRepository = new();
         private readonly Mock<ICreditCardsRepository> _creditCardsRepository = new();
         private readonly Mock<ISavingsAccountsValidateServices> _validateServices = new();
+        private readonly Mock<IUserManagementService> _userManagementService = new();
         private readonly Mock<IEmailServices> _emailServices = new();
         private readonly SavingsAccountsServices _sut;
 
         private readonly List<Transaction> _registeredTransactions = new();
 
         private const string CustomerId = "3f2a1c9e-0000-4a2b-9c1d-8e7f6a5b4c3d";
+        private const string AdminUserId = "8b1d4f60-1111-4c3a-9d2e-7f6a5b4c3d2e";
         private const string SecondaryAccountNumber = "500000002";
         private const string PrimaryAccountNumber = "500000001";
 
@@ -68,12 +73,19 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
                 .Setup(repository => repository.SaveChangesAsync())
                 .ReturnsAsync(1);
 
+            //Por defecto hay un administrador autenticado: cada prueba que valide lo contrario
+            //lo sobrescribe.
+            _validateServices
+                .Setup(service => service.ValidateAdministratorInSession())
+                .Returns(ValidationResult<string>.Success(AdminUserId));
+
             _sut = new SavingsAccountsServices(
                 _savingsAccountsRepository.Object,
                 _transactionRepository.Object,
                 _loansRepository.Object,
                 _creditCardsRepository.Object,
                 _validateServices.Object,
+                _userManagementService.Object,
                 _emailServices.Object,
                 mapper,
                 NullLogger<SavingsAccountsServices>.Instance);
@@ -95,6 +107,20 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
                 Status = status,
                 CreatedAt = DateTimeOffset.UtcNow,
                 CreateByUserId = "SYSTEM"
+            };
+
+        private static UserDetailDto BuildCustomer()
+            => new()
+            {
+                Id = CustomerId,
+                UserName = "mgomez",
+                Name = "María",
+                LastName = "Gómez",
+                IDCARD = "40200000001",
+                Email = "maria.gomez@artemis.com",
+                TypeUser = Roles.Cliente,
+                State = true,
+                IsClient = true
             };
 
         private void SetupAssignmentIsValid(string generatedAccountNumber = SecondaryAccountNumber)
@@ -122,6 +148,72 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
         }
 
         #region AssignSavingsAccountAsync
+        //Sin administrador en sesión no hay a quién atribuir la cuenta ni sus asientos.
+        [Fact]
+        public async Task AssignSavingsAccountAsync_WithoutAnAdministratorInSession_ShouldFail()
+        {
+            _validateServices
+                .Setup(service => service.ValidateAdministratorInSession())
+                .Returns(ValidationResult<string>.Failure(SavingsAccountError.AdminUserRequired));
+
+            var result = await _sut.AssignSavingsAccountAsync(
+                new SavingsAccountAssignmentDto { CustomerId = CustomerId, InitialBalance = 100m });
+
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().Contain(SavingsAccountError.AdminUserRequired);
+            _savingsAccountsRepository.Verify(
+                repository => repository.SaveChangesAsync(), Times.Never);
+        }
+
+        //La cuenta y su asiento inicial se atribuyen al administrador autenticado, no al sistema.
+        [Fact]
+        public async Task AssignSavingsAccountAsync_ShouldAuditTheAuthenticatedAdministrator()
+        {
+            SetupAssignmentIsValid();
+
+            SavingsAccount? persisted = null;
+            _savingsAccountsRepository
+                .Setup(repository => repository.AddAsync(It.IsAny<SavingsAccount>()))
+                .ReturnsAsync((SavingsAccount account) =>
+                {
+                    persisted = account;
+                    return account;
+                });
+
+            await _sut.AssignSavingsAccountAsync(
+                new SavingsAccountAssignmentDto { CustomerId = CustomerId, InitialBalance = 800m });
+
+            persisted!.CreateByUserId.Should().Be(AdminUserId);
+
+            var entry = _registeredTransactions.Single();
+            entry.PerformedByUserId.Should().Be(AdminUserId);
+            entry.CreateByUserId.Should().Be(AdminUserId);
+        }
+
+        //El correo va después de confirmar: un fallo de envío no revierte la cuenta creada.
+        [Fact]
+        public async Task AssignSavingsAccountAsync_WhenTheEmailFails_ShouldStillSucceed()
+        {
+            SetupAssignmentIsValid();
+
+            _userManagementService
+                .Setup(service => service.GetUserByIdAsync(CustomerId))
+                .ReturnsAsync(BuildCustomer());
+
+            _emailServices
+                .Setup(service => service.SendNotification(It.IsAny<MessageDto>()))
+                .ReturnsAsync(false);
+
+            var result = await _sut.AssignSavingsAccountAsync(
+                new SavingsAccountAssignmentDto { CustomerId = CustomerId, InitialBalance = 100m });
+
+            result.IsValid.Should().BeTrue();
+            _emailServices.Verify(
+                service => service.SendNotification(
+                    It.Is<MessageDto>(message => message.To == "maria.gomez@artemis.com")),
+                Times.Once);
+        }
+
         [Fact]
         public async Task AssignSavingsAccountAsync_WithEmptyGeneratedNumber_ShouldFail()
         {
@@ -225,6 +317,38 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
         #endregion
 
         #region CancelSavingsAccountAsync
+        [Fact]
+        public async Task CancelSavingsAccountAsync_WithoutAnAdministratorInSession_ShouldFail()
+        {
+            _validateServices
+                .Setup(service => service.ValidateAdministratorInSession())
+                .Returns(ValidationResult<string>.Failure(SavingsAccountError.AdminUserRequired));
+
+            var result = await _sut.CancelSavingsAccountAsync(2);
+
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().Contain(SavingsAccountError.AdminUserRequired);
+            _savingsAccountsRepository.Verify(
+                repository => repository.SaveChangesAsync(), Times.Never);
+        }
+
+        //Ambos asientos y las dos cuentas tocadas quedan a nombre del administrador autenticado.
+        [Fact]
+        public async Task CancelSavingsAccountAsync_ShouldAuditTheAuthenticatedAdministrator()
+        {
+            var secondary = BuildAccount(2, SecondaryAccountNumber, SavingsAccountType.Secundaria, 1200m);
+            var primary = BuildAccount(1, PrimaryAccountNumber, SavingsAccountType.Principal, 800m);
+
+            SetupCancellationIsValid(secondary, primary);
+
+            await _sut.CancelSavingsAccountAsync(secondary.Id);
+
+            secondary.LastModifiedByIdUser.Should().Be(AdminUserId);
+            primary.LastModifiedByIdUser.Should().Be(AdminUserId);
+            _registeredTransactions.Should().OnlyContain(
+                t => t.PerformedByUserId == AdminUserId && t.CreateByUserId == AdminUserId);
+        }
+
         //Criterios 8 y 9: el saldo viaja a la principal y quedan dos asientos cruzados.
         [Fact]
         public async Task CancelSavingsAccountAsync_WithBalance_ShouldTransferItAndRegisterTwoTransactions()
@@ -321,7 +445,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
         {
             _validateServices
                 .Setup(service => service.ValidateCustomerAccountsQueryAsync(It.IsAny<SavingsAccountFilterDto>()))
-                .ReturnsAsync(ValidationResult.Success());
+                .ReturnsAsync(ValidationResult<string?>.Success(CustomerId));
 
             _savingsAccountsRepository
                 .Setup(repository => repository.GetPagedSavingsAccountsAsync(
@@ -330,10 +454,65 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
                 .ReturnsAsync(new PagedResult<SavingsAccount>(Array.Empty<SavingsAccount>(), 1, 20, 0));
 
             var result = await _sut.GetPagedSavingsAccountsAsync(
-                new SavingsAccountFilterDto { IdCard = "40200000001" }, CustomerId);
+                new SavingsAccountFilterDto { IdCard = "40200000001" });
 
             result.IsValid.Should().BeFalse();
             result.Errors.Should().Contain(SavingsAccountError.NonExistsSavingsAccounts);
+        }
+
+        //La cédula no existe en Identity: el listado no llega a consultar el repositorio.
+        [Fact]
+        public async Task GetPagedSavingsAccountsAsync_WithAnUnknownIdCard_ShouldFailWithoutQuerying()
+        {
+            _validateServices
+                .Setup(service => service.ValidateCustomerAccountsQueryAsync(It.IsAny<SavingsAccountFilterDto>()))
+                .ReturnsAsync(ValidationResult<string?>.Failure(SavingsAccountError.NonExistsCustomerByIdCard));
+
+            var result = await _sut.GetPagedSavingsAccountsAsync(
+                new SavingsAccountFilterDto { IdCard = "40200000001" });
+
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().Contain(SavingsAccountError.NonExistsCustomerByIdCard);
+            _savingsAccountsRepository.Verify(
+                repository => repository.GetPagedSavingsAccountsAsync(
+                    It.IsAny<int>(), It.IsAny<int>(),
+                    It.IsAny<SavingsAccountStatus?>(), It.IsAny<SavingsAccountType?>(), It.IsAny<string?>()),
+                Times.Never);
+        }
+
+        //El nombre y la cédula del titular no están en la entidad: los completa Identity.
+        [Fact]
+        public async Task GetPagedSavingsAccountsAsync_ShouldFillTheCustomerNameAndIdCardFromIdentity()
+        {
+            _validateServices
+                .Setup(service => service.ValidateCustomerAccountsQueryAsync(It.IsAny<SavingsAccountFilterDto>()))
+                .ReturnsAsync(ValidationResult<string?>.Success(null));
+
+            _savingsAccountsRepository
+                .Setup(repository => repository.GetPagedSavingsAccountsAsync(
+                    It.IsAny<int>(), It.IsAny<int>(),
+                    It.IsAny<SavingsAccountStatus?>(), It.IsAny<SavingsAccountType?>(), It.IsAny<string?>()))
+                .ReturnsAsync(new PagedResult<SavingsAccount>(
+                    new[]
+                    {
+                        BuildAccount(1, PrimaryAccountNumber, SavingsAccountType.Principal),
+                        BuildAccount(2, SecondaryAccountNumber, SavingsAccountType.Secundaria)
+                    },
+                    1, 20, 2));
+
+            _userManagementService
+                .Setup(service => service.GetUserByIdAsync(CustomerId))
+                .ReturnsAsync(BuildCustomer());
+
+            var result = await _sut.GetPagedSavingsAccountsAsync(new SavingsAccountFilterDto());
+
+            result.IsValid.Should().BeTrue();
+            result.Value!.Items.Should().OnlyContain(
+                account => account.FullNameCustomer == "María Gómez" && account.IdCard == "40200000001");
+
+            //Ambas cuentas son del mismo cliente: Identity se consulta una sola vez
+            _userManagementService.Verify(
+                service => service.GetUserByIdAsync(CustomerId), Times.Once);
         }
 
         [Theory]
@@ -345,7 +524,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
         {
             _validateServices
                 .Setup(service => service.ValidateCustomerAccountsQueryAsync(It.IsAny<SavingsAccountFilterDto>()))
-                .ReturnsAsync(ValidationResult.Success());
+                .ReturnsAsync(ValidationResult<string?>.Success(null));
 
             _savingsAccountsRepository
                 .Setup(repository => repository.GetPagedSavingsAccountsAsync(
@@ -353,7 +532,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
                     It.IsAny<SavingsAccountStatus?>(), It.IsAny<SavingsAccountType?>(), It.IsAny<string?>()))
                 .ReturnsAsync(new PagedResult<SavingsAccount>(Array.Empty<SavingsAccount>(), 1, 20, 0));
 
-            await _sut.GetPagedSavingsAccountsAsync(new SavingsAccountFilterDto { Status = filter }, null);
+            await _sut.GetPagedSavingsAccountsAsync(new SavingsAccountFilterDto { Status = filter });
 
             _savingsAccountsRepository.Verify(
                 repository => repository.GetPagedSavingsAccountsAsync(
@@ -439,6 +618,82 @@ namespace ArtemisBankingPro.Unit.Tests.Services.SavingsAccounts
                     It.IsAny<Expression<Func<Loan, bool>>>(),
                     It.IsAny<Expression<Func<Loan, decimal>>>()),
                 Times.Never);
+        }
+        #endregion
+
+        #region GetActiveClientsAsync
+        //Criterio 2: paso 1 de la asignación. Los clientes vienen de Identity y la deuda de aquí.
+        [Fact]
+        public async Task GetActiveClientsAsync_ShouldListActiveClientsWithTheirTotalDebt()
+        {
+            _userManagementService
+                .Setup(service => service.GetActiveClientsAsync())
+                .ReturnsAsync(new List<ClientSummaryDto>
+                {
+                    new()
+                    {
+                        Id = CustomerId,
+                        IDCARD = "40200000001",
+                        FullName = "María Gómez",
+                        Email = "maria.gomez@artemis.com"
+                    }
+                });
+
+            _loansRepository
+                .Setup(repository => repository.SumAsync(
+                    It.IsAny<Expression<Func<Loan, bool>>>(),
+                    It.IsAny<Expression<Func<Loan, decimal>>>()))
+                .ReturnsAsync(15000m);
+
+            _creditCardsRepository
+                .Setup(repository => repository.SumAsync(
+                    It.IsAny<Expression<Func<CreditCard, bool>>>(),
+                    It.IsAny<Expression<Func<CreditCard, decimal>>>()))
+                .ReturnsAsync(4500m);
+
+            var result = await _sut.GetActiveClientsAsync();
+
+            result.IsValid.Should().BeTrue();
+            var client = result.Value!.Should().ContainSingle().Subject;
+            client.Id.Should().Be(CustomerId);
+            client.IdCard.Should().Be("40200000001");
+            client.FullName.Should().Be("María Gómez");
+            client.Email.Should().Be("maria.gomez@artemis.com");
+            client.TotalDebtAmount.Should().Be(19500m);
+        }
+
+        [Fact]
+        public async Task GetActiveClientsAsync_WithAnIdCard_ShouldNarrowTheListToThatClient()
+        {
+            _userManagementService
+                .Setup(service => service.GetClientByIdCardAsync("40200000001"))
+                .ReturnsAsync(new ClientSummaryDto
+                {
+                    Id = CustomerId,
+                    IDCARD = "40200000001",
+                    FullName = "María Gómez",
+                    Email = "maria.gomez@artemis.com"
+                });
+
+            var result = await _sut.GetActiveClientsAsync("40200000001");
+
+            result.IsValid.Should().BeTrue();
+            result.Value!.Should().ContainSingle();
+            _userManagementService.Verify(
+                service => service.GetActiveClientsAsync(), Times.Never);
+        }
+
+        [Fact]
+        public async Task GetActiveClientsAsync_WithAnUnknownIdCard_ShouldFail()
+        {
+            _userManagementService
+                .Setup(service => service.GetClientByIdCardAsync(It.IsAny<string>()))
+                .ReturnsAsync((ClientSummaryDto?)null);
+
+            var result = await _sut.GetActiveClientsAsync("40200000001");
+
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().Contain(SavingsAccountError.NonExistsCustomerByIdCard);
         }
         #endregion
     }

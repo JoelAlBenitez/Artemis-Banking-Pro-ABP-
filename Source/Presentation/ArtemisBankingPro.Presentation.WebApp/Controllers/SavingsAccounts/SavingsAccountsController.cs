@@ -68,21 +68,46 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.SavingsAccounts
         #endregion
 
         #region asignar cuenta secundaria
+        //Paso 1: listado de clientes activos con su deuda total y búsqueda por cédula.
+        [HttpGet]
+        public async Task<IActionResult> Assign(string? idCard = null)
+        {
+            var result = await _savingsAccountsServices.GetActiveClientsAsync(idCard);
+
+            if (!result.IsValid)
+            {
+                AddErrors(result);
+
+                return View(new ClientsForSavingsAccountAssignmentViewModel
+                {
+                    Clients = Array.Empty<ClientSavingsAccountViewModel>(),
+                    IdCard = idCard
+                });
+            }
+
+            return View(new ClientsForSavingsAccountAssignmentViewModel
+            {
+                Clients = _mapper.Map<IReadOnlyCollection<ClientSavingsAccountViewModel>>(result.Value!),
+                IdCard = idCard
+            });
+        }
+
         //Paso 1: llega el cliente elegido en el formulario de selección y se muestra el paso 2.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SelectCustomer(string customerId)
+        public IActionResult SelectCustomer(string customerId, string? fullNameCustomer = null)
         {
             if (string.IsNullOrWhiteSpace(customerId))
             {
                 _logger.LogWarning("Intento de asignacion de cuenta de ahorro sin cliente seleccionado");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Assign));
             }
 
             return View("Create", new SavingsAccountAssignmentViewModel
             {
                 CustomerId = customerId,
-                InitialBalance = 0m
+                InitialBalance = 0m,
+                FullNameCustomer = fullNameCustomer
             });
         }
 
@@ -101,9 +126,6 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.SavingsAccounts
                 AddErrors(result);
                 return View(vm);
             }
-
-            //El correo de asignación se envía desde el servicio cuando Identity exponga el
-            //nombre y el correo del cliente; su fallo no revierte la cuenta creada.
 
             return RedirectToAction(nameof(Index));
         }
@@ -168,15 +190,9 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.SavingsAccounts
                     BuildList(filter, PagedResult<SavingsAccountDto>.Empty(1, DomainConstants.DefaultPageSize)));
             }
 
-            //La cédula del filtro identifica al cliente dentro del project Identity. Mientras el
-            //servicio de consulta de usuarios no esté disponible, el listado no puede traducirla
-            //y la búsqueda por cédula queda sin efecto.
-            //var customer = await _userServices.GetCustomerByIdCardAsync(filter.IdCard);
-            //if (customer is null) -> SavingsAccountError.NonExistsCustomerByIdCard
-            string? customerId = null;
-
+            //La cédula del filtro la traduce el servicio al Id del cliente en Identity
             var result = await _savingsAccountsServices.GetPagedSavingsAccountsAsync(
-                _mapper.Map<SavingsAccountFilterDto>(filter), customerId);
+                _mapper.Map<SavingsAccountFilterDto>(filter));
 
             if (!result.IsValid)
             {

@@ -7,6 +7,9 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.SavingsAccounts
     //Único lugar donde viven las reglas de negocio del módulo de cuentas de ahorro.
     public interface ISavingsAccountsValidateServices
     {
+        //Administrador autenticado responsable de la operación. Devuelve su Id de Identity.
+        ValidationResult<string> ValidateAdministratorInSession();
+
         //Paso 1 de la asignación: cliente seleccionado, activo y con principal activa
         Task<ValidationResult> ValidateCustomerSelectionAsync(string customerId);
 
@@ -20,7 +23,8 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.SavingsAccounts
         //Devuelve la cuenta secundaria rastreada para aplicar la transferencia y el cambio de estado.
         Task<ValidationResult<SavingsAccount>> ValidateCancellationAsync(int savingsAccountId);
 
-        //Búsqueda por cédula del listado principal
-        Task<ValidationResult> ValidateCustomerAccountsQueryAsync(SavingsAccountFilterDto filter);
+        //Búsqueda por cédula del listado principal. Devuelve el Id del cliente en Identity
+        //cuando se buscó por cédula, y null cuando el listado va sin filtro de cliente.
+        Task<ValidationResult<string?>> ValidateCustomerAccountsQueryAsync(SavingsAccountFilterDto filter);
     }
 }

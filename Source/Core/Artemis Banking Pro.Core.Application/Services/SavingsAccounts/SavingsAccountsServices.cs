@@ -3,6 +3,8 @@ using Artemis_Banking_Pro.Core.Application.Contracts.SavingsAccounts;
 using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
 using Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts;
 using Artemis_Banking_Pro.Core.Application.Services.Generic;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+using ArtemisBankingPro.Core.Application.DTOs.Users;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.CodeErrors.SavingsAccountsErrors;
 using ArtemisBankingPro.Core.Domain.Common.Constants;
@@ -29,6 +31,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
         private readonly ILoansRepository _loansRepository;
         private readonly ICreditCardsRepository _creditCardsRepository;
         private readonly ISavingsAccountsValidateServices _savingsAccountsValidateServices;
+        private readonly IUserManagementService _userManagementService;
         private readonly IEmailServices _emailServices;
         private readonly ILogger<SavingsAccountsServices> _logger;
 
@@ -38,6 +41,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
             ILoansRepository loansRepository,
             ICreditCardsRepository creditCardsRepository,
             ISavingsAccountsValidateServices savingsAccountsValidateServices,
+            IUserManagementService userManagementService,
             IEmailServices emailServices,
             IMapper mapper,
             ILogger<SavingsAccountsServices> logger)
@@ -48,24 +52,28 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
             _loansRepository = loansRepository;
             _creditCardsRepository = creditCardsRepository;
             _savingsAccountsValidateServices = savingsAccountsValidateServices;
+            _userManagementService = userManagementService;
             _emailServices = emailServices;
             _logger = logger;
         }
 
         #region query methods
         public async Task<ValidationResult<PagedResult<SavingsAccountDto>>> GetPagedSavingsAccountsAsync(
-            SavingsAccountFilterDto filter, string? customerId)
+            SavingsAccountFilterDto filter)
         {
             try
             {
                 _logger.LogInformation("Recuperando el listado de cuentas de ahorro. Página {Pagina}, estado {Estado}, tipo {Tipo}",
                     filter.Page, filter.Status, filter.Type);
 
+                //La búsqueda por cédula se traduce aquí al Id del cliente en Identity
                 var queryValidation = await _savingsAccountsValidateServices.ValidateCustomerAccountsQueryAsync(filter);
                 if (!queryValidation.IsValid)
                 {
                     return ValidationResult<PagedResult<SavingsAccountDto>>.Failure(queryValidation.Errors.ToList());
                 }
+
+                var customerId = queryValidation.Value;
 
                 var result = await _savingsAccountsRepository.GetPagedSavingsAccountsAsync(
                     filter.Page,
@@ -80,10 +88,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                     return ValidationResult<PagedResult<SavingsAccountDto>>.Failure(SavingsAccountError.NonExistsSavingsAccounts);
                 }
 
-                //El nombre y la cédula del cliente de cada cuenta provienen del project Identity y
-                //se completan cuando su servicio de consulta de usuarios esté disponible.
-
                 var items = _mapper.Map<IReadOnlyCollection<SavingsAccountDto>>(result.Items);
+
+                //El nombre y la cédula del titular viven en Identity: se completan por página,
+                //una sola consulta por cliente distinto (máximo 20 filas).
+                await FillCustomerDataAsync(items);
+
                 var paged = new PagedResult<SavingsAccountDto>(
                     items, result.Page, result.PageSize, result.TotalRecords);
 
@@ -189,29 +199,57 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
             }
         }
 
-        //Paso 1 de la asignación: listado de clientes activos con su deuda total. La deuda ya
-        //está resuelta arriba; falta el project Identity para obtener los clientes activos con
-        //su cédula, nombre y correo. Descomentar cuando IUserServices exista.
+        //Paso 1 de la asignación: clientes activos de Identity con su deuda total.
+        //La cédula, cuando llega, filtra el listado a un único cliente.
+        public async Task<ValidationResult<IReadOnlyCollection<ClientSavingsAccountDto>>> GetActiveClientsAsync(
+            string? idCard = null)
+        {
+            try
+            {
+                _logger.LogInformation("Recuperando los clientes activos elegibles para asignarles una cuenta de ahorro secundaria");
 
-        //public async Task<ValidationResult<IReadOnlyCollection<ClientSavingsAccountDto>>> GetActiveClientsAsync()
-        //{
-        //    var customers = await _userServices.GetActiveCustomersAsync();
-        //    var clients = new List<ClientSavingsAccountDto>();
+                List<ClientSummaryDto> customers;
 
-        //    foreach (var customer in customers)
-        //    {
-        //        clients.Add(new ClientSavingsAccountDto
-        //        {
-        //            Id = customer.Id,
-        //            IdCard = customer.IdCard,
-        //            FullName = customer.FullName,
-        //            Email = customer.Email,
-        //            TotalDebtAmount = await GetCustomerTotalDebtAmountAsync(customer.Id)
-        //        });
-        //    }
+                if (string.IsNullOrWhiteSpace(idCard))
+                {
+                    customers = await _userManagementService.GetActiveClientsAsync();
+                }
+                else
+                {
+                    var customer = await _userManagementService.GetClientByIdCardAsync(idCard);
 
-        //    return ValidationResult<IReadOnlyCollection<ClientSavingsAccountDto>>.Success(clients);
-        //}
+                    if (customer is null)
+                    {
+                        _logger.LogWarning("No existe un cliente activo registrado con la cédula {IdCard}", idCard);
+                        return ValidationResult<IReadOnlyCollection<ClientSavingsAccountDto>>.Failure(
+                            SavingsAccountError.NonExistsCustomerByIdCard);
+                    }
+
+                    customers = new List<ClientSummaryDto> { customer };
+                }
+
+                var clients = new List<ClientSavingsAccountDto>(customers.Count);
+
+                foreach (var customer in customers)
+                {
+                    clients.Add(new ClientSavingsAccountDto
+                    {
+                        Id = customer.Id,
+                        IdCard = customer.IDCARD,
+                        FullName = customer.FullName,
+                        Email = customer.Email,
+                        TotalDebtAmount = await GetCustomerTotalDebtAmountAsync(customer.Id)
+                    });
+                }
+
+                return ValidationResult<IReadOnlyCollection<ClientSavingsAccountDto>>.Success(clients);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al recuperar los clientes activos para la asignación de una cuenta de ahorro");
+                return ValidationResult<IReadOnlyCollection<ClientSavingsAccountDto>>.Failure(GeneralError.UnexpectedError);
+            }
+        }
         #endregion
 
         #region write methods
@@ -220,7 +258,14 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
             _logger.LogInformation("Inicio de la asignación de una cuenta de ahorro secundaria al cliente {CustomerId}",
                 dto.CustomerId);
 
-            //agregar validacion del admin User Id -> falta metodo de adrian
+            //El administrador responsable sale de la sesión, nunca de un parámetro
+            var adminValidation = _savingsAccountsValidateServices.ValidateAdministratorInSession();
+            if (!adminValidation.IsValid)
+            {
+                return ValidationResult.Failure(adminValidation.Errors.ToList());
+            }
+
+            var adminUserId = adminValidation.Value!;
 
             var validation = await _savingsAccountsValidateServices.ValidateAssignmentAsync(dto);
             if (!validation.IsValid)
@@ -246,7 +291,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                 var savingsAccount = _mapper.Map<SavingsAccount>(dto);
                 savingsAccount.AccountNumber = accountNumber;
                 savingsAccount.CreatedAt = assignedAt;
-                savingsAccount.CreateByUserId = ""; // por modificar
+                savingsAccount.CreateByUserId = adminUserId;
 
                 await _savingsAccountsRepository.AddAsync(savingsAccount);
 
@@ -271,11 +316,9 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                         Beneficiary = accountNumber,
                         Status = TransactionStatus.Aprobada,
                         Channel = ChannelPayment.Administrador,
-                        //Hasta que exista ICurrentUserServices no hay administrador autenticado
-                        //que atribuir: la auditoría queda a nombre del sistema.
-                        PerformedByUserId = DomainConstants.SystemUserId,
+                        PerformedByUserId = adminUserId,
                         CreatedAt = assignedAt,
-                        CreateByUserId = DomainConstants.SystemUserId
+                        CreateByUserId = adminUserId
                     });
 
                     _logger.LogInformation("La cuenta {AccountNumber} se crea con un balance inicial de RD${Balance} registrado como CRÉDITO",
@@ -294,6 +337,15 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                 _logger.LogInformation("Cuenta de ahorro secundaria {AccountNumber} asignada al cliente {CustomerId}",
                     accountNumber, dto.CustomerId);
 
+                //Fuera de la transacción: un fallo de correo no revierte la cuenta creada
+                await SendSavingsAccountAssignedNotificationAsync(new SavingsAccountAssignedDto
+                {
+                    CustomerId = dto.CustomerId,
+                    AccountNumber = accountNumber,
+                    InitialBalance = dto.InitialBalance,
+                    AssignedAt = assignedAt
+                });
+
                 return ValidationResult.Success();
             }
             catch (Exception ex)
@@ -307,6 +359,14 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
         {
             _logger.LogInformation("Inicio de la cancelación de la cuenta de ahorro con ID {SavingsAccountId}",
                 savingsAccountId);
+
+            var adminValidation = _savingsAccountsValidateServices.ValidateAdministratorInSession();
+            if (!adminValidation.IsValid)
+            {
+                return ValidationResult.Failure(adminValidation.Errors.ToList());
+            }
+
+            var adminUserId = adminValidation.Value!;
 
             var validation = await _savingsAccountsValidateServices.ValidateCancellationAsync(savingsAccountId);
             if (!validation.IsValid)
@@ -341,7 +401,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                     savingsAccount.Balance = 0m;
                     primaryAccount.Balance += transferredAmount;
                     primaryAccount.ModifiedAt = cancelledAt;
-                    primaryAccount.LastModifiedByIdUser = ""; // por modificar
+                    primaryAccount.LastModifiedByIdUser = adminUserId;
 
                     await _savingsAccountsRepository.UpdateAsync(primaryAccount);
 
@@ -359,9 +419,9 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                         Beneficiary = primaryAccount.AccountNumber,
                         Status = TransactionStatus.Aprobada,
                         Channel = ChannelPayment.Administrador,
-                        PerformedByUserId = DomainConstants.SystemUserId,
+                        PerformedByUserId = adminUserId,
                         CreatedAt = cancelledAt,
-                        CreateByUserId = DomainConstants.SystemUserId
+                        CreateByUserId = adminUserId
                     };
 
                     //El Id del débito no existe antes de SaveChangesAsync: el enlace se declara
@@ -376,10 +436,10 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                         Beneficiary = primaryAccount.AccountNumber,
                         Status = TransactionStatus.Aprobada,
                         Channel = ChannelPayment.Administrador,
-                        PerformedByUserId = DomainConstants.SystemUserId,
+                        PerformedByUserId = adminUserId,
                         RelatedTransaction = debitEntry,
                         CreatedAt = cancelledAt,
-                        CreateByUserId = DomainConstants.SystemUserId
+                        CreateByUserId = adminUserId
                     };
 
                     await _transactionRepository.AddAsync(debitEntry);
@@ -392,7 +452,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                 savingsAccount.Status = SavingsAccountStatus.Cancelada;
                 savingsAccount.StatusChangedAt = cancelledAt;
                 savingsAccount.ModifiedAt = cancelledAt;
-                savingsAccount.LastModifiedByIdUser = ""; // por modificar
+                savingsAccount.LastModifiedByIdUser = adminUserId;
 
                 await _savingsAccountsRepository.UpdateAsync(savingsAccount);
 
@@ -410,6 +470,16 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                 _logger.LogInformation("Cuenta de ahorro {AccountNumber} cancelada. El historial de transacciones se conserva",
                     savingsAccount.AccountNumber);
 
+                //Fuera de la transacción: un fallo de correo no revierte la cancelación
+                await SendSavingsAccountCancelledNotificationAsync(new SavingsAccountCancelledDto
+                {
+                    CustomerId = savingsAccount.CustomerId,
+                    AccountNumber = savingsAccount.AccountNumber,
+                    TransferredAmount = transferredAmount,
+                    PrimaryAccountNumber = primaryAccount.AccountNumber,
+                    CancelledAt = cancelledAt
+                });
+
                 return ValidationResult.Success();
             }
             catch (Exception ex)
@@ -420,74 +490,137 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
         }
         #endregion
 
-        //modificar cuando se integre el ICurrentUserServices para obtener el correo y el nombre
-        //del cliente. El envío siempre ocurre fuera de la transacción: un fallo de correo no
-        //revierte la asignación ni la cancelación, solo se informa como advertencia.
+        #region notificaciones
+        //El envío siempre ocurre fuera de la transacción: un fallo de correo no revierte la
+        //asignación ni la cancelación, solo se informa como advertencia en el log.
+        private async Task<ValidationResult> SendSavingsAccountAssignedNotificationAsync(
+            SavingsAccountAssignedDto assigned)
+        {
+            try
+            {
+                var customer = await _userManagementService.GetUserByIdAsync(assigned.CustomerId);
 
-        //public async Task<ValidationResult> SendSavingsAccountAssignedNotificationAsync(
-        //    SavingsAccountAssignedDto assigned, string customerEmail, string customerFullName)
-        //{
-        //    var message = new MessageDto
-        //    {
-        //        To = customerEmail,
-        //        Subject = "Nueva cuenta de ahorro asignada",
-        //        Message = BuildSavingsAccountAssignedBody(assigned, customerFullName)
-        //    };
+                if (customer is null)
+                {
+                    _logger.LogWarning("Sin datos de contacto del cliente {CustomerId}: no se envía el correo de asignación",
+                        assigned.CustomerId);
 
-        //    var sent = await _emailServices.SendNotification(message);
+                    return ValidationResult.Failure(SavingsAccountError.SavingsAccountCreatedWithoutNotification);
+                }
 
-        //    if (!sent)
-        //    {
-        //        _logger.LogWarning("No fue posible enviar el correo de asignación de la cuenta {AccountNumber}. La operación no se revierte",
-        //            assigned.AccountNumber);
+                var message = new MessageDto
+                {
+                    To = customer.Email,
+                    Subject = "Nueva cuenta de ahorro asignada",
+                    Message = BuildSavingsAccountAssignedBody(assigned, $"{customer.Name} {customer.LastName}".Trim())
+                };
 
-        //        return ValidationResult.Failure(SavingsAccountError.SavingsAccountCreatedWithoutNotification);
-        //    }
+                var sent = await _emailServices.SendNotification(message);
 
-        //    return ValidationResult.Success();
-        //}
+                if (!sent)
+                {
+                    _logger.LogWarning("No fue posible enviar el correo de asignación de la cuenta {AccountNumber}. La operación no se revierte",
+                        assigned.AccountNumber);
 
-        //public async Task<ValidationResult> SendSavingsAccountCancelledNotificationAsync(
-        //    SavingsAccountCancelledDto cancelled, string customerEmail, string customerFullName)
-        //{
-        //    var message = new MessageDto
-        //    {
-        //        To = customerEmail,
-        //        Subject = "Cancelación de cuenta de ahorro",
-        //        Message = BuildSavingsAccountCancelledBody(cancelled, customerFullName)
-        //    };
+                    return ValidationResult.Failure(SavingsAccountError.SavingsAccountCreatedWithoutNotification);
+                }
 
-        //    var sent = await _emailServices.SendNotification(message);
+                return ValidationResult.Success();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error al enviar el correo de asignación de la cuenta {AccountNumber}. La operación no se revierte",
+                    assigned.AccountNumber);
 
-        //    if (!sent)
-        //    {
-        //        _logger.LogWarning("No fue posible enviar el correo de cancelación de la cuenta {AccountNumber}. La operación no se revierte",
-        //            cancelled.AccountNumber);
+                return ValidationResult.Failure(SavingsAccountError.SavingsAccountCreatedWithoutNotification);
+            }
+        }
 
-        //        return ValidationResult.Failure(SavingsAccountError.SavingsAccountCancelledWithoutNotification);
-        //    }
+        private async Task<ValidationResult> SendSavingsAccountCancelledNotificationAsync(
+            SavingsAccountCancelledDto cancelled)
+        {
+            try
+            {
+                var customer = await _userManagementService.GetUserByIdAsync(cancelled.CustomerId);
 
-        //    return ValidationResult.Success();
-        //}
+                if (customer is null)
+                {
+                    _logger.LogWarning("Sin datos de contacto del cliente {CustomerId}: no se envía el correo de cancelación",
+                        cancelled.CustomerId);
+
+                    return ValidationResult.Failure(SavingsAccountError.SavingsAccountCancelledWithoutNotification);
+                }
+
+                var message = new MessageDto
+                {
+                    To = customer.Email,
+                    Subject = "Cancelación de cuenta de ahorro",
+                    Message = BuildSavingsAccountCancelledBody(cancelled, $"{customer.Name} {customer.LastName}".Trim())
+                };
+
+                var sent = await _emailServices.SendNotification(message);
+
+                if (!sent)
+                {
+                    _logger.LogWarning("No fue posible enviar el correo de cancelación de la cuenta {AccountNumber}. La operación no se revierte",
+                        cancelled.AccountNumber);
+
+                    return ValidationResult.Failure(SavingsAccountError.SavingsAccountCancelledWithoutNotification);
+                }
+
+                return ValidationResult.Success();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error al enviar el correo de cancelación de la cuenta {AccountNumber}. La operación no se revierte",
+                    cancelled.AccountNumber);
+
+                return ValidationResult.Failure(SavingsAccountError.SavingsAccountCancelledWithoutNotification);
+            }
+        }
+        #endregion
 
         #region private methods
-        //private static string BuildSavingsAccountAssignedBody(
-        //    SavingsAccountAssignedDto assigned, string customerFullName)
-        //    => $"<p>Hola {customerFullName},</p>" +
-        //       "<p>Se ha asignado una nueva cuenta de ahorro secundaria a su perfil.</p>" +
-        //       $"<p>Número de cuenta: {assigned.AccountNumber}<br/>" +
-        //       $"Balance inicial: RD${assigned.InitialBalance:N2}<br/>" +
-        //       $"Fecha de asignación: {assigned.AssignedAt:dd/MM/yyyy}</p>" +
-        //       "<p>Si usted no reconoce esta asignación, comuníquese con la entidad bancaria.</p>";
+        //Una sola consulta a Identity por cliente distinto de la página
+        private async Task FillCustomerDataAsync(IReadOnlyCollection<SavingsAccountDto> accounts)
+        {
+            if (accounts.Count == 0) return;
 
-        //private static string BuildSavingsAccountCancelledBody(
-        //    SavingsAccountCancelledDto cancelled, string customerFullName)
-        //    => $"<p>Hola {customerFullName},</p>" +
-        //       $"<p>Su cuenta de ahorro {cancelled.AccountNumber} ha sido cancelada.</p>" +
-        //       $"<p>Monto transferido a su cuenta principal: RD${cancelled.TransferredAmount:N2}<br/>" +
-        //       $"Cuenta principal receptora: {cancelled.PrimaryAccountNumber}<br/>" +
-        //       $"Fecha de cancelación: {cancelled.CancelledAt:dd/MM/yyyy}</p>" +
-        //       "<p>Si usted no reconoce esta cancelación, comuníquese con la entidad bancaria.</p>";
+            var customers = new Dictionary<string, UserDetailDto?>();
+
+            foreach (var account in accounts)
+            {
+                if (!customers.TryGetValue(account.CustomerId, out var customer))
+                {
+                    customer = await _userManagementService.GetUserByIdAsync(account.CustomerId);
+                    customers[account.CustomerId] = customer;
+                }
+
+                account.FullNameCustomer = customer is null
+                    ? string.Empty
+                    : $"{customer.Name} {customer.LastName}".Trim();
+
+                account.IdCard = customer?.IDCARD ?? string.Empty;
+            }
+        }
+
+        private static string BuildSavingsAccountAssignedBody(
+            SavingsAccountAssignedDto assigned, string customerFullName)
+            => $"<p>Hola {customerFullName},</p>" +
+               "<p>Se ha asignado una nueva cuenta de ahorro secundaria a su perfil.</p>" +
+               $"<p>Número de cuenta: {assigned.AccountNumber}<br/>" +
+               $"Balance inicial: RD${assigned.InitialBalance:N2}<br/>" +
+               $"Fecha de asignación: {assigned.AssignedAt:dd/MM/yyyy}</p>" +
+               "<p>Si usted no reconoce esta asignación, comuníquese con la entidad bancaria.</p>";
+
+        private static string BuildSavingsAccountCancelledBody(
+            SavingsAccountCancelledDto cancelled, string customerFullName)
+            => $"<p>Hola {customerFullName},</p>" +
+               $"<p>Su cuenta de ahorro {cancelled.AccountNumber} ha sido cancelada.</p>" +
+               $"<p>Monto transferido a su cuenta principal: RD${cancelled.TransferredAmount:N2}<br/>" +
+               $"Cuenta principal receptora: {cancelled.PrimaryAccountNumber}<br/>" +
+               $"Fecha de cancelación: {cancelled.CancelledAt:dd/MM/yyyy}</p>" +
+               "<p>Si usted no reconoce esta cancelación, comuníquese con la entidad bancaria.</p>";
 
         private static SavingsAccountStatus? ToSavingsAccountStatus(SavingsAccountStatusFilter filter)
             => filter switch
