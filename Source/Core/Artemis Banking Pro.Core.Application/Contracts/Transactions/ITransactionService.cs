@@ -12,5 +12,14 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.Transactions
         Task<ValidationResult> RegisterInitialTransactionAsync(InitialTransactionDto dto);
         Task<ValidationResult<IReadOnlyCollection<ClientDto>>> GetClientsAsync();
         Task<ValidationResult<IReadOnlyCollection<Artemis_Banking_Pro.Core.Application.DTOs.Beneficiaries.BeneficiaryDto>>> GetBeneficiariesAsync(string clientId);
+
+        // ATM Methods
+        Task<ValidationResult> ProcessAtmDepositAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmDepositDto dto);
+        Task<ValidationResult> ProcessAtmWithdrawalAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmWithdrawalDto dto);
+        Task<ValidationResult> ProcessAtmCreditCardPaymentAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardPaymentDto dto);
+        Task<ValidationResult> ProcessAtmLoanPaymentAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanPaymentDto dto);
+        Task<ValidationResult> ProcessAtmThirdPartyTransferAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmThirdPartyTransferDto dto);
+        Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmIndicatorsDto>> GetCashierDailyIndicatorsAsync(string cashierId);
+        Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmAccountDetailsDto>> GetAtmAccountDetailsAsync(string accountNumber);
     }
 }

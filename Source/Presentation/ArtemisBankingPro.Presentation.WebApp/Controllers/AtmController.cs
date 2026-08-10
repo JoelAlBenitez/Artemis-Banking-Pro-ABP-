@@ -16,32 +16,31 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
     public class AtmController : Controller
     {
         private readonly ILogger<AtmController> _logger;
+        private readonly Artemis_Banking_Pro.Core.Application.Contracts.Transactions.ITransactionService _transactionService;
         // private readonly IEmailServices _emailService;
-        // private readonly IAccountService _accountService; // Handled by Admin team
-        // private readonly ICreditCardService _creditCardService; // Handled by Admin team
-        // private readonly ITransactionService _transactionService; // Handled by Client team
 
         public AtmController(
-            ILogger<AtmController> logger
+            ILogger<AtmController> logger,
+            Artemis_Banking_Pro.Core.Application.Contracts.Transactions.ITransactionService transactionService
             // IEmailServices emailService
             )
         {
             _logger = logger;
+            _transactionService = transactionService;
             // _emailService = emailService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             
-            // MOCK INDICATORS until PR is merged
-            // var indicators = await _transactionService.GetCashierDailyIndicatorsAsync(userId);
+            var result = await _transactionService.GetCashierDailyIndicatorsAsync(userId);
             
-            ViewBag.TotalTransactions = 15; // mock
-            ViewBag.TotalPayments = 5; // mock
-            ViewBag.TotalDeposits = 7; // mock
-            ViewBag.TotalWithdrawals = 3; // mock
+            ViewBag.TotalTransactions = result.IsValid && result.Value != null ? result.Value.TotalTransactions : 0;
+            ViewBag.TotalPayments = result.IsValid && result.Value != null ? result.Value.TotalPayments : 0;
+            ViewBag.TotalDeposits = result.IsValid && result.Value != null ? result.Value.TotalDeposits : 0;
+            ViewBag.TotalWithdrawals = result.IsValid && result.Value != null ? result.Value.TotalWithdrawals : 0;
             
             return View();
         }
@@ -60,23 +59,23 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
                 return View(model);
             }
 
-            // TODO: Validate account exists and is active
-            // var account = await _savingsAccountService.GetByNumberAsync(model.DestinationAccountNumber);
-            // if (account == null || !account.IsActive)
-            // {
-            //     ModelState.AddModelError("DestinationAccountNumber", "El número de cuenta ingresado no corresponde a una cuenta válida.");
-            //     return View(model);
-            // }
+            if (model.Amount <= 0)
+            {
+                ModelState.AddModelError("Amount", "El monto a depositar debe ser mayor que cero.");
+                return View(model);
+            }
 
-            // TODO: Get account owner full name
-            // var ownerId = account.ClientId;
-            // var ownerName = await _userManagementService.GetFullNameByIdAsync(ownerId);
-            var ownerName = "Titular Ejemplo (Mock)";
+            var accountResult = await _transactionService.GetAtmAccountDetailsAsync(model.DestinationAccountNumber);
+            if (!accountResult.IsValid)
+            {
+                ModelState.AddModelError("DestinationAccountNumber", "El número de cuenta ingresado no corresponde a una cuenta válida.");
+                return View(model);
+            }
 
             var confirmModel = new ConfirmDepositViewModel
             {
                 DestinationAccountNumber = model.DestinationAccountNumber,
-                AccountOwnerName = ownerName,
+                AccountOwnerName = accountResult.Value!.OwnerName,
                 Amount = model.Amount
             };
 
@@ -86,33 +85,20 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> ConfirmDeposit(ConfirmDepositViewModel model)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
             _logger.LogInformation("Iniciando depósito. Cajero: {UserId}, Cuenta Destino: {Cuenta}, Monto: {Monto}", userId, model.DestinationAccountNumber, model.Amount);
 
-            // TODO: Execute deposit via ITransactionService.ProcessDepositAsync
-            // var depositDto = new DepositDto { AccountNumber = model.DestinationAccountNumber, Amount = model.Amount, CashierId = userId };
-            // var result = await _transactionService.ProcessDepositAsync(depositDto);
+            var depositDto = new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmDepositDto { DestinationAccountNumber = model.DestinationAccountNumber, Amount = model.Amount, CashierId = userId };
+            var result = await _transactionService.ProcessAtmDepositAsync(depositDto);
 
-            // TODO: Send email notification to account owner
-            // try
-            // {
-            //     var lastFour = model.DestinationAccountNumber[^4..];
-            //     var email = new MessageDto
-            //     {
-            //         To = accountOwnerEmail,
-            //         Subject = $"Depósito realizado a su cuenta {lastFour}",
-            //         Message = $"Hola {model.AccountOwnerName},\n\nSe ha realizado un depósito a su cuenta terminada en {lastFour}.\nMonto depositado: RD${model.Amount}\nFecha y hora: {DateTime.Now:g}\n\nSi usted no reconoce esta operación, comuníquese con la entidad bancaria."
-            //     };
-            //     await _emailService.SendNotification(email);
-            // }
-            // catch (Exception ex)
-            // {
-            //     _logger.LogError(ex, "Error al enviar correo de depósito.");
-            //     TempData["WarningMessage"] = "El depósito fue realizado correctamente, pero no fue posible enviar el correo de notificación.";
-            // }
+            if (!result.IsValid)
+            {
+                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar el depósito";
+                return RedirectToAction(nameof(Index));
+            }
 
-            TempData["SuccessMessage"] = "Depósito realizado correctamente (Mock).";
+            TempData["SuccessMessage"] = "Depósito realizado correctamente.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -130,29 +116,29 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
                 return View(model);
             }
 
-            // TODO: Validate account exists and is active
-            // var account = await _savingsAccountService.GetByNumberAsync(model.OriginAccountNumber);
-            // if (account == null || !account.IsActive)
-            // {
-            //     ModelState.AddModelError("OriginAccountNumber", "El número de cuenta ingresado no corresponde a una cuenta válida.");
-            //     return View(model);
-            // }
+            if (model.Amount <= 0)
+            {
+                ModelState.AddModelError("Amount", "El monto a retirar debe ser mayor que cero.");
+                return View(model);
+            }
 
-            // TODO: Validate sufficient funds
-            // if (account.Balance < model.Amount)
-            // {
-            //     ModelState.AddModelError("Amount", "El monto ingresado excede el saldo disponible de la cuenta.");
-            //     return View(model);
-            // }
+            var accountResult = await _transactionService.GetAtmAccountDetailsAsync(model.OriginAccountNumber);
+            if (!accountResult.IsValid)
+            {
+                ModelState.AddModelError("OriginAccountNumber", "El número de cuenta ingresado no corresponde a una cuenta válida.");
+                return View(model);
+            }
 
-            // TODO: Get account owner full name
-            // var ownerName = await _userManagementService.GetFullNameByIdAsync(account.ClientId);
-            var ownerName = "Titular Ejemplo (Mock)";
+            if (accountResult.Value!.Balance < model.Amount)
+            {
+                ModelState.AddModelError("Amount", "El monto ingresado excede el saldo disponible de la cuenta.");
+                return View(model);
+            }
 
             var confirmModel = new ConfirmWithdrawalViewModel
             {
                 OriginAccountNumber = model.OriginAccountNumber,
-                AccountOwnerName = ownerName,
+                AccountOwnerName = accountResult.Value.OwnerName,
                 Amount = model.Amount
             };
 
@@ -162,37 +148,19 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> ConfirmWithdrawal(ConfirmWithdrawalViewModel model)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
             _logger.LogInformation("Iniciando retiro. Cajero: {UserId}, Cuenta Origen: {Cuenta}, Monto: {Monto}", userId, model.OriginAccountNumber, model.Amount);
 
-            // TODO: Execute withdrawal via ITransactionService.ProcessWithdrawalAsync
-            // var result = await _transactionService.ProcessWithdrawalAsync(new WithdrawalDto { AccountNumber = model.OriginAccountNumber, Amount = model.Amount, CashierId = userId });
-            // if (!result.IsSuccess)
-            // {
-            //     TempData["ErrorMessage"] = result.ErrorMessage;
-            //     return RedirectToAction(nameof(Index));
-            // }
+            var result = await _transactionService.ProcessAtmWithdrawalAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmWithdrawalDto { SourceAccountNumber = model.OriginAccountNumber, Amount = model.Amount, CashierId = userId });
+            
+            if (!result.IsValid)
+            {
+                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar el retiro";
+                return RedirectToAction(nameof(Index));
+            }
 
-            // TODO: Send email notification
-            // try
-            // {
-            //     var lastFour = model.OriginAccountNumber[^4..];
-            //     var email = new MessageDto
-            //     {
-            //         To = accountOwnerEmail,
-            //         Subject = $"Retiro realizado desde su cuenta {lastFour}",
-            //         Message = $"Hola {model.AccountOwnerName},\n\nSe ha realizado un retiro desde su cuenta terminada en {lastFour}.\nMonto retirado: RD${model.Amount}\nFecha y hora: {DateTime.Now:g}\n\nSi usted no reconoce esta operación, comuníquese con la entidad bancaria."
-            //     };
-            //     await _emailService.SendNotification(email);
-            // }
-            // catch (Exception ex)
-            // {
-            //     _logger.LogError(ex, "Error al enviar correo de retiro.");
-            //     TempData["WarningMessage"] = "El retiro fue realizado correctamente, pero no fue posible enviar el correo de notificación.";
-            // }
-
-            TempData["SuccessMessage"] = "Retiro realizado correctamente (Mock).";
+            TempData["SuccessMessage"] = "Retiro realizado correctamente.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -282,30 +250,19 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> ExecuteCreditCardPayment(ConfirmCreditCardPaymentViewModel model)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             
             _logger.LogInformation("Iniciando proceso de pago a tarjeta. Cajero: {UserId}, Cuenta Origen: {Cuenta}, Monto Efectivo: {Monto}", userId, model.SourceAccountNumber, model.EffectiveAmount);
             
-            /*
-             * COMMENTED LOGIC WAITING FOR OTHER TEAMS' SERVICES
-             * 
-             * await _accountService.UpdateBalanceAsync(model.SourceAccountNumber, -model.EffectiveAmount);
-             * await _creditCardService.ApplyPaymentAsync(model.CardLastFourDigits, model.EffectiveAmount);
-             * 
-             * var transaccion = new TransactionDto { Type = "DÉBITO", Origin = model.SourceAccountNumber, Beneficiary = model.CardLastFourDigits, Status = "APROBADA", ... };
-             * await _transactionService.RegisterTransactionAsync(transaccion);
-             * 
-             * _logger.LogInformation("Pago procesado exitosamente...");
-             * 
-             * try {
-             *     var emailDto = new MessageDto { To = "cardowner@email.com", Subject = $"Pago realizado a la tarjeta {model.CardLastFourDigits}", Body = "..." };
-             *     await _emailService.SendNotification(emailDto);
-             * } catch (Exception ex) {
-             *     _logger.LogError(ex, "Error al enviar correo...");
-             * }
-             */
+            var result = await _transactionService.ProcessAtmCreditCardPaymentAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardPaymentDto { SourceAccountNumber = model.SourceAccountNumber, CreditCardNumber = model.CardLastFourDigits, Amount = model.EffectiveAmount, CashierId = userId });
 
-            TempData["SuccessMessage"] = "Pago de tarjeta realizado correctamente (Mock).";
+            if (!result.IsValid)
+            {
+                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar el pago de tarjeta";
+                return RedirectToAction("Index");
+            }
+
+            TempData["SuccessMessage"] = "Pago de tarjeta realizado correctamente.";
             return RedirectToAction("Index");
         }
 
@@ -392,38 +349,19 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> ConfirmLoanPayment(LoanPaymentConfirmationViewModel model)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
             _logger.LogInformation("Iniciando pago a préstamo. Cajero: {UserId}, Préstamo: {Prestamo}, Monto Efectivo: {Monto}", userId, model.LoanNumber, model.EffectiveAmount);
 
-            // TODO: Process payment via ITransactionServices / ILoanServices (handles amortization cascade)
-            // var result = await _transactionServices.ProcessLoanPaymentAsync(new LoanPaymentDto { ... }, userId);
+            var result = await _transactionService.ProcessAtmLoanPaymentAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanPaymentDto { SourceAccountNumber = model.OriginAccountNumber, LoanNumber = model.LoanNumber, Amount = model.EffectiveAmount, CashierId = userId });
+            
+            if (!result.IsValid)
+            {
+                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar el pago al préstamo";
+                return RedirectToAction(nameof(Index));
+            }
 
-            // TODO: Send email notifications
-            // try {
-            //     var accountSuffix = model.OriginAccountNumber[^4..];
-            //     var emailLoanHolder = new MessageDto
-            //     {
-            //         To = loanHolderEmail,
-            //         Subject = $"Pago realizado al préstamo {model.LoanNumber}",
-            //         Message = $"Hola {model.LoanHolderName},\n\nSe ha realizado un pago a su préstamo {model.LoanNumber}.\nMonto pagado: RD${model.EffectiveAmount}\nCuenta origen terminada en: {accountSuffix}\nFecha y hora: {DateTime.Now:g}\n\nSi usted no reconoce esta operación, comuníquese con la entidad bancaria."
-            //     };
-            //     await _emailService.SendNotification(emailLoanHolder);
-            //     if (model.OriginAccountHolderName != model.LoanHolderName) {
-            //         var emailAccountHolder = new MessageDto
-            //         {
-            //             To = accountHolderEmail,
-            //             Subject = $"Débito por pago a préstamo {model.LoanNumber}",
-            //             Message = $"Hola {model.OriginAccountHolderName},\n\nSe ha debitado dinero de su cuenta terminada en {accountSuffix} para realizar un pago al préstamo {model.LoanNumber}.\nMonto debitado: RD${model.EffectiveAmount}\nFecha y hora: {DateTime.Now:g}\n\nSi usted no reconoce esta operación, comuníquese con la entidad bancaria."
-            //         };
-            //         await _emailService.SendNotification(emailAccountHolder);
-            //     }
-            // } catch (Exception ex) {
-            //     _logger.LogError(ex, "Error al enviar correo de pago a préstamo.");
-            //     TempData["WarningMessage"] = "El pago fue realizado correctamente, pero no fue posible enviar el correo de notificación.";
-            // }
-
-            TempData["SuccessMessage"] = "Pago a préstamo realizado correctamente (Mock).";
+            TempData["SuccessMessage"] = "Pago a préstamo realizado correctamente.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -501,44 +439,17 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> ConfirmThirdPartyTransfer(ThirdPartyTransferConfirmationViewModel model)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             
-            // TODO: Process transfer with ITransactionServices (Atomically debit and credit)
-            // bool success = await _transactionServices.ProcessThirdPartyTransferAsync(model, userId);
-            bool success = true; // Placeholder
-
-            if (!success)
+            var result = await _transactionService.ProcessAtmThirdPartyTransferAsync(new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmThirdPartyTransferDto { SourceAccountNumber = model.OriginAccountNumber, DestinationAccountNumber = model.DestinationAccountNumber, Amount = model.Amount, CashierId = userId });
+            
+            if (!result.IsValid)
             {
-                ModelState.AddModelError("", "An error occurred while processing the transfer.");
-                return View(model);
+                TempData["ErrorMessage"] = result.Errors.FirstOrDefault()?.Description ?? "Error al procesar la transferencia a terceros";
+                return RedirectToAction(nameof(Index));
             }
 
-            // TODO: Get actual emails from services when available
-            // try {
-            //     var originSuffix = model.OriginAccountNumber[^4..];
-            //     var destinationSuffix = model.DestinationAccountNumber[^4..];
-            //
-            //     var emailOrigin = new MessageDto
-            //     {
-            //         To = originHolderEmail,
-            //         Subject = $"Transacción realizada a la cuenta {destinationSuffix}",
-            //         Message = $"Hola {model.OriginAccountHolderName},\n\nSe ha realizado un envío de dinero hacia otra cuenta.\nMonto transferido: RD${model.Amount}\nCuenta origen terminada en: {originSuffix}\nCuenta destino terminada en: {destinationSuffix}\nFecha y hora: {DateTime.Now:g}\n\nSi usted no reconoce esta operación, comuníquese con la entidad bancaria."
-            //     };
-            //     await _emailService.SendNotification(emailOrigin);
-            //
-            //     var emailDestination = new MessageDto
-            //     {
-            //         To = destinationHolderEmail,
-            //         Subject = $"Transacción enviada desde la cuenta {originSuffix}",
-            //         Message = $"Hola {model.DestinationAccountHolderName},\n\nHa recibido una transacción desde otra cuenta.\nMonto recibido: RD${model.Amount}\nCuenta origen terminada en: {originSuffix}\nCuenta destino terminada en: {destinationSuffix}\nFecha y hora: {DateTime.Now:g}\n\nSi usted no reconoce esta operación, comuníquese con la entidad bancaria."
-            //     };
-            //     await _emailService.SendNotification(emailDestination);
-            // } catch (Exception ex) {
-            //     _logger.LogError(ex, "Error al enviar correos de transferencia a terceros.");
-            //     TempData["WarningMessage"] = "La transacción fue realizada correctamente, pero no fue posible enviar una o más notificaciones por correo.";
-            // }
-
-            TempData["SuccessMessage"] = "Transferencia a terceros realizada correctamente (Mock).";
+            TempData["SuccessMessage"] = "Transferencia a terceros realizada correctamente.";
             return RedirectToAction(nameof(Index));
         }
     }
