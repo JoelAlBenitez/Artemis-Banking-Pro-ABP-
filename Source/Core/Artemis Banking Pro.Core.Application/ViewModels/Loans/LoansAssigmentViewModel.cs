@@ -22,6 +22,7 @@ namespace Artemis_Banking_Pro.Core.Application.ViewModels.Loans
         [Range(typeof(decimal), "0.0", "999999999999.99", ErrorMessage = "Debe ingresar un valor mayor o igual a 0.")]
         public required decimal AnnualInterestRate { get; set; }
 
+
         public bool ConfirmHighRisk { get; set; }
     }
 }

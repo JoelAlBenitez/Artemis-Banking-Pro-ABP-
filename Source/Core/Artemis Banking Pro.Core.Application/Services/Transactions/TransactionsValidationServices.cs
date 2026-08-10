@@ -1,5 +1,6 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
@@ -23,6 +24,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
         private readonly IBeneficiaryRepository _beneficiaryRepository;
         private readonly ILoanInstallmentRepository _loanInstallmentRepository;
         private readonly ILogger<TransactionsValidationServices> _logger;
+        private readonly IUserManagementService _userManagementService;
 
         public TransactionsValidationServices(
             ISavingsAccountsRepository savingsAccountRepository,
@@ -30,7 +32,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             ILoansRepository loansRepository,
             IBeneficiaryRepository beneficiaryRepository,
             ILoanInstallmentRepository loanInstallmentRepository,
-            ILogger<TransactionsValidationServices> logger)
+            ILogger<TransactionsValidationServices> logger,
+            IUserManagementService userManagementService)
         {
             _savingsAccountRepository = savingsAccountRepository;
             _creditCardRepository = creditCardRepository;
@@ -38,6 +41,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             _beneficiaryRepository = beneficiaryRepository;
             _loanInstallmentRepository = loanInstallmentRepository;
             _logger = logger;
+            _userManagementService = userManagementService;
         }
 
         public async Task<ValidationResult<(SavingsAccount Origin, SavingsAccount Destination)>> ValidateExpressAsync(ExpressTransactionDto dto, string clientId)
@@ -66,7 +70,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                     return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.DestinationAccountNotFound);
                 }
 
-                // TODO: Cuando Adrián envíe los elementos necesarios (servicios de Identity/Users), verificar la existencia y estado activo del cliente destino (destAccount.CustomerId) en el sistema para fines de reglas de negocio.
+                var destUserValidation = await _userManagementService.ValidateUserExistsByIdAsync(destAccount.CustomerId);
+                if (!destUserValidation.Exists || !destUserValidation.IsActive)
+                {
+                    _logger.LogWarning("Validación fallida: el cliente propietario de la cuenta de destino {DestinationAccountNumber} no existe o no está activo", dto.DestinationAccountNumber);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.DestinationAccountNotFound);
+                }
 
                 if (originAccount.Id == destAccount.Id)
                 {
@@ -123,7 +132,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                     return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.DestinationAccountNotFound);
                 }
 
-                // TODO: Cuando Adrián envíe los elementos necesarios (servicios de Identity/Users), verificar la existencia y estado activo del cliente destino (destAccount.CustomerId) en el sistema para fines de reglas de negocio.
+                var destUserValidation = await _userManagementService.ValidateUserExistsByIdAsync(destAccount.CustomerId);
+                if (!destUserValidation.Exists || !destUserValidation.IsActive)
+                {
+                    _logger.LogWarning("Validación fallida: el cliente propietario de la cuenta del beneficiario {BeneficiaryAccountNumber} no existe o no está activo", beneficiary.BeneficiaryAccountNumber);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.BeneficiaryNotFound);
+                }
 
                 if (originAccount.Id == destAccount.Id)
                 {
@@ -249,6 +263,61 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             {
                 _logger.LogError(ex, "Error inesperado al validar el pago de préstamo del cliente {ClientId}", clientId);
                 return ValidationResult<(SavingsAccount, Loan, List<LoanInstallment>, decimal)>.Failure(GeneralError.UnexpectedError);
+            }
+        }
+
+        public async Task<ValidationResult<(SavingsAccount Origin, SavingsAccount Destination)>> ValidateAccountTransferAsync(AccountTransferDto dto, string clientId)
+        {
+            _logger.LogInformation("Iniciando validación de transferencia entre cuentas propias para el cliente {ClientId} por monto RD${Amount}", clientId, dto.Amount);
+
+            if (dto.Amount <= 0)
+            {
+                _logger.LogWarning("Validación fallida: el monto ingresado {Amount} debe ser mayor que cero", dto.Amount);
+                return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.TransferInvalidAmount);
+            }
+
+            try
+            {
+                var activeAccountsCount = await _savingsAccountRepository.CountAsync(a => a.CustomerId == clientId && a.Status == SavingsAccountStatus.Activa);
+                if (activeAccountsCount < 2)
+                {
+                    _logger.LogWarning("Validación fallida: el cliente {ClientId} no posee al menos dos cuentas de ahorro activas. Total: {Count}", clientId, activeAccountsCount);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.MinTwoAccountsRequired);
+                }
+
+                if (dto.SourceAccountId == dto.DestinationAccountId)
+                {
+                    _logger.LogWarning("Validación fallida: intento de transferencia entre la misma cuenta ID {SourceAccountId}", dto.SourceAccountId);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.TransferSameAccount);
+                }
+
+                var originAccount = await _savingsAccountRepository.GetFirstAsync(a => a.Id == dto.SourceAccountId && a.CustomerId == clientId && a.Status == SavingsAccountStatus.Activa);
+                if (originAccount is null)
+                {
+                    _logger.LogWarning("Validación fallida: la cuenta de origen ID {SourceAccountId} no existe, está inactiva o no pertenece al cliente {ClientId}", dto.SourceAccountId, clientId);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.OriginAccountNotFound);
+                }
+
+                var destAccount = await _savingsAccountRepository.GetFirstAsync(a => a.Id == dto.DestinationAccountId && a.CustomerId == clientId && a.Status == SavingsAccountStatus.Activa);
+                if (destAccount is null)
+                {
+                    _logger.LogWarning("Validación fallida: la cuenta de destino ID {DestinationAccountId} no existe, está inactiva o no pertenece al cliente {ClientId}", dto.DestinationAccountId, clientId);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.DestinationAccountNotFound);
+                }
+
+                if (originAccount.Balance < dto.Amount)
+                {
+                    _logger.LogWarning("Validación fallida: fondos insuficientes en la cuenta {AccountNumber}. Balance actual RD${Balance}, monto requerido RD${Amount}", originAccount.AccountNumber, originAccount.Balance, dto.Amount);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.TransferInsufficientFunds);
+                }
+
+                _logger.LogInformation("Validación de transferencia entre cuentas propia exitosa para el cliente {ClientId}", clientId);
+                return ValidationResult<(SavingsAccount, SavingsAccount)>.Success((originAccount, destAccount));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado al validar la transferencia entre cuentas del cliente {ClientId}", clientId);
+                return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(GeneralError.UnexpectedError);
             }
         }
     }

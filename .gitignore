@@ -3,6 +3,19 @@ docs/
 bin/
 obj/
 .claudes/
+<<<<<<< HEAD
+<<<<<<< HEAD
+.claude/
+<<<<<<< HEAD
+Logs/
+/.agents
+=======
+=======
+.claude/
+Logs/
+>>>>>>> origin/development
+>>>>>>> origin/development
+=======
 .claude/
 .gemini/
 Logs/
@@ -10,3 +23,6 @@ Logs/
 *.user
 *.suo
 .idea/
+obj/
+/.agents
+>>>>>>> origin/development

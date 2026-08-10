@@ -2,6 +2,7 @@ using Artemis_Banking_Pro.Core.Application.Contracts.EmailSerives;
 using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
 using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.Common.Constants;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
@@ -27,6 +28,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
         private readonly IEmailServices _emailServices;
         private readonly IMapper _mapper;
         private readonly ILogger<CashAdvanceServices> _logger;
+        private readonly IUserManagementService _userManagementService;
 
         public CashAdvanceServices(
             ICashAdvanceValidationServices validationServices,
@@ -37,7 +39,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             ITransactionRepository transactionRepository,
             IEmailServices emailServices,
             IMapper mapper,
-            ILogger<CashAdvanceServices> logger)
+            ILogger<CashAdvanceServices> logger,
+            IUserManagementService userManagementService)
         {
             _validationServices = validationServices;
             _cashAdvanceRepository = cashAdvanceRepository;
@@ -48,6 +51,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             _emailServices = emailServices;
             _mapper = mapper;
             _logger = logger;
+            _userManagementService = userManagementService;
         }
 
         public async Task<ValidationResult<CashAdvanceDto>> ProcessCashAdvanceAsync(
@@ -151,7 +155,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             decimal totalCharged, 
             string clientId)
         {
-            var email = $"{clientId}@artemis.com";
+            var user = await _userManagementService.GetUserByIdAsync(clientId);
+            var email = user?.Email ?? $"{clientId}@artemis.com";
             var lastFourAccount = accountNumber.Length >= 4 
                 ? accountNumber.Substring(accountNumber.Length - 4) 
                 : accountNumber;

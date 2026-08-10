@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.Loans.LoansValidate
 {
-    
+
     public sealed class LoansValidateServices : ILoansValidateServices
     {
         private readonly ILoansRepository _loansRepository;

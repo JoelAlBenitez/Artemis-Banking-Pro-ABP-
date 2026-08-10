@@ -4,7 +4,14 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>1fb55103-e76c-408b-9a59-4d9d9ccd4dc0</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ArtemisBankingPro.IOC\ArtemisBankingPro.IOC.csproj" />
+    <ProjectReference Include="..\..\Core\Artemis Banking Pro.Core.Application\ArtemisBankingPro.Core.Application.csproj" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.18">

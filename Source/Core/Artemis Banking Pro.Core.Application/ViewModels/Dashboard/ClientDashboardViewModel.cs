@@ -9,5 +9,7 @@ namespace Artemis_Banking_Pro.Core.Application.ViewModels.Dashboard
         public IReadOnlyCollection<SavingsAccountDto> SavingsAccounts { get; set; } = new List<SavingsAccountDto>();
         public IReadOnlyCollection<LoansDto> Loans { get; set; } = new List<LoansDto>();
         public IReadOnlyCollection<CreditCardDto> CreditCards { get; set; } = new List<CreditCardDto>();
+        public string? ClientName { get; set; }
+        public string? ClientEmail { get; set; }
     }
 }

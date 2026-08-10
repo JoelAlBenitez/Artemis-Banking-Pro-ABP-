@@ -34,7 +34,7 @@ namespace ArtemisBankingPro.IOC
         {
             services.AddAutoMapper(configuration => { }, Assembly.GetAssembly(typeof(ICreditCardsServices))!);
 
-           
+
 
             #region Mappings
             services.AddAutoMapper(configuration =>
@@ -54,16 +54,15 @@ namespace ArtemisBankingPro.IOC
                 configuration.AddMaps(typeof(SavingsAccountsMappingEntitieToDtoAndReverse).Assembly);
                 #endregion
 
-                #region customer dashboard
-                configuration.AddMaps(typeof(SavingsAccountMappingProfile).Assembly);
-                #endregion
-
+       
                 #region admin dashboard
                 configuration.AddMaps(typeof(AdminDashboardMappingDtoToViewModel).Assembly);
                 #endregion
-            });
 
+               
+            });
             #endregion
+
 
             #region loans
             services.AddScoped<ILoansServices, LoansServices>();
@@ -71,6 +70,7 @@ namespace ArtemisBankingPro.IOC
             services.AddScoped<IAmortizationCalculator, AmortizationCalculator>();
             services.AddScoped<ILoansOverdueServices, LoansOverdueServices>();
             #endregion
+
 
             //Compartido: préstamos, tarjetas y dashboard consumen el mismo cálculo de deuda
             services.AddScoped<IDebtCalculator, DebtCalculator>();
@@ -96,6 +96,7 @@ namespace ArtemisBankingPro.IOC
             #endregion
 
             #region beneficiaries 
+
             services.AddScoped<IBeneficiaryServices, BeneficiaryServices>();
             services.AddScoped<IBeneficiaryValidationServices, BeneficiaryValidationServices>();
             #endregion
@@ -108,4 +109,5 @@ namespace ArtemisBankingPro.IOC
             return services;
         }
     }
+
 }

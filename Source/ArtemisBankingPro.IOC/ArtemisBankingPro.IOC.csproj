@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Artemis Banking Pro.Core.Application\ArtemisBankingPro.Core.Application.csproj" />
+    <ProjectReference Include="..\Infaestructure\ArtemisBankingPro.Infraestructrue.Identity\ArtemisBankingPro.Infraestructrue.Identity.csproj" />
+    <ProjectReference Include="..\Infaestructure\ArtemisBankingPro.Infraestructrue.Shared\ArtemisBankingPro.Infraestructrue.Shared.csproj" />
+    <ProjectReference Include="..\Infaestructure\ArtemisBankingPro.Infraestructrue.Persistence\ArtemisBankingPro.Infraestructrue.Persistence.csproj" />
     <ProjectReference Include="..\Infaestructure\ArtemisBankingPro.Infraestructrue.Persistence\ArtemisBankingPro.Infraestructrue.Persistence.csproj" />
     <ProjectReference Include="..\Infaestructure\ArtemisBankingPro.Infraestructrue.Shared\ArtemisBankingPro.Infraestructrue.Shared.csproj" />
   </ItemGroup>

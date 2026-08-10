@@ -4,6 +4,7 @@ namespace ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros
 {
     public static class CashAdvanceError
     {
+
         public static readonly Error CardNotActive = new(
             "CashAdvance.CardNotActive",
             "La tarjeta seleccionada no se encuentra activa."

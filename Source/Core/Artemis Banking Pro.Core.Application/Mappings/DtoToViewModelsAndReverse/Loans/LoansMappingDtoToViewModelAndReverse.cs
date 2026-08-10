@@ -22,6 +22,7 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndRevers
 
             CreateMap<ClientLoansDto, ClientLoansViewModel>();
 
+
             //paso 1 de la asignacion: promedio de deuda y clientes elegibles
             CreateMap<ClientsForLoanAssignmentDto, ClientsForLoanAssignmentViewModel>()
                 .ForMember(d => d.IdCard, o => o.Ignore());

@@ -12,6 +12,7 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.Loans
             builder.ToTable("LoanPayments");
             builder.HasKey(p => p.Id);
 
+
             builder.Property(p => p.RequestedAmount)
                 .HasPrecision(DomainConstants.MoneyPrecision, DomainConstants.MoneyScale);
 
