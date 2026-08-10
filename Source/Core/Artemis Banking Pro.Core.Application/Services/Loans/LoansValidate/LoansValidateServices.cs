@@ -1,5 +1,7 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.Loans;
 using Artemis_Banking_Pro.Core.Application.DTOs.Loans;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Session;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.CodeErrors.LoansErros;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
@@ -17,18 +19,39 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans.LoansValidate
     {
         private readonly ILoansRepository _loansRepository;
         private readonly ISavingsAccountsRepository _savingsAccountsRepository;
+        private readonly IUserManagementService _userManagementService;
+        private readonly ICurrentUserService _currentUserService;
         private readonly ILogger<LoansValidateServices> _logger;
-
-        //integrar el ICurrentUserServices para el administrador responsable y su rol
 
         public LoansValidateServices(
             ILogger<LoansValidateServices> logger,
             ILoansRepository loansRepository,
-            ISavingsAccountsRepository savingsAccountsRepository)
+            ISavingsAccountsRepository savingsAccountsRepository,
+            IUserManagementService userManagementService,
+            ICurrentUserService currentUserService)
         {
             _loansRepository = loansRepository;
             _savingsAccountsRepository = savingsAccountsRepository;
+            _userManagementService = userManagementService;
+            _currentUserService = currentUserService;
             _logger = logger;
+        }
+
+        //El administrador responsable nunca llega por parámetro: se toma de la sesión. La
+        //autorización por rol la aplica la WebApp; aquí se repite porque la auditoría del
+        //préstamo, sus cuotas y el asiento del desembolso no puede atribuirse a otro rol.
+        public ValidationResult<string> ValidateAdministratorInSession()
+        {
+            var adminUserId = _currentUserService.UserId;
+
+            if (string.IsNullOrWhiteSpace(adminUserId)
+                || !_currentUserService.IsInRole(Roles.Administrador.ToString()))
+            {
+                _logger.LogWarning("Operacion de prestamos sin un administrador autenticado que atribuir");
+                return ValidationResult<string>.Failure(LoansError.AdminNotIdentified);
+            }
+
+            return ValidationResult<string>.Success(adminUserId);
         }
 
         public async Task<ValidationResult> AssigmentLoansValidateAsync(LoansAssignmentDto assignment)
@@ -47,12 +70,20 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans.LoansValidate
 
             try
             {
-                //La existencia del cliente y su estado activo se validan contra el project Identity.
-                //Cuando el servicio de consulta de usuarios esté disponible, esta validación debe
-                //consultarlo y agregar LoansError.NonExistsCustomerByIdCard o LoansError.CustomerIsNotActive.
-                //var customer = await _userServices.GetCustomerByIdAsync(assignment.CustomerId);
-                //if (customer is null) return ValidationResult.Failure(LoansError.NonExistsCustomerByIdCard);
-                //if (!customer.IsActive) return ValidationResult.Failure(LoansError.CustomerIsNotActive);
+                //La existencia del cliente y su estado activo pertenecen al project Identity
+                var customer = await _userManagementService.ValidateUserExistsByIdAsync(assignment.CustomerId);
+
+                if (!customer.Exists)
+                {
+                    _logger.LogWarning("El cliente con ID {ID} no existe", assignment.CustomerId);
+                    return ValidationResult.Failure(LoansError.NonExistsCustomerByIdCard);
+                }
+
+                if (!customer.IsActive)
+                {
+                    _logger.LogWarning("El cliente con ID {ID} no se encuentra activo", assignment.CustomerId);
+                    return ValidationResult.Failure(LoansError.CustomerIsNotActive);
+                }
 
                 _logger.LogInformation("Verificaciones de prestamos activos del cliente con ID {ID}", assignment.CustomerId);
                 var exist = await _loansRepository.ExistElementByConsult(x => x.CustomerId == assignment.CustomerId
@@ -166,29 +197,41 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans.LoansValidate
             }
         }
 
-        public Task<ValidationResult> GetLoansByCustomerValidateAsync(LoansFilterDto dto)
+        public async Task<ValidationResult<string?>> GetLoansByCustomerValidateAsync(LoansFilterDto dto)
         {
             if (dto is null)
             {
                 _logger.LogWarning("Filtros de consulta de prestamos invalidos");
-                return Task.FromResult(ValidationResult.Failure(GeneralError.DataInvalid));
+                return ValidationResult<string?>.Failure(GeneralError.DataInvalid);
             }
 
             if (string.IsNullOrWhiteSpace(dto.IdCard))
             {
-                return Task.FromResult(ValidationResult.Success());
+                return ValidationResult<string?>.Success(null);
             }
 
-            //La cédula identifica al cliente dentro del project Identity. Cuando el servicio de
-            //consulta de usuarios esté disponible, esta validación debe traducirla a su ID y
-            //devolver LoansError.NonExistsCustomerByIdCard cuando no exista. La inexistencia de
-            //préstamos del cliente se resuelve en el servicio, ya con el listado en la mano.
-            //var customer = await _userServices.GetCustomerByIdCardAsync(dto.IdCard);
-            //if (customer is null) return ValidationResult.Failure(LoansError.NonExistsCustomerByIdCard);
+            try
+            {
+                //La cédula identifica al cliente dentro de Identity: aquí se traduce a su Id, que
+                //es la única clave con la que este módulo relaciona los préstamos. La inexistencia
+                //de préstamos del cliente se resuelve en el servicio, ya con el listado en la mano.
+                var customer = await _userManagementService.GetClientByIdCardAsync(dto.IdCard);
 
-            _logger.LogInformation("Consulta de prestamos por la cedula {IdCard}", dto.IdCard);
+                if (customer is null)
+                {
+                    _logger.LogWarning("No existe un cliente registrado con la cedula {IdCard}", dto.IdCard);
+                    return ValidationResult<string?>.Failure(LoansError.NonExistsCustomerByIdCard);
+                }
 
-            return Task.FromResult(ValidationResult.Success());
+                _logger.LogInformation("Consulta de prestamos por la cedula {IdCard}", dto.IdCard);
+
+                return ValidationResult<string?>.Success(customer.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al resolver el cliente de la cedula {IdCard}", dto.IdCard);
+                return ValidationResult<string?>.Failure(GeneralError.UnexpectedError);
+            }
         }
     }
 }

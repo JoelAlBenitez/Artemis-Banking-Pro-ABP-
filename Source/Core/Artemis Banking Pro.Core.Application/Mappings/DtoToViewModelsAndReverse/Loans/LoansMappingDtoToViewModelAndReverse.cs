@@ -10,8 +10,11 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndRevers
         public LoansMappingDtoToViewModelAndReverse()
         {
 
-            //write loans
-            CreateMap<LoansAssignmentDto, LoansAssigmentViewModel>().ReverseMap();
+            //write loans. FullNameCustomer solo existe en el ViewModel: el controlador lo
+            //completa con el cliente elegido en el paso 1 para mostrarlo en el formulario.
+            CreateMap<LoansAssignmentDto, LoansAssigmentViewModel>()
+                .ForMember(d => d.FullNameCustomer, o => o.Ignore())
+                .ReverseMap();
 
             CreateMap<LoansFilterDto, LoansFilterViewModel>().ReverseMap();
             

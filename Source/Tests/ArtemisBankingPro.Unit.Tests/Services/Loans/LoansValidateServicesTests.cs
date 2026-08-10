@@ -8,6 +8,9 @@ using ArtemisBankingPro.Core.Domain.CodeErrors.LoansErros;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Entities.Loans;
 using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Session;
+using ArtemisBankingPro.Core.Application.DTOs.Users;
 using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
 using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
 using FluentAssertions;
@@ -20,24 +23,108 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Loans
     public sealed class LoansValidateServicesTests
     {
         private const string CustomerId = "customer-1";
+        private const string AdminUserId = "8b1d4f60-1111-4c3a-9d2e-7f6a5b4c3d2e";
 
         private readonly Mock<ILoansRepository> _loansRepositoryMock;
         private readonly Mock<ISavingsAccountsRepository> _savingsAccountsRepositoryMock;
+        private readonly Mock<IUserManagementService> _userManagementServiceMock;
+        private readonly Mock<ICurrentUserService> _currentUserServiceMock;
         private readonly LoansValidateServices _validateServices;
 
         public LoansValidateServicesTests()
         {
             _loansRepositoryMock = new Mock<ILoansRepository>();
             _savingsAccountsRepositoryMock = new Mock<ISavingsAccountsRepository>();
+            _userManagementServiceMock = new Mock<IUserManagementService>();
+            _currentUserServiceMock = new Mock<ICurrentUserService>();
 
             _validateServices = new LoansValidateServices(
                 NullLogger<LoansValidateServices>.Instance,
                 _loansRepositoryMock.Object,
-                _savingsAccountsRepositoryMock.Object);
+                _savingsAccountsRepositoryMock.Object,
+                _userManagementServiceMock.Object,
+                _currentUserServiceMock.Object);
 
+            //Cliente existente y activo por defecto: cada prueba que valide lo contrario lo cambia
+            GivenCustomer(exists: true, isActive: true);
+            GivenAdministratorInSession(AdminUserId);
             GivenCustomerWithoutActiveLoan();
             GivenCustomerWithActivePrimaryAccount();
         }
+
+        private void GivenCustomer(bool exists, bool isActive)
+            => _userManagementServiceMock
+                .Setup(s => s.ValidateUserExistsByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new UserExistenceDto { Exists = exists, IsActive = isActive });
+
+        private void GivenAdministratorInSession(string? userId, bool isAdmin = true)
+        {
+            _currentUserServiceMock.Setup(s => s.UserId).Returns(userId);
+            _currentUserServiceMock
+                .Setup(s => s.IsInRole(Roles.Administrador.ToString()))
+                .Returns(isAdmin);
+        }
+
+        #region administrador en sesion
+        [Fact]
+        public void ValidateAdministratorInSession_WithAnAuthenticatedAdministrator_ShouldReturnItsId()
+        {
+            var result = _validateServices.ValidateAdministratorInSession();
+
+            result.IsValid.Should().BeTrue();
+            result.Value.Should().Be(AdminUserId);
+        }
+
+        [Fact]
+        public void ValidateAdministratorInSession_WithoutSession_ShouldFail()
+        {
+            GivenAdministratorInSession(null);
+
+            var result = _validateServices.ValidateAdministratorInSession();
+
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().Contain(LoansError.AdminNotIdentified);
+        }
+
+        //Un usuario autenticado que no es administrador tampoco puede firmar la operación.
+        [Fact]
+        public void ValidateAdministratorInSession_WithoutTheAdministratorRole_ShouldFail()
+        {
+            GivenAdministratorInSession(AdminUserId, isAdmin: false);
+
+            var result = _validateServices.ValidateAdministratorInSession();
+
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().Contain(LoansError.AdminNotIdentified);
+        }
+        #endregion
+
+        #region cliente en Identity
+        [Fact]
+        public async Task AssigmentLoansValidateAsync_WithANonExistentCustomer_ShouldFail()
+        {
+            GivenCustomer(exists: false, isActive: false);
+
+            var result = await _validateServices.AssigmentLoansValidateAsync(BuildAssignment());
+
+            result.Errors.Should().Contain(LoansError.NonExistsCustomerByIdCard);
+        }
+
+        //Regla del documento: solo se asignan préstamos a clientes activos.
+        [Fact]
+        public async Task AssigmentLoansValidateAsync_WithAnInactiveCustomer_ShouldFail()
+        {
+            GivenCustomer(exists: true, isActive: false);
+
+            var result = await _validateServices.AssigmentLoansValidateAsync(BuildAssignment());
+
+            result.Errors.Should().Contain(LoansError.CustomerIsNotActive);
+
+            //No se llega siquiera a mirar si tiene un préstamo activo
+            _loansRepositoryMock.Verify(
+                r => r.ExistElementByConsult(It.IsAny<Expression<Func<Loan, bool>>>()), Times.Never);
+        }
+        #endregion
 
         #region asignacion
         [Fact]
@@ -175,12 +262,16 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Loans
         #endregion
 
         #region consulta por cedula
+        //Sin cédula el listado va sin filtro de cliente: no se consulta Identity.
         [Fact]
-        public async Task GetLoansByCustomerValidateAsync_WithoutIdCard_ShouldSucceed()
+        public async Task GetLoansByCustomerValidateAsync_WithoutIdCard_ShouldSucceedWithoutCustomerId()
         {
             var result = await _validateServices.GetLoansByCustomerValidateAsync(new LoansFilterDto());
 
             result.IsValid.Should().BeTrue();
+            result.Value.Should().BeNull();
+            _userManagementServiceMock.Verify(
+                s => s.GetClientByIdCardAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -189,6 +280,41 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Loans
             var result = await _validateServices.GetLoansByCustomerValidateAsync(null!);
 
             result.IsValid.Should().BeFalse();
+        }
+
+        //La cédula se traduce al Id del cliente: es la clave con la que se filtran los préstamos.
+        [Fact]
+        public async Task GetLoansByCustomerValidateAsync_WithAKnownIdCard_ShouldReturnTheCustomerId()
+        {
+            _userManagementServiceMock
+                .Setup(s => s.GetClientByIdCardAsync("40200000001"))
+                .ReturnsAsync(new ClientSummaryDto
+                {
+                    Id = CustomerId,
+                    IDCARD = "40200000001",
+                    FullName = "María Gómez",
+                    Email = "maria.gomez@artemis.com"
+                });
+
+            var result = await _validateServices.GetLoansByCustomerValidateAsync(
+                new LoansFilterDto { IdCard = "40200000001" });
+
+            result.IsValid.Should().BeTrue();
+            result.Value.Should().Be(CustomerId);
+        }
+
+        [Fact]
+        public async Task GetLoansByCustomerValidateAsync_WithAnUnknownIdCard_ShouldFail()
+        {
+            _userManagementServiceMock
+                .Setup(s => s.GetClientByIdCardAsync(It.IsAny<string>()))
+                .ReturnsAsync((ClientSummaryDto?)null);
+
+            var result = await _validateServices.GetLoansByCustomerValidateAsync(
+                new LoansFilterDto { IdCard = "40200000001" });
+
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().Contain(LoansError.NonExistsCustomerByIdCard);
         }
         #endregion
 
