@@ -28,7 +28,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 
 namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
 {
