@@ -43,14 +43,6 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans
             return new PagedResult<Loan>(items, page, pageSize, totalRecords);
         }
 
-        public async Task<Loan> GetLoanWithInstallmentsAsync(int loanId)
-        {
-            var loan = await _context.Loans
-                .AsNoTracking()
-                .Include(l => l.loanInstallments)
-                .FirstOrDefaultAsync(l => l.Id == loanId);
-
-            return loan!;
-        }
+       
     }
 }

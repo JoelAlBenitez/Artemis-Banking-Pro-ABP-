@@ -10,9 +10,7 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.Loans
     {
         public void Configure(EntityTypeBuilder<Loan> builder)
         {
-            // Revisiones -> Use constantes definidas en common / domain para los valores de preciones y longitudes
-            //para evitar hardcode y a la vez manejar de forma directa los elementos de preciones para futuras nuevas integraciones
-            // o escalamientos
+          
             builder.ToTable("Loans");
             builder.HasKey(l => l.Id);
 
@@ -20,7 +18,7 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.Loans
                 .IsRequired()
                 .HasMaxLength(DomainConstants.LoanNumberLength)
                 .IsUnicode(false);
-
+           
             builder.HasIndex(l => l.LoanNumber).IsUnique();
 
             builder.Property(l => l.CustomerId)
