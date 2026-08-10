@@ -1,6 +1,7 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.DTOs.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.Services.Generic;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 using ArtemisBankingPro.Core.Domain.Entities.Beneficiaries;
@@ -16,16 +17,19 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Beneficiaries
     {
         private readonly IBeneficiaryValidationServices _validationServices;
         private readonly ILogger<BeneficiaryServices> _logger;
+        private readonly IUserManagementService _userManagementService;
 
         public BeneficiaryServices(
             IBeneficiaryRepository beneficiaryRepository,
             IBeneficiaryValidationServices validationServices,
             IMapper mapper,
-            ILogger<BeneficiaryServices> logger)
+            ILogger<BeneficiaryServices> logger,
+            IUserManagementService userManagementService)
             : base(beneficiaryRepository, mapper, logger)
         {
             _validationServices = validationServices;
             _logger = logger;
+            _userManagementService = userManagementService;
         }
 
         public override async Task<ValidationResult> CreateAsync(SaveBeneficiaryDto dto)
@@ -112,7 +116,16 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Beneficiaries
                     b => b.BeneficiarySavingsAccount!
                 );
 
-                var dtos = _mapper.Map<IReadOnlyCollection<BeneficiaryDto>>(beneficiaries);
+                var dtos = _mapper.Map<List<BeneficiaryDto>>(beneficiaries);
+                foreach (var dto in dtos)
+                {
+                    var entity = beneficiaries.FirstOrDefault(b => b.Id == dto.Id);
+                    if (entity?.BeneficiarySavingsAccount != null)
+                    {
+                        var fullName = await _userManagementService.GetFullNameByIdAsync(entity.BeneficiarySavingsAccount.CustomerId);
+                        dto.OwnerFullName = fullName ?? $"Cliente {entity.BeneficiarySavingsAccount.CustomerId}";
+                    }
+                }
 
                 _logger.LogInformation("Se recuperaron {Count} beneficiarios activos para el cliente {ClientId}", dtos.Count, ownerClientId);
                 return ValidationResult<IReadOnlyCollection<BeneficiaryDto>>.Success(dtos);
