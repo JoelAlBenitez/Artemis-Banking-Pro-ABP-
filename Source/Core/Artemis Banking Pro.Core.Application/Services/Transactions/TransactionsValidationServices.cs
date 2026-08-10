@@ -1,5 +1,6 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
@@ -23,6 +24,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
         private readonly IBeneficiaryRepository _beneficiaryRepository;
         private readonly ILoanInstallmentRepository _loanInstallmentRepository;
         private readonly ILogger<TransactionsValidationServices> _logger;
+        private readonly IUserManagementService _userManagementService;
 
         public TransactionsValidationServices(
             ISavingsAccountsRepository savingsAccountRepository,
@@ -30,7 +32,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             ILoansRepository loansRepository,
             IBeneficiaryRepository beneficiaryRepository,
             ILoanInstallmentRepository loanInstallmentRepository,
-            ILogger<TransactionsValidationServices> logger)
+            ILogger<TransactionsValidationServices> logger,
+            IUserManagementService userManagementService)
         {
             _savingsAccountRepository = savingsAccountRepository;
             _creditCardRepository = creditCardRepository;
@@ -38,6 +41,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             _beneficiaryRepository = beneficiaryRepository;
             _loanInstallmentRepository = loanInstallmentRepository;
             _logger = logger;
+            _userManagementService = userManagementService;
         }
 
         public async Task<ValidationResult<(SavingsAccount Origin, SavingsAccount Destination)>> ValidateExpressAsync(ExpressTransactionDto dto, string clientId)
@@ -66,7 +70,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                     return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.DestinationAccountNotFound);
                 }
 
-                // TODO: Cuando Adrián envíe los elementos necesarios (servicios de Identity/Users), verificar la existencia y estado activo del cliente destino (destAccount.CustomerId) en el sistema para fines de reglas de negocio.
+                var destUserValidation = await _userManagementService.ValidateUserExistsByIdAsync(destAccount.CustomerId);
+                if (!destUserValidation.Exists || !destUserValidation.IsActive)
+                {
+                    _logger.LogWarning("Validación fallida: el cliente propietario de la cuenta de destino {DestinationAccountNumber} no existe o no está activo", dto.DestinationAccountNumber);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.DestinationAccountNotFound);
+                }
 
                 if (originAccount.Id == destAccount.Id)
                 {
@@ -123,7 +132,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                     return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.DestinationAccountNotFound);
                 }
 
-                // TODO: Cuando Adrián envíe los elementos necesarios (servicios de Identity/Users), verificar la existencia y estado activo del cliente destino (destAccount.CustomerId) en el sistema para fines de reglas de negocio.
+                var destUserValidation = await _userManagementService.ValidateUserExistsByIdAsync(destAccount.CustomerId);
+                if (!destUserValidation.Exists || !destUserValidation.IsActive)
+                {
+                    _logger.LogWarning("Validación fallida: el cliente propietario de la cuenta del beneficiario {BeneficiaryAccountNumber} no existe o no está activo", beneficiary.BeneficiaryAccountNumber);
+                    return ValidationResult<(SavingsAccount, SavingsAccount)>.Failure(TransactionError.BeneficiaryNotFound);
+                }
 
                 if (originAccount.Id == destAccount.Id)
                 {
