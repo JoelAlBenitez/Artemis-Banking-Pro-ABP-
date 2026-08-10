@@ -11,23 +11,55 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.AdminDashboard
     {
         private readonly IAdminDashboardServices _adminDashboardServices;
         private readonly IMapper _mapper;
+        private readonly ILogger<AdminController> _logger;
 
         public AdminController(
          IAdminDashboardServices adminDashboardServices,
-         IMapper mapper   
-         ) { 
-            
+         IMapper mapper,
+         ILogger<AdminController> logger
+         ) {
+
             _adminDashboardServices = adminDashboardServices;
             _mapper = mapper;
+            _logger = logger;
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            ///agregar ICurrentUserServices 
             var data = await _adminDashboardServices.GetDataAdminDashboard();
-            var map = _mapper.Map<AdminDashboardViewModel>(data);
-            return View(map);
+
+            //El Home se muestra siempre: si los indicadores fallan, se pintan en cero con el
+            //mensaje del error. Dejar al administrador sin panel sería peor.
+            if (!data.IsValid)
+            {
+                _logger.LogWarning("No fue posible calcular los indicadores del Home del administrador");
+
+                foreach (var error in data.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                return View(EmptyIndicators());
+            }
+
+            return View(_mapper.Map<AdminDashboardViewModel>(data.Value!));
         }
+
+        private static AdminDashboardViewModel EmptyIndicators()
+            => new()
+            {
+                TotalHistoricalTransactions = 0,
+                DayTransactions = 0,
+                TotalHistoricalPay = 0,
+                DayPay = 0,
+                CustomerActive = 0,
+                CustomerInactive = 0,
+                TotalFinancialProducts = 0,
+                OutstandingLoans = 0,
+                CreditCardActive = 0,
+                SavingAccountActive = 0,
+                AverageDebtAmountPerCustomer = 0m
+            };
     }
 }
