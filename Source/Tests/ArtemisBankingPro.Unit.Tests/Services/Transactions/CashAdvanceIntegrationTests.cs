@@ -26,7 +26,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Xunit;
 
-namespace ArtemisBankingPro.Integration.Tests.Services.Transactions
+namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
 {
     public sealed class CashAdvanceIntegrationTests
     {
