@@ -47,7 +47,6 @@ namespace ArtemisBankingPro.IOC
             services.AddScoped<ISavingsAccountsRepository, SavingsAccountsRepository>();
             #endregion
 
-            services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
 
             services.AddScoped<ICardPaymentRepository, CardPaymentRepository>();
 
