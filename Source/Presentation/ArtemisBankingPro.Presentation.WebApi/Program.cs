@@ -44,10 +44,12 @@ try
     app.UseHttpsRedirection();
 
     app.UseAuthentication();
-    app.UseAuthorization();
 
-    // Después de UseAuthentication: antes el usuario no está resuelto y todo saldría anónimo.
-    app.UseUserContextLogging();
+    // Entre autenticación y autorización: el usuario ya está resuelto y el rechazo por rol
+    // también queda registrado con su nombre y su rol.
+    app.UseRequestLoggingWithUserContext();
+
+    app.UseAuthorization();
 
     app.MapControllers();
 
