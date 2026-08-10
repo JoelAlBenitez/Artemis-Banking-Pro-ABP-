@@ -14,6 +14,6 @@ namespace ArtemisBankingPro.Core.Domain.Interfaces.Loans
             LoanStatus? status,
             string? customerId);
 
-        Task<Loan> GetLoanWithInstallmentsAsync(int loanId);
+       
     }
 }

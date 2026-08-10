@@ -4,11 +4,13 @@ namespace ArtemisBankingPro.Core.Application.ViewModels.Atm
 {
     public class DepositViewModel
     {
-        [Required(ErrorMessage = "The destination account number is required.")]
-        public string DestinationAccountNumber { get; set; }
+        [Required(ErrorMessage = "El número de cuenta destino es requerido.")]
+        [Display(Name = "Número de cuenta destino")]
+        public string DestinationAccountNumber { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "The amount to deposit is required.")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "The amount to deposit must be greater than zero.")]
+        [Required(ErrorMessage = "El monto a depositar es requerido.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "El monto a depositar debe ser mayor que cero.")]
+        [Display(Name = "Monto a depositar")]
         public decimal Amount { get; set; }
     }
 }

@@ -1,44 +1,98 @@
-@model ArtemisBankingPro.Core.Application.ViewModels.Atm.AtmDashboardViewModel
 @{
-    ViewData["Title"] = "ATM Dashboard";
-    Layout = "_CajeroLayout";
+    ViewData["Title"] = "Home Cajero";
 }
 
-<div class="text-center mb-4">
-    <h1 class="display-4">ATM Dashboard</h1>
-    <p>Operational summary for today</p>
-</div>
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h2 class="fw-bold text-primary">Bienvenido, Cajero</h2>
+            <p class="text-muted">Resumen de operaciones del día</p>
+        </div>
+    </div>
 
-<div class="row">
-    <div class="col-md-3 mb-4">
-        <div class="card text-white bg-primary h-100">
-            <div class="card-body">
-                <h5 class="card-title">Transactions Made Today</h5>
-                <p class="card-text display-6">@Model.TransactionsMadeToday</p>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @TempData["WarningMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Indicadores -->
+    <div class="row text-center mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary">Transacciones hoy</h5>
+                    <h2 class="fw-bold text-dark">@ViewBag.TotalTransactions</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary">Pagos hoy</h5>
+                    <h2 class="fw-bold text-primary">@ViewBag.TotalPayments</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary">Depósitos hoy</h5>
+                    <h2 class="fw-bold text-success">@ViewBag.TotalDeposits</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary">Retiros hoy</h5>
+                    <h2 class="fw-bold text-danger">@ViewBag.TotalWithdrawals</h2>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-4">
-        <div class="card text-white bg-success h-100">
-            <div class="card-body">
-                <h5 class="card-title">Payments Made Today</h5>
-                <p class="card-text display-6">@Model.PaymentsMadeToday</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-4">
-        <div class="card text-white bg-info h-100">
-            <div class="card-body">
-                <h5 class="card-title">Deposits Made Today</h5>
-                <p class="card-text display-6">@Model.DepositsMadeToday</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-4">
-        <div class="card text-white bg-warning h-100">
-            <div class="card-body">
-                <h5 class="card-title">Withdrawals Made Today</h5>
-                <p class="card-text display-6">@Model.WithdrawalsMadeToday</p>
+
+    <!-- Menú de Operaciones -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h4 class="mb-0"><i class="bi bi-grid-fill"></i> Opciones de Operación</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-grid gap-3">
+                        <a asp-action="Deposit" class="btn btn-outline-success btn-lg text-start px-4">
+                            <i class="bi bi-box-arrow-in-down me-2"></i> Depósito a cuenta de ahorro
+                        </a>
+                        <a asp-action="Withdrawal" class="btn btn-outline-danger btn-lg text-start px-4">
+                            <i class="bi bi-box-arrow-up me-2"></i> Retiro de cuenta de ahorro
+                        </a>
+                        <a asp-action="CreditCardPayment" class="btn btn-outline-primary btn-lg text-start px-4">
+                            <i class="bi bi-credit-card me-2"></i> Pago a tarjeta de crédito
+                        </a>
+                        <a asp-action="LoanPayment" class="btn btn-outline-info btn-lg text-start px-4">
+                            <i class="bi bi-bank me-2"></i> Pago a préstamo
+                        </a>
+                        <a asp-action="ThirdPartyTransfer" class="btn btn-outline-secondary btn-lg text-start px-4">
+                            <i class="bi bi-arrow-left-right me-2"></i> Transacciones a cuentas de terceros
+                        </a>
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="mt-2">
+                            <button type="submit" class="btn btn-dark btn-lg w-100 text-start px-4">
+                                <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

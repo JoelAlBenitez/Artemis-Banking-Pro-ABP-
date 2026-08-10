@@ -10,6 +10,8 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.
         public LoansMappingEntitieToDtoAndReverse()
         {
             //El nombre del cliente proviene de Identity y lo completa el servicio
+            
+            
             CreateMap<Loan, LoansDto>()
                 .ForMember(d => d.FullNameCustomer, o => o.Ignore())
                 .ForMember(d => d.AprovechedCapital, o => o.MapFrom(s => s.ApprovedCapital))
@@ -35,6 +37,13 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.
                 .ForMember(d => d.NumberLoanInstallment, o => o.MapFrom(s => s.InstallmentNumber))
                 .ForMember(d => d.OutstandingBalance, o => o.MapFrom(s => s.PendingBalance))
                 .ForMember(d => d.StateInstallment, o => o.MapFrom(s => s.paymentStatus));
+
+
+            //
+            CreateMap<Loan, EditAnnualInterestRateDto>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.AnnualInterestRate, o => o.MapFrom(s => s.AnnualInterestRate));
+
 
             //Campos de solo sistema: numero, cuota, totales, estado y auditoria
             CreateMap<LoansAssignmentDto, Loan>()

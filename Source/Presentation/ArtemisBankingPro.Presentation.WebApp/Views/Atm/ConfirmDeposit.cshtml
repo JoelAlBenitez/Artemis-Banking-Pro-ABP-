@@ -1,44 +1,46 @@
-@model ArtemisBankingPro.Core.Application.ViewModels.Atm.DepositConfirmationViewModel
-
+@model ArtemisBankingPro.Core.Application.ViewModels.Atm.ConfirmDepositViewModel
 @{
-    ViewData["Title"] = "Confirm Deposit";
-    Layout = "~/Views/Shared/_CajeroLayout.cshtml";
+    ViewData["Title"] = "Confirmar Depósito";
 }
 
-<div class="container mt-4">
+<div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow-sm border-info">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">Confirm Deposit Details</h4>
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-warning text-dark text-center py-3">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i> Confirmar Depósito</h4>
                 </div>
-                <div class="card-body">
-                    <p class="lead">Are you sure you want to make this deposit?</p>
-                    <table class="table table-bordered mt-3">
+                <div class="card-body p-4">
+                    <p class="text-center fs-5 fw-semibold text-secondary mb-4">¿Está seguro que desea realizar este depósito?</p>
+
+                    <table class="table table-bordered">
                         <tbody>
                             <tr>
-                                <th>Account Holder</th>
-                                <td>@Model.AccountHolderName</td>
+                                <th class="table-light w-50">Titular de la cuenta</th>
+                                <td>@Model.AccountOwnerName</td>
                             </tr>
                             <tr>
-                                <th>Destination Account Number</th>
+                                <th class="table-light">Número de cuenta destino</th>
                                 <td>@Model.DestinationAccountNumber</td>
                             </tr>
                             <tr>
-                                <th>Amount to Deposit</th>
-                                <td>@Model.Amount.ToString("C")</td>
+                                <th class="table-light">Monto a depositar</th>
+                                <td class="fw-bold text-success">RD$ @Model.Amount.ToString("N2")</td>
                             </tr>
                         </tbody>
                     </table>
-                    
-                    <form asp-action="ConfirmDeposit" method="post">
+
+                    <form asp-action="ConfirmDeposit" method="post" class="mt-3">
                         <input type="hidden" asp-for="DestinationAccountNumber" />
+                        <input type="hidden" asp-for="AccountOwnerName" />
                         <input type="hidden" asp-for="Amount" />
-                        <input type="hidden" asp-for="AccountHolderName" />
-                        
-                        <div class="d-flex justify-content-between mt-4">
-                            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-                            <button type="submit" class="btn btn-success">Confirmar</button>
+                        <div class="d-flex gap-3">
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg flex-fill">
+                                <i class="bi bi-x-circle me-2"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg flex-fill">
+                                <i class="bi bi-check-circle me-2"></i> Confirmar
+                            </button>
                         </div>
                     </form>
                 </div>
