@@ -1,6 +1,7 @@
 using ArtemisBankingPro.IOC;
 using ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguration;
 using ArtemisBankingPro.Presentation.WebApi.Extensions;
+using ArtemisBankingPro.Presentation.WebApi.Middlewares;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -43,10 +44,12 @@ try
     app.UseHttpsRedirection();
 
     app.UseAuthentication();
-    app.UseAuthorization();
 
-    // Pendiente: habilitar cuando exista ICurrentUserService (proyecto Identity).
-    //app.UseUserContextLogging();
+    // Entre autenticación y autorización: el usuario ya está resuelto y el rechazo por rol
+    // también queda registrado con su nombre y su rol.
+    app.UseRequestLoggingWithUserContext();
+
+    app.UseAuthorization();
 
     app.MapControllers();
 

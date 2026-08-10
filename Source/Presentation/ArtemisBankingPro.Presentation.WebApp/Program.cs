@@ -1,6 +1,7 @@
 using ArtemisBankingPro.IOC;
 using ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguration;
 using ArtemisBankingPro.Presentation.WebApp.Extensions;
+using ArtemisBankingPro.Presentation.WebApp.Middlewares;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -27,13 +28,6 @@ try
 
     // Run Identity Seeds (Roles and Default Users)
     await app.Services.RunIdentitySeedsAsync();
-    // Add services to the container.
-    builder.Services.AddControllersWithViews();
-
-    builder.Services.AddApplicationDependecies();
-    builder.Services.AddInfraestructurePersistence(builder.Configuration);
-    builder.Services.AddInfraestructureDependencies(builder.Configuration);
-
 
     // Configure the HTTP request pipeline.
     app.UseLoggingAndExceptionHandling();
@@ -48,13 +42,12 @@ try
     app.UseRouting();
 
     app.UseAuthentication();
-    app.UseAuthorization();
+
+    // Entre autenticación y autorización: el usuario ya está resuelto y el rechazo por rol
+    // también queda registrado con su nombre y su rol.
+    app.UseRequestLoggingWithUserContext();
 
     app.UseAuthorization();
-
-    // Pendiente: habilitar cuando exista ICurrentUserService (proyecto Identity).
-    //app.UseUserContextLogging();
-
 
     app.MapStaticAssets();
 

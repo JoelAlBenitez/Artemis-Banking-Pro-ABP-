@@ -104,7 +104,8 @@ namespace ArtemisBankingPro.Integration.Tests.Services.Transactions
                 var instRepo = new LoanInstallmentRepository(execContext);
 
                 var validationServices = new TransactionsValidationServices(
-                    savingsRepo, ccRepo, loanRepo, benRepo, instRepo, NullLogger<TransactionsValidationServices>.Instance);
+                    savingsRepo, ccRepo, loanRepo, benRepo, instRepo, NullLogger<TransactionsValidationServices>.Instance,
+                    _userManagementServiceMock.Object);
 
                 var transactionService = new TransactionService(
                     savingsRepo,
@@ -219,7 +220,8 @@ namespace ArtemisBankingPro.Integration.Tests.Services.Transactions
                 var instRepo = new LoanInstallmentRepository(execContext);
 
                 var validationServices = new TransactionsValidationServices(
-                    savingsRepo, ccRepo, loanRepo, benRepo, instRepo, NullLogger<TransactionsValidationServices>.Instance);
+                    savingsRepo, ccRepo, loanRepo, benRepo, instRepo, NullLogger<TransactionsValidationServices>.Instance,
+                    _userManagementServiceMock.Object);
 
                 var transactionService = new TransactionService(
                     savingsRepo,
@@ -306,7 +308,8 @@ namespace ArtemisBankingPro.Integration.Tests.Services.Transactions
                 var instRepo = new LoanInstallmentRepository(execContext);
 
                 var validationServices = new TransactionsValidationServices(
-                    savingsRepo, ccRepo, loanRepo, benRepo, instRepo, NullLogger<TransactionsValidationServices>.Instance);
+                    savingsRepo, ccRepo, loanRepo, benRepo, instRepo, NullLogger<TransactionsValidationServices>.Instance,
+                    _userManagementServiceMock.Object);
 
                 var transactionService = new TransactionService(
                     savingsRepo,
