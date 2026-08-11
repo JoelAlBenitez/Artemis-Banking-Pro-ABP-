@@ -12,6 +12,8 @@ using Artemis_Banking_Pro.Core.Application.Mappings.EntitieToDtosAndReverse.Savi
 using Artemis_Banking_Pro.Core.Application.Services.Loans.LoansValidate;
 using Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts;
 using Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts.SavingsAccountsValidate;
+using Artemis_Banking_Pro.Core.Application.Behaviors;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Artemis_Banking_Pro.Core.Application.Contracts.Dashboard;
@@ -33,6 +35,20 @@ namespace ArtemisBankingPro.IOC
         public static IServiceCollection AddApplicationDependecies(this IServiceCollection services)
         {
             services.AddAutoMapper(configuration => { }, Assembly.GetAssembly(typeof(ICreditCardsServices))!);
+
+            #region CQRS
+            //Commands, Queries, handlers y validadores viven todos en la capa de aplicación:
+            //un solo assembly alimenta el registro de los tres.
+            var applicationAssembly = Assembly.GetAssembly(typeof(ValidationBehavior<,>))!;
+
+            services.AddMediatR(configuration =>
+            {
+                configuration.RegisterServicesFromAssembly(applicationAssembly);
+                configuration.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            });
+
+            services.AddValidatorsFromAssembly(applicationAssembly);
+            #endregion
 
 
 

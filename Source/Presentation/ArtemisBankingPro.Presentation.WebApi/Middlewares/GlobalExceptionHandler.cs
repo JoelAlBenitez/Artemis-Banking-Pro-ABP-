@@ -56,8 +56,11 @@ namespace ArtemisBankingPro.Presentation.WebApi.Middlewares
         public static int GetStatusCode(Exception exception) => exception switch
         {
             ValidationException => StatusCodes.Status400BadRequest,
+            //Una regla de negocio incumplida es una solicitud inválida: el documento reserva
+            //el 409 para los choques de estado, que viajan en ConflictException.
+            BusinessRuleException => StatusCodes.Status400BadRequest,
             NotFoundException => StatusCodes.Status404NotFound,
-            BusinessRuleException => StatusCodes.Status409Conflict,
+            ConflictException => StatusCodes.Status409Conflict,
             _ => StatusCodes.Status500InternalServerError
         };
 
