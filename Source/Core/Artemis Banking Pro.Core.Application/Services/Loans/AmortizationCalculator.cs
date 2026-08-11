@@ -10,8 +10,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
     {
         private const int MoneyDecimals = 2;
 
-        //agregar ILogger, ICurrent User Services
-
         private readonly ILogger<AmortizationCalculator> _logger;
         public AmortizationCalculator(ILogger<AmortizationCalculator> logger)
         {
@@ -23,7 +21,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             decimal annualInterestRate,
             int totalInstallments)
         {
-            _logger.LogInformation("Realizando calculo de la cutoas según la tarifa determinada.");
+            _logger.LogInformation("Realizando calculo de la cutoas segï¿½n la tarifa determinada.");
             if (totalInstallments <= 0) return 0m;
             var monthlyRate = MonthlyRate(annualInterestRate);
             if (monthlyRate == 0m) return Money(capital / totalInstallments);
@@ -36,13 +34,14 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             decimal annualInterestRate,
             int totalInstallments,
             DateTimeOffset loanCreatedAt,
-            int loanId)
+            int loanId,
+            string createdByUserId)
         {
             var installments = new List<LoanInstallment>();
             if (totalInstallments <= 0) return installments;
 
             #region  calculando la tarifa mensual de as cuotas
-            _logger.LogInformation("Realización del calculo de la tarifa mensual" +
+            _logger.LogInformation("Realizaciï¿½n del calculo de la tarifa mensual" +
                 " y las mensualidades de las cuotas del prestamo con ID {ID} ", loanId);
             var monthlyRate = MonthlyRate(annualInterestRate);
             var monthlyInstallment = CalculateMonthlyInstallment(capital, annualInterestRate, totalInstallments);
@@ -66,7 +65,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
                 pendingCapital = Money(pendingCapital - capitalAmount);
 
-                _logger.LogInformation("Creando cuota determinada número {N} al prestamo con ID {ID}", number, loanId);
+                _logger.LogInformation("Creando cuota determinada nï¿½mero {N} al prestamo con ID {ID}", number, loanId);
                 installments.Add(new LoanInstallment
                 {
                     LoanId = loanId,
@@ -79,7 +78,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     paymentStatus = PaymentStatus.Pendiente,
                     IsOverdue = false,
                     CreatedAt = loanCreatedAt,
-                    CreateByUserId = "" // cambiar cuando se cree el ICurrentUserSession
+                    CreateByUserId = createdByUserId
                 });
 
             }
@@ -92,7 +91,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             IReadOnlyCollection<LoanInstallment> installments,
             decimal pendingCapital,
             decimal newAnnualInterestRate,
-            DateTimeOffset today
+            DateTimeOffset today,
+            string modifiedByUserId
            )
         {
             #region obteniendo cuotas futuras
@@ -134,9 +134,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 installment.CapitalAmount = capitalAmount;
                 installment.PendingBalance = installmentValue;
                 installment.ModifiedAt = today;
-
-                
-               // installment.LastModifiedByIdUser = modifiedByUserId; //en espera de adrian con el ICurrentUserServices
+                installment.LastModifiedByIdUser = modifiedByUserId;
             }
             #endregion
 
