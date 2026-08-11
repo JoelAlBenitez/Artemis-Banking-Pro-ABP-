@@ -24,5 +24,8 @@ namespace Artemis_Banking_Pro.Core.Application.ViewModels.Loans
 
 
         public bool ConfirmHighRisk { get; set; }
+
+        //Solo lectura: el nombre del cliente elegido en el paso 1 se muestra en el formulario
+        public string? FullNameCustomer { get; set; }
     }
 }

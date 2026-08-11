@@ -66,10 +66,18 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
         {
             var result = await _loansServices.GetCustomersForAssignmentAsync(idCard);
 
+            //Una cédula sin cliente se informa en la misma pantalla: un redirect perdería el
+            //mensaje del documento funcional.
             if (!result.IsValid)
             {
                 AddErrors(result);
-                return RedirectToAction(nameof(Index));
+
+                return View(new ClientsForLoanAssignmentViewModel
+                {
+                    AverageDebt = 0m,
+                    Clients = Array.Empty<ClientLoansViewModel>(),
+                    IdCard = idCard
+                });
             }
 
             var vm = _mapper.Map<ClientsForLoanAssignmentViewModel>(result.Value!);
@@ -81,7 +89,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
         //Paso 1: llega el cliente elegido en el formulario de selección y se muestra el paso 2.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SelectCustomer(string customerId)
+        public IActionResult SelectCustomer(string customerId, string? fullNameCustomer = null)
         {
             if (string.IsNullOrWhiteSpace(customerId))
             {
@@ -94,7 +102,8 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
                 CustomerId = customerId,
                 TermLoans = TermMonths.Meses6,
                 AmmountLoans = 0m,
-                AnnualInterestRate = 0m
+                AnnualInterestRate = 0m,
+                FullNameCustomer = fullNameCustomer
             });
         }
 

@@ -4,6 +4,8 @@ using Artemis_Banking_Pro.Core.Application.Contracts.Loans;
 using Artemis_Banking_Pro.Core.Application.DTOs.Loans;
 using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
 using Artemis_Banking_Pro.Core.Application.Services.Generic;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+using ArtemisBankingPro.Core.Application.DTOs.Users;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.CodeErrors.LoansErros;
 using ArtemisBankingPro.Core.Domain.Common.Constants;
@@ -31,6 +33,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
         private readonly IAmortizationCalculator _amortizationCalculator;
         private readonly IDebtCalculator _debtCalculator;
         private readonly IEmailServices _emailServices;
+        private readonly IUserManagementService _userManagementService;
         private readonly ILoansValidateServices _loansValidateServices;
         private readonly ILogger<LoansServices> _logger;
 
@@ -42,11 +45,13 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             IAmortizationCalculator amortizationCalculator,
             IDebtCalculator debtCalculator,
             IEmailServices emailServices,
+            IUserManagementService userManagementService,
             IMapper mapper,
             ILoansValidateServices loansValidateServices,
             ILogger<LoansServices> logger
            ) : base(loansRepository, mapper, logger)
         {
+            _userManagementService = userManagementService;
             _loansRepository = loansRepository;
             _loanInstallmentRepository = loanInstallmentRepository;
             _savingsAccountsRepository = savingsAccountsRepository;
@@ -69,10 +74,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     return ValidationResult<PagedResult<LoansDto>>.Failure(validation.Errors.ToList());
                 }
 
-                //La cédula identifica al cliente dentro del project Identity. Cuando su servicio de
-                //consulta de usuarios esté disponible, aquí se traduce a su ID y se pasa al filtro.
-                //customerId = (await _userServices.GetCustomerByIdCardAsync(filter.IdCard))?.Id;
-                string? customerId = null;
+                //La validación traduce la cédula al Id del cliente en Identity
+                var customerId = validation.Value;
 
                 _logger.LogInformation("Recuperando el listado de prestamos. Pagina {Pagina}, estado {Estado}",
                     filter.Page, filter.Status);
@@ -93,10 +96,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                             : LoansError.NonExistLoansByIndicateState);
                 }
 
-                //El nombre del cliente de cada préstamo proviene del project Identity y se completa
-                //cuando su servicio de consulta de usuarios esté disponible.
-
                 var items = _mapper.Map<IReadOnlyCollection<LoansDto>>(result.Items);
+
+                //El nombre del titular vive en Identity: se completa por página, una sola
+                //consulta por cliente distinto (máximo 20 filas).
+                await FillCustomerNamesAsync(items);
+
                 var paged = new PagedResult<LoansDto>(items, result.Page, result.PageSize, result.TotalRecords);
 
                 return ValidationResult<PagedResult<LoansDto>>.Success(paged);
@@ -122,8 +127,12 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     return ValidationResult<DetailLoansDto>.Failure(LoansError.NonExistsLoan);
                 }
 
+                var detail = _mapper.Map<DetailLoansDto>(loan);
+                detail.FullNameCustomer =
+                    await _userManagementService.GetFullNameByIdAsync(loan.CustomerId) ?? string.Empty;
+
                 _logger.LogInformation("Retornando los detalles del prestamo con ID {ID}", loanId);
-                return ValidationResult<DetailLoansDto>.Success(_mapper.Map<DetailLoansDto>(loan));
+                return ValidationResult<DetailLoansDto>.Success(detail);
             }
             catch (Exception ex)
             {
@@ -185,37 +194,66 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             {
                 _logger.LogInformation("Recuperando los clientes elegibles para la asignacion de un prestamo");
 
-                //El monto promedio de deuda sí pertenece a este módulo y se muestra arriba del listado
-                var averageDebt = await _debtCalculator.GetAverageDebtAsync();
+                //Los clientes activos vienen de Identity; la cédula, cuando llega, reduce el
+                //listado a uno solo.
+                List<ClientSummaryDto> activeCustomers;
 
-                //El listado de clientes activos, su nombre, su correo y la búsqueda por cédula
-                //provienen del project Identity. Cuando su servicio de consulta de usuarios esté
-                //disponible, este bloque se descomenta: se descartan los clientes con préstamo
-                //activo y se completa la deuda de cada uno con el IDebtCalculator.
-                //var activeCustomers = string.IsNullOrWhiteSpace(idCard)
-                //    ? await _userServices.GetActiveCustomersAsync()
-                //    : await _userServices.GetCustomerByIdCardAsync(idCard);
-                //var customerIds = activeCustomers.Select(customer => customer.Id).ToList();
-                //var withActiveLoan = await _loansRepository.GetAllFindAsync(
-                //    loan => loan.Status == LoanStatus.Activo && customerIds.Contains(loan.CustomerId));
-                //var eligible = activeCustomers
-                //    .Where(customer => withActiveLoan.All(loan => loan.CustomerId != customer.Id))
-                //    .ToList();
-                //var debts = await _debtCalculator.GetCustomersDebtAsync(
-                //    eligible.Select(customer => customer.Id).ToList());
-                //var clients = eligible.Select(customer => new ClientLoansDto
-                //{
-                //    Id = customer.Id,
-                //    IdCard = customer.IdCard,
-                //    FullName = customer.FullName,
-                //    Email = customer.Email,
-                //    TotalDebtAmount = debts[customer.Id]
-                //}).ToList();
+                if (string.IsNullOrWhiteSpace(idCard))
+                {
+                    activeCustomers = await _userManagementService.GetActiveClientsAsync();
+                }
+                else
+                {
+                    var customer = await _userManagementService.GetClientByIdCardAsync(idCard);
+
+                    if (customer is null)
+                    {
+                        _logger.LogWarning("No existe un cliente activo registrado con la cedula {IdCard}", idCard);
+                        return ValidationResult<ClientsForLoanAssignmentDto>.Failure(
+                            LoansError.NonExistsCustomerByIdCard);
+                    }
+
+                    activeCustomers = new List<ClientSummaryDto> { customer };
+                }
+
+                //El promedio se calcula sobre TODOS los clientes activos, no solo los elegibles:
+                //es el umbral de riesgo del sistema, no una media del listado que se muestra.
+                var allActiveIds = string.IsNullOrWhiteSpace(idCard)
+                    ? activeCustomers.Select(customer => customer.Id).ToList()
+                    : (await _userManagementService.GetActiveClientIdsAsync()).ToList();
+
+                var averageDebt = await _debtCalculator.GetAverageDebtAsync(allActiveIds);
+
+                //Un cliente solo puede tener un préstamo activo: los que ya lo tienen no son
+                //elegibles y no se muestran en el paso 1.
+                var customerIds = activeCustomers.Select(customer => customer.Id).ToList();
+
+                var withActiveLoan = await _loansRepository.GetAllFindAsync(
+                    loan => loan.Status == LoanStatus.Activo && customerIds.Contains(loan.CustomerId));
+
+                var eligible = activeCustomers
+                    .Where(customer => withActiveLoan.All(loan => loan.CustomerId != customer.Id))
+                    .ToList();
+
+                var debts = await _debtCalculator.GetCustomersDebtAsync(
+                    eligible.Select(customer => customer.Id).ToList());
+
+                var clients = eligible.Select(customer => new ClientLoansDto
+                {
+                    Id = customer.Id,
+                    IdCard = customer.IDCARD,
+                    FullName = customer.FullName,
+                    Email = customer.Email,
+                    TotalDebtAmount = debts.TryGetValue(customer.Id, out var debt) ? debt : 0m
+                }).ToList();
+
+                _logger.LogInformation("{Elegibles} clientes elegibles de {Activos} activos. Deuda promedio del sistema RD${Promedio}",
+                    clients.Count, activeCustomers.Count, averageDebt);
 
                 var result = new ClientsForLoanAssignmentDto
                 {
                     AverageDebt = averageDebt,
-                    Clients = new List<ClientLoansDto>()
+                    Clients = clients
                 };
 
                 return ValidationResult<ClientsForLoanAssignmentDto>.Success(result);
@@ -249,12 +287,17 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 _logger.LogInformation("Evaluando el riesgo del cliente con ID {ID} antes de registrar el prestamo",
                     dto.CustomerId);
 
-                var averageDebt = await _debtCalculator.GetAverageDebtAsync();
+                //El umbral es el promedio de los clientes activos de Identity, no el de quienes
+                //hoy tienen deuda: ese es el divisor que exige el documento funcional.
+                var activeClientIds = await _userManagementService.GetActiveClientIdsAsync();
+
+                var averageDebt = await _debtCalculator.GetAverageDebtAsync(activeClientIds);
                 var currentDebt = await _debtCalculator.GetCustomerDebtAsync(dto.CustomerId);
 
                 //El total a pagar sale de la suma de las cuotas de la tabla de amortización: se
-                //calcula en memoria, sin persistir nada, porque el préstamo aún no existe.
-                var totalPayable = BuildAmortizationTable(dto, DateTimeOffset.UtcNow)
+                //calcula en memoria, sin persistir nada, porque el préstamo aún no existe. La
+                //auditoría no importa aquí: esta tabla no se persiste.
+                var totalPayable = BuildAmortizationTable(dto, DateTimeOffset.UtcNow, DomainConstants.SystemUserId)
                     .Sum(installment => installment.InstallmentValue);
 
                 var projectedDebt = _debtCalculator.GetProjectedDebt(currentDebt, totalPayable);
@@ -295,6 +338,15 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
         public override async Task<ValidationResult> CreateAsync(LoansAssignmentDto dto)
         {
             _logger.LogInformation("Inicio de la asignacion de un prestamo al cliente con ID {ID}", dto.CustomerId);
+
+            //El administrador responsable sale de la sesión, nunca de un parámetro
+            var adminValidation = _loansValidateServices.ValidateAdministratorInSession();
+            if (!adminValidation.IsValid)
+            {
+                return ValidationResult.Failure(adminValidation.Errors.ToList());
+            }
+
+            var adminUserId = adminValidation.Value!;
 
             //Las validaciones de negocio van antes de tocar la base de datos
             var validation = await _loansValidateServices.AssigmentLoansValidateAsync(dto);
@@ -345,7 +397,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     return ValidationResult.Failure(LoansError.NonExistAccountFirstActive);
                 }
 
-                var installments = BuildAmortizationTable(dto, assignedAt);
+                var installments = BuildAmortizationTable(dto, assignedAt, adminUserId);
                 if (installments.Count == 0)
                 {
                     _logger.LogError("No fue posible generar la tabla de amortizacion del prestamo {LoanNumber}", loanNumber);
@@ -359,7 +411,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 loan.TotalPayable = installments.Sum(installment => installment.InstallmentValue);
                 loan.PendingAmount = loan.TotalPayable;
                 loan.CreatedAt = assignedAt;
-                loan.CreateByUserId = ""; // administrador responsable, por modificar
+                loan.CreateByUserId = adminUserId;
 
                 //Las cuotas viajan en la navegación: EF les asigna el LoanId al insertar el préstamo
                 foreach (var installment in installments) loan.loanInstallments.Add(installment);
@@ -370,7 +422,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 //registrado como una transacción de tipo CRÉDITO cuyo origen es el préstamo.
                 primaryAccount.Balance += dto.AmmountLoans;
                 primaryAccount.ModifiedAt = assignedAt;
-                primaryAccount.LastModifiedByIdUser = ""; // por modificar
+                primaryAccount.LastModifiedByIdUser = adminUserId;
 
                 await _savingsAccountsRepository.UpdateAsync(primaryAccount);
 
@@ -383,10 +435,10 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     Origin = loanNumber,
                     Beneficiary = primaryAccount.AccountNumber,
                     Status = TransactionStatus.Aprobada,
-                    PerformedByUserId = "", // administrador responsable, por modificar
+                    PerformedByUserId = adminUserId,
                     Channel = ChannelPayment.Administrador,
                     CreatedAt = assignedAt,
-                    CreateByUserId = "" // por modificar
+                    CreateByUserId = adminUserId
                 });
 
                 //Un único SaveChangesAsync confirma el préstamo, sus n cuotas, el nuevo balance de
@@ -404,19 +456,16 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     "Prestamo {LoanNumber} asignado al cliente con ID {ID}. Capital RD${Capital} desembolsado en la cuenta {Cuenta}",
                     loanNumber, dto.CustomerId, dto.AmmountLoans, primaryAccount.AccountNumber);
 
-                //El correo de aprobación va fuera de la transacción: un fallo de correo no revierte
-                //el préstamo. El destinatario y el nombre del cliente provienen del project Identity
-                //y esta llamada se descomenta cuando su servicio los exponga.
-                //var assigned = new LoanAssignedDto
-                //{
-                //    CustomerId = dto.CustomerId,
-                //    LoanNumber = loanNumber,
-                //    ApprovedAmount = dto.AmmountLoans,
-                //    Term = (int)dto.TermLoans,
-                //    AnnualInterestRate = dto.AnnualInterestRate,
-                //    MonthlyInstallment = loan.MonthlyInstallment
-                //};
-                //return await SendLoanApprovedNotificationAsync(assigned, customerEmail, customerFullName);
+                //Fuera de la transacción: un fallo de correo no revierte el préstamo
+                await SendLoanApprovedNotificationAsync(new LoanAssignedDto
+                {
+                    CustomerId = dto.CustomerId,
+                    LoanNumber = loanNumber,
+                    ApprovedAmount = dto.AmmountLoans,
+                    Term = (int)dto.TermLoans,
+                    AnnualInterestRate = dto.AnnualInterestRate,
+                    MonthlyInstallment = loan.MonthlyInstallment
+                });
 
                 return ValidationResult.Success();
             }
@@ -434,6 +483,14 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 return ValidationResult.Failure(LoansError.NegativeAnnualInterestRate);
             }
 
+            var adminValidation = _loansValidateServices.ValidateAdministratorInSession();
+            if (!adminValidation.IsValid)
+            {
+                return ValidationResult.Failure(adminValidation.Errors.ToList());
+            }
+
+            var adminUserId = adminValidation.Value!;
+
             _logger.LogInformation("Validando las reglas del negocio del prestamo con ID {ID}", dto.Id);
             var validation = await _loansValidateServices.EditValidateAnnualInterestRateAsync(dto.Id);
             if (!validation.IsValid) return ValidationResult.Failure(validation.Errors.ToList());
@@ -450,7 +507,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
                 _logger.LogInformation("Recalculando las cuotas futuras pendientes del prestamo con ID {ID}", loan.Id);
                 var recalculated = _amortizationCalculator.RecalculateFutureInstallments(
-                    loan.loanInstallments.ToList(), pendingCapital, dto.AnnualInterestRate, today);
+                    loan.loanInstallments.ToList(), pendingCapital, dto.AnnualInterestRate, today, adminUserId);
 
                 loan.AnnualInterestRate = dto.AnnualInterestRate;
                 loan.MonthlyInstallment = recalculated[0].InstallmentValue;
@@ -459,7 +516,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     .Where(i => i.paymentStatus != PaymentStatus.Pagada)
                     .Sum(i => i.PendingBalance);
                 loan.ModifiedAt = today;
-                loan.LastModifiedByIdUser = ""; // por modificar
+                loan.LastModifiedByIdUser = adminUserId;
 
                 _logger.LogInformation("Intento de modificacion del prestamo y sus cuotas con ID {ID}", loan.Id);
                 await _loansRepository.UpdateAsync(loan);
@@ -474,19 +531,17 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     return ValidationResult.Failure(GeneralError.UnexpectedError);
                 }
 
-                //El correo de actualización de tasa va fuera de la transacción. El destinatario y el
-                //nombre del cliente provienen del project Identity y esta llamada se descomenta
-                //cuando su servicio los exponga.
-                //var nextInstallment = recalculated.OrderBy(i => i.InstallmentNumber).First();
-                //var rateUpdated = new LoanRateUpdatedDto
-                //{
-                //    CustomerId = loan.CustomerId,
-                //    LoanNumber = loan.LoanNumber,
-                //    AnnualInterestRate = loan.AnnualInterestRate,
-                //    NextInstallmentValue = nextInstallment.InstallmentValue,
-                //    NextInstallmentDueDate = nextInstallment.DueDate
-                //};
-                //return await SendRateUpdateNotificationAsync(rateUpdated, customerEmail, customerFullName);
+                //Fuera de la transacción: un fallo de correo no revierte la nueva tasa
+                var nextInstallment = recalculated.OrderBy(i => i.InstallmentNumber).First();
+
+                await SendRateUpdateNotificationAsync(new LoanRateUpdatedDto
+                {
+                    CustomerId = loan.CustomerId,
+                    LoanNumber = loan.LoanNumber,
+                    AnnualInterestRate = loan.AnnualInterestRate,
+                    NextInstallmentValue = nextInstallment.InstallmentValue,
+                    NextInstallmentDueDate = nextInstallment.DueDate
+                });
 
                 return ValidationResult.Success();
             }
@@ -499,13 +554,34 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
         #endregion
 
         #region private methods
-        private List<LoanInstallment> BuildAmortizationTable(LoansAssignmentDto dto, DateTimeOffset createdAt)
+        private List<LoanInstallment> BuildAmortizationTable(
+            LoansAssignmentDto dto, DateTimeOffset createdAt, string createdByUserId)
             => _amortizationCalculator.GenerateAmortizationTable(
                 dto.AmmountLoans,
                 dto.AnnualInterestRate,
                 (int)dto.TermLoans,
                 createdAt,
-                0).ToList();
+                0,
+                createdByUserId).ToList();
+
+        //Una sola consulta a Identity por cliente distinto de la página
+        private async Task FillCustomerNamesAsync(IReadOnlyCollection<LoansDto> loans)
+        {
+            if (loans.Count == 0) return;
+
+            var names = new Dictionary<string, string>();
+
+            foreach (var loan in loans)
+            {
+                if (!names.TryGetValue(loan.CustomerId, out var fullName))
+                {
+                    fullName = await _userManagementService.GetFullNameByIdAsync(loan.CustomerId) ?? string.Empty;
+                    names[loan.CustomerId] = fullName;
+                }
+
+                loan.FullNameCustomer = fullName;
+            }
+        }
 
         private static string BuildRateUpdateBody(LoanRateUpdatedDto rateUpdated, string customerFullName)
             => $"<p>Hola {customerFullName},</p>" +
@@ -525,50 +601,88 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                $"Cuota mensual: RD${assigned.MonthlyInstallment:N2}</p>" +
                "<p>El monto aprobado ha sido depositado en su cuenta de ahorro principal.</p>";
 
-        private async Task<ValidationResult> SendLoanApprovedNotificationAsync(
-            LoanAssignedDto assigned, string customerEmail, string customerFullName)
+        private async Task<ValidationResult> SendLoanApprovedNotificationAsync(LoanAssignedDto assigned)
         {
-            var message = new MessageDto
+            try
             {
-                To = customerEmail,
-                Subject = "Préstamo aprobado",
-                Message = BuildLoanApprovedBody(assigned, customerFullName)
-            };
+                var customer = await _userManagementService.GetUserByIdAsync(assigned.CustomerId);
 
-            var sent = await _emailServices.SendNotification(message);
+                if (customer is null)
+                {
+                    _logger.LogWarning("Sin datos de contacto del cliente con ID {ID}: no se envia el correo de aprobacion",
+                        assigned.CustomerId);
 
-            if (!sent)
+                    return ValidationResult.Failure(LoansError.LoanCreatedWithoutNotification);
+                }
+
+                var message = new MessageDto
+                {
+                    To = customer.Email,
+                    Subject = "Préstamo aprobado",
+                    Message = BuildLoanApprovedBody(assigned, $"{customer.Name} {customer.LastName}".Trim())
+                };
+
+                var sent = await _emailServices.SendNotification(message);
+
+                if (!sent)
+                {
+                    _logger.LogWarning("No fue posible enviar el correo de aprobacion del prestamo {LoanNumber}. La operacion no se revierte",
+                        assigned.LoanNumber);
+
+                    return ValidationResult.Failure(LoansError.LoanCreatedWithoutNotification);
+                }
+
+                return ValidationResult.Success();
+            }
+            catch (Exception ex)
             {
-                _logger.LogWarning("No fue posible enviar el correo de aprobacion del prestamo {LoanNumber}. La operacion no se revierte",
+                _logger.LogWarning(ex, "Error al enviar el correo de aprobacion del prestamo {LoanNumber}. La operacion no se revierte",
                     assigned.LoanNumber);
 
                 return ValidationResult.Failure(LoansError.LoanCreatedWithoutNotification);
             }
-
-            return ValidationResult.Success();
         }
 
-        private async Task<ValidationResult> SendRateUpdateNotificationAsync(
-            LoanRateUpdatedDto rateUpdated, string customerEmail, string customerFullName)
+        private async Task<ValidationResult> SendRateUpdateNotificationAsync(LoanRateUpdatedDto rateUpdated)
         {
-            var message = new MessageDto
+            try
             {
-                To = customerEmail,
-                Subject = "Actualización de tasa de interés de préstamo",
-                Message = BuildRateUpdateBody(rateUpdated, customerFullName)
-            };
+                var customer = await _userManagementService.GetUserByIdAsync(rateUpdated.CustomerId);
 
-            var sent = await _emailServices.SendNotification(message);
+                if (customer is null)
+                {
+                    _logger.LogWarning("Sin datos de contacto del cliente con ID {ID}: no se envia el correo de tasa",
+                        rateUpdated.CustomerId);
 
-            if (!sent)
+                    return ValidationResult.Failure(LoansError.RateUpdatedWithoutNotification);
+                }
+
+                var message = new MessageDto
+                {
+                    To = customer.Email,
+                    Subject = "Actualización de tasa de interés de préstamo",
+                    Message = BuildRateUpdateBody(rateUpdated, $"{customer.Name} {customer.LastName}".Trim())
+                };
+
+                var sent = await _emailServices.SendNotification(message);
+
+                if (!sent)
+                {
+                    _logger.LogWarning("No fue posible enviar el correo de actualizacion de tasa del prestamo {LoanNumber}. La operacion no se revierte",
+                        rateUpdated.LoanNumber);
+
+                    return ValidationResult.Failure(LoansError.RateUpdatedWithoutNotification);
+                }
+
+                return ValidationResult.Success();
+            }
+            catch (Exception ex)
             {
-                _logger.LogWarning("No fue posible enviar el correo de actualizacion de tasa del prestamo {LoanNumber}. La operacion no se revierte",
+                _logger.LogWarning(ex, "Error al enviar el correo de actualizacion de tasa del prestamo {LoanNumber}. La operacion no se revierte",
                     rateUpdated.LoanNumber);
 
                 return ValidationResult.Failure(LoansError.RateUpdatedWithoutNotification);
             }
-
-            return ValidationResult.Success();
         }
 
         private static LoanStatus? ToLoanStatus(LoanStatusFilter filter)
