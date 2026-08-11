@@ -8,6 +8,8 @@ using ArtemisBankingPro.Core.Domain.Interfaces.Transactions;
 using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Transactions;
 using ArtemisBankingPro.Core.Domain.Interfaces.Beneficiaries;
 using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Beneficiaries;
+using ArtemisBankingPro.Core.Domain.Interfaces.Commerces;
+using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Commerces;
 using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
 using ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans;
 using ArtemisBankingPro.Infraestructrue.Persistence.Context;
@@ -54,6 +56,10 @@ namespace ArtemisBankingPro.IOC
             services.AddScoped<ICashAdvanceRepository, CashAdvanceRepository>();
 
             services.AddScoped<IBeneficiaryRepository, BeneficiaryRepository>();
+
+            //Comercios y procesador de pagos Hermes Pay
+            services.AddScoped<ICommerceRepository, CommerceRepository>();
+            services.AddScoped<ICommercePaymentRepository, CommercePaymentRepository>();
 
             services.AddScoped<ILoansPaymentRepository, LoansPaymentRepository>();
 
