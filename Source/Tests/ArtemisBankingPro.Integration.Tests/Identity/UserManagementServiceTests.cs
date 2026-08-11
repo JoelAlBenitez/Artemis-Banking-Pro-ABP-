@@ -1,3 +1,4 @@
+using ArtemisBankingPro.Core.Application.Contracts.Users.Session;
 using ArtemisBankingPro.Core.Application.DTOs.Users;
 using ArtemisBankingPro.Core.Domain.Common.Constants;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
@@ -166,8 +167,9 @@ namespace ArtemisBankingPro.Integration.Tests.Identity
         public async Task ToggleUserAsync_OnTheCurrentUserOwnAccount_ShouldBeRejected()
         {
             var admin = await _host.GivenUserAsync(Roles.Administrador, "admin01");
+            GivenAuthenticatedUser(admin.Id);
 
-            var response = await _service.ToggleUserAsync(admin.Id, admin.Id);
+            var response = await _service.ToggleUserAsync(admin.Id);
 
             response.HasError.Should().BeTrue();
             response.Error.Should().Be("No puede modificar el estado de su propia cuenta.");
@@ -177,7 +179,9 @@ namespace ArtemisBankingPro.Integration.Tests.Identity
         [Fact]
         public async Task ToggleUserAsync_WithAnUnknownUser_ShouldReportItAsNotFound()
         {
-            var response = await _service.ToggleUserAsync("no-existe", "admin-1");
+            GivenAuthenticatedUser("admin-1");
+
+            var response = await _service.ToggleUserAsync("no-existe");
 
             response.HasError.Should().BeTrue();
             response.NotFound.Should().BeTrue();
@@ -189,8 +193,9 @@ namespace ArtemisBankingPro.Integration.Tests.Identity
         {
             var admin = await _host.GivenUserAsync(Roles.Administrador, "admin01");
             var client = await _host.GivenUserAsync(Roles.Cliente, "cliente01");
+            GivenAuthenticatedUser(admin.Id);
 
-            var response = await _service.ToggleUserAsync(client.Id, admin.Id);
+            var response = await _service.ToggleUserAsync(client.Id);
 
             response.HasError.Should().BeFalse();
             var updated = await _host.UserManager.FindByIdAsync(client.Id);
@@ -203,8 +208,9 @@ namespace ArtemisBankingPro.Integration.Tests.Identity
         {
             var admin = await _host.GivenUserAsync(Roles.Administrador, "admin01");
             var client = await _host.GivenUserAsync(Roles.Cliente, "cliente01", isActive: false);
+            GivenAuthenticatedUser(admin.Id);
 
-            var response = await _service.SetUserStatusAsync(client.Id, true, admin.Id);
+            var response = await _service.SetUserStatusAsync(client.Id, true);
 
             response.HasError.Should().BeFalse();
             (await _host.UserManager.FindByIdAsync(client.Id))!.IsActive.Should().BeTrue();
@@ -357,6 +363,61 @@ namespace ArtemisBankingPro.Integration.Tests.Identity
         }
 
         // ─── Edición ─────────────────────────────────────────────────────────
+
+        //El administrador autenticado no puede editar su propia cuenta desde el mantenimiento
+        [Fact]
+        public async Task GetUserForEditAsync_OnTheCurrentUserOwnAccount_ShouldBeRejected()
+        {
+            var admin = await _host.GivenUserAsync(Roles.Administrador, "admin01");
+            GivenAuthenticatedUser(admin.Id);
+
+            var response = await _service.GetUserForEditAsync(admin.Id);
+
+            response.HasError.Should().BeTrue();
+            response.Error.Should().Be("No puede editar su propia cuenta desde este módulo.");
+            response.User.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task GetUserForEditAsync_WithACommerceUser_ShouldReportItAsNotFound()
+        {
+            var commerce = await _host.GivenUserAsync(Roles.Comercio, "comercio01");
+            GivenAuthenticatedUser("admin-1");
+
+            var response = await _service.GetUserForEditAsync(commerce.Id);
+
+            response.NotFound.Should().BeTrue();
+            response.Error.Should().Be("El usuario seleccionado no existe.");
+            response.User.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task GetUserForEditAsync_WithAnEditableUser_ShouldReturnTheDetail()
+        {
+            var client = await _host.GivenUserAsync(Roles.Cliente, "cliente01");
+            GivenAuthenticatedUser("admin-1");
+
+            var response = await _service.GetUserForEditAsync(client.Id);
+
+            response.HasError.Should().BeFalse();
+            response.User.Should().NotBeNull();
+            response.User!.UserName.Should().Be("cliente01");
+            response.User.IsClient.Should().BeTrue();
+        }
+
+        //La misma regla protege el guardado: no basta con bloquear la carga de la pantalla
+        [Fact]
+        public async Task UpdateUserAsync_OnTheCurrentUserOwnAccount_ShouldBeRejected()
+        {
+            var admin = await _host.GivenUserAsync(Roles.Administrador, "admin01");
+            GivenAuthenticatedUser(admin.Id);
+
+            var response = await _service.UpdateUserAsync(admin.Id, BuildEdit(admin.Id, userName: "otro"));
+
+            response.HasError.Should().BeTrue();
+            response.Error.Should().Be("No puede editar su propia cuenta desde este módulo.");
+            (await _host.UserManager.FindByIdAsync(admin.Id))!.UserName.Should().Be("admin01");
+        }
 
         [Fact]
         public async Task UpdateUserAsync_WithAnUnknownUser_ShouldReportItAsNotFound()

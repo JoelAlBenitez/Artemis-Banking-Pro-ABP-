@@ -114,7 +114,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
         // 5
         public async Task<UserOperationResponseDto> ToggleUserAsync(string userId)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await FindUserAsync(userId);
             if (user == null)
                 return NotFoundResponse();
 
@@ -123,7 +123,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
 
         public async Task<UserOperationResponseDto> SetUserStatusAsync(string userId, bool status)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await FindUserAsync(userId);
             if (user == null)
                 return NotFoundResponse();
 
@@ -133,7 +133,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
         // 6
         public async Task<UserDetailDto?> GetUserByIdAsync(string userId)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await FindUserAsync(userId);
             if (user == null) return null;
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -265,7 +265,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
                 return Failure("No puede editar su propia cuenta desde este módulo.");
             }
 
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await FindUserAsync(id);
             if (user == null)
                 return NotFoundResponse();
 
@@ -449,6 +449,11 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
 
             return new UserExistenceDto { Exists = true, IsActive = user.IsActive };
         }
+
+        //La presentación ya no filtra el identificador: un Id ausente se trata como usuario
+        //inexistente en lugar de reventar en el UserManager.
+        private async Task<ApplicationUser?> FindUserAsync(string userId)
+            => string.IsNullOrWhiteSpace(userId) ? null : await _userManager.FindByIdAsync(userId);
 
         //Sin sesión no hay cuenta propia que proteger: las reglas del mantenimiento no aplican
         private bool IsCurrentUser(string userId)
