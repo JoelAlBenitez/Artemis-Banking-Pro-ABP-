@@ -29,8 +29,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.AdminDashboard
         {
             var data = await _adminDashboardServices.GetDataAdminDashboard();
 
-            //El Home se muestra siempre: si los indicadores fallan, se pintan en cero con el
-            //mensaje del error. Dejar al administrador sin panel sería peor.
+           
             if (!data.IsValid)
             {
                 _logger.LogWarning("No fue posible calcular los indicadores del Home del administrador");

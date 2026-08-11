@@ -16,12 +16,16 @@ namespace ArtemisBankingPro.Core.Application.Contracts.Users.Management
         Task<PagedResponseDto<UserDto>> GetUsersByRoleAsync(Roles role, int page, int pageSize);
         // 3 - Roles del sistema, excluyendo Comercio
         Task<List<string>> GetRolesAsync();
-        // 5 - Activar / inactivar usuario
-        Task<UserOperationResponseDto> ToggleUserAsync(string userId, string currentUserId);
+        // 5 - Activar / inactivar usuario. El usuario autenticado lo resuelve el servicio:
+        //ninguna presentación necesita leer el claim ni comprobar la propia cuenta.
+        Task<UserOperationResponseDto> ToggleUserAsync(string userId);
         //Variante usada por la Web API: el estado llega explícito en el body
-        Task<UserOperationResponseDto> SetUserStatusAsync(string userId, bool status, string currentUserId);
+        Task<UserOperationResponseDto> SetUserStatusAsync(string userId, bool status);
         // 6 - Detalle de un usuario (consulta y edición)
         Task<UserDetailDto?> GetUserByIdAsync(string userId);
+        //Detalle para la pantalla de edición: aplica las reglas del mantenimiento antes de
+        //devolver los datos (existe, no es Comercio y no es la propia cuenta).
+        Task<UserEditResponseDto> GetUserForEditAsync(string userId);
         // 7 - Roles asociados a un usuario
         Task<List<string>> GetRolesByUserAsync(string userId);
         // 8 - Datos base del cliente: Id, Name, LastName
