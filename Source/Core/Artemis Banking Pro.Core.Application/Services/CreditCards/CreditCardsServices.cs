@@ -77,7 +77,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
 
                 var result = await _creditCardsRepository.GetPagedCreditCardsAsync(
                     filter!.Page,
-                    DomainConstants.DefaultPageSize,
+                    filter.PageSize,
                     ToCreditCardStatus(filter.Status),
                     customerId);
 
@@ -183,7 +183,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
         }
 
         public async Task<ValidationResult<PagedResult<CardConsumptionDto>>> GetPagedConsumptionsAsync(
-            int creditCardId, int page)
+            int creditCardId, int page, int pageSize = DomainConstants.DefaultPageSize)
         {
             try
             {
@@ -200,7 +200,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
                 //Aprobados y rechazados: el historial conserva los intentos denegados
                 var result = await _cardConsumptionRepository.GetAllAsync(
                     page,
-                    DomainConstants.DefaultPageSize,
+                    pageSize,
                     consumption => consumption.CreditCardId == creditCardId,
                     query => query.OrderByDescending(consumption => consumption.CreatedAt));
 

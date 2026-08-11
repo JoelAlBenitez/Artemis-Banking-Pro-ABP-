@@ -77,7 +77,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
 
                 var result = await _savingsAccountsRepository.GetPagedSavingsAccountsAsync(
                     filter.Page,
-                    DomainConstants.DefaultPageSize,
+                    filter.PageSize,
                     ToSavingsAccountStatus(filter.Status),
                     ToSavingsAccountType(filter.Type),
                     customerId);
@@ -107,7 +107,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
         }
 
         public async Task<ValidationResult<PagedResult<TransactionDto>>> GetPagedTransactionsAsync(
-            int savingsAccountId, int page)
+            int savingsAccountId, int page, int pageSize = DomainConstants.DefaultPageSize)
         {
             try
             {
@@ -125,7 +125,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts
                 //Transaction pertenece al módulo Cliente: este módulo solo la consulta.
                 var result = await _transactionRepository.GetAllAsync(
                     page,
-                    DomainConstants.DefaultPageSize,
+                    pageSize,
                     transaction => transaction.SavingsAccountId == savingsAccountId,
                     query => query.OrderByDescending(transaction => transaction.CreatedAt));
 

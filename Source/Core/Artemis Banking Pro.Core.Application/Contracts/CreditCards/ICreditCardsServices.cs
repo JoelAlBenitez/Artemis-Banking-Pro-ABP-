@@ -1,5 +1,6 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.Generic;
 using Artemis_Banking_Pro.Core.Application.DTOs.CreditCards;
+using ArtemisBankingPro.Core.Domain.Common.Constants;
 using ArtemisBankingPro.Core.Domain.Common.Pagination;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 
@@ -18,8 +19,9 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.CreditCards
         Task<ValidationResult<ClientsForCreditCardAssignmentDto>> GetCustomersForAssignmentAsync(
             string? idCard);
 
+        //pageSize es opcional porque la Web App siempre usa el máximo; la Web API lo expone
         Task<ValidationResult<PagedResult<CardConsumptionDto>>> GetPagedConsumptionsAsync(
-            int creditCardId, int page);
+            int creditCardId, int page, int pageSize = DomainConstants.DefaultPageSize);
 
         Task<ValidationResult<EditCardLimitDto>> GetCreditCardForEditLimitAsync(int creditCardId);
 
