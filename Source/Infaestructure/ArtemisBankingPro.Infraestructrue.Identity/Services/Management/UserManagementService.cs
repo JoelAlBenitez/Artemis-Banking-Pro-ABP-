@@ -1,4 +1,5 @@
 using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Session;
 using ArtemisBankingPro.Core.Application.DTOs.Common;
 using ArtemisBankingPro.Core.Application.DTOs.Users;
 using ArtemisBankingPro.Core.Domain.Common.Constants;
@@ -26,6 +27,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
         private readonly ILogger<UserManagementService> _logger;
         private readonly ISavingsAccountsRepository _savingsAccountsRepository;
         private readonly ITransactionRepository _transactionRepository;
+        private readonly ICurrentUserService _currentUserService;
 
         public UserManagementService(
             UserManager<ApplicationUser> userManager,
@@ -33,7 +35,8 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
             IMapper mapper,
             ILogger<UserManagementService> logger,
             ISavingsAccountsRepository savingsAccountsRepository,
-            ITransactionRepository transactionRepository)
+            ITransactionRepository transactionRepository,
+            ICurrentUserService currentUserService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -41,6 +44,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
             _logger = logger;
             _savingsAccountsRepository = savingsAccountsRepository;
             _transactionRepository = transactionRepository;
+            _currentUserService = currentUserService;
         }
 
         // 1
@@ -108,22 +112,22 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
         }
 
         // 5
-        public async Task<UserOperationResponseDto> ToggleUserAsync(string userId, string currentUserId)
+        public async Task<UserOperationResponseDto> ToggleUserAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 return NotFoundResponse();
 
-            return await ApplyStatusAsync(user, !user.IsActive, currentUserId);
+            return await ApplyStatusAsync(user, !user.IsActive);
         }
 
-        public async Task<UserOperationResponseDto> SetUserStatusAsync(string userId, bool status, string currentUserId)
+        public async Task<UserOperationResponseDto> SetUserStatusAsync(string userId, bool status)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 return NotFoundResponse();
 
-            return await ApplyStatusAsync(user, status, currentUserId);
+            return await ApplyStatusAsync(user, status);
         }
 
         // 6
@@ -142,6 +146,32 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
                 dto.TypeUser = roleEnum;
 
             return dto;
+        }
+
+        //Carga de la pantalla de edición: las mismas reglas que rechazan el guardado deciden
+        //también si la pantalla llega a pintarse.
+        public async Task<UserEditResponseDto> GetUserForEditAsync(string userId)
+        {
+            if (IsCurrentUser(userId))
+            {
+                _logger.LogWarning("Intento de editar la propia cuenta: {UserId}", userId);
+                return new UserEditResponseDto
+                {
+                    HasError = true,
+                    Error = "No puede editar su propia cuenta desde este módulo."
+                };
+            }
+
+            var user = await GetUserByIdAsync(userId);
+            if (user == null)
+                return new UserEditResponseDto
+                {
+                    HasError = true,
+                    NotFound = true,
+                    Error = "El usuario seleccionado no existe."
+                };
+
+            return new UserEditResponseDto { User = user };
         }
 
         // 7
@@ -227,6 +257,13 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
         {
             _logger.LogInformation("Actualizando los datos del usuario con Id: {UserId}", id);
             var response = new UserOperationResponseDto();
+
+            //El administrador autenticado no puede editar su propia cuenta desde este módulo
+            if (IsCurrentUser(id))
+            {
+                _logger.LogWarning("Intento de editar la propia cuenta: {UserId}", id);
+                return Failure("No puede editar su propia cuenta desde este módulo.");
+            }
 
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
@@ -371,10 +408,10 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
             return dto;
         }
 
-        private async Task<UserOperationResponseDto> ApplyStatusAsync(ApplicationUser user, bool status, string currentUserId)
+        private async Task<UserOperationResponseDto> ApplyStatusAsync(ApplicationUser user, bool status)
         {
             //El administrador autenticado no puede modificar el estado de su propia cuenta
-            if (user.Id == currentUserId)
+            if (IsCurrentUser(user.Id))
             {
                 _logger.LogWarning("Intento de modificar el estado de la propia cuenta: {UserId}", user.Id);
                 return Failure("No puede modificar el estado de su propia cuenta.");
@@ -411,6 +448,14 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
                 return new UserExistenceDto { Exists = false, IsActive = false };
 
             return new UserExistenceDto { Exists = true, IsActive = user.IsActive };
+        }
+
+        //Sin sesión no hay cuenta propia que proteger: las reglas del mantenimiento no aplican
+        private bool IsCurrentUser(string userId)
+        {
+            var currentUserId = _currentUserService.UserId;
+            return !string.IsNullOrWhiteSpace(currentUserId)
+                && string.Equals(userId, currentUserId, StringComparison.Ordinal);
         }
 
         private static UserOperationResponseDto Failure(string error)

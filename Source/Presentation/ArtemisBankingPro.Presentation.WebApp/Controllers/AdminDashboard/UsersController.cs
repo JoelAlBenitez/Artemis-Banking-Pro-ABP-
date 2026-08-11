@@ -1,70 +1,64 @@
+using Artemis_Banking_Pro.Core.Application.ViewModels.Users;
 using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Application.Contracts.Users.Registration;
 using ArtemisBankingPro.Core.Application.DTOs.Account;
+using ArtemisBankingPro.Core.Application.DTOs.Common;
 using ArtemisBankingPro.Core.Application.DTOs.Users;
-using ArtemisBankingPro.Core.Domain.Common.Enum;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace ArtemisBankingPro.Presentation.WebApp.Controllers.AdminDashboard
 {
+   
     [Authorize(Roles = "Administrador")]
-    public class UsersController : Controller
+    public sealed class UsersController : Controller
     {
         private readonly IUserManagementService _userManagementService;
         private readonly IAccountRegistrationService _accountRegistrationService;
+        private readonly IMapper _mapper;
         private readonly ILogger<UsersController> _logger;
 
         public UsersController(
             IUserManagementService userManagementService,
             IAccountRegistrationService accountRegistrationService,
+            IMapper mapper,
             ILogger<UsersController> logger)
         {
             _userManagementService = userManagementService;
             _accountRegistrationService = accountRegistrationService;
+            _mapper = mapper;
             _logger = logger;
         }
 
+        #region listado
+        //Listado principal: carga inicial, paginación y regreso desde las demás pantallas.
         [HttpGet]
-        public async Task<IActionResult> Index(Roles? role = null, StatusFilter status = StatusFilter.Todos, int page = 1)
-        {
-            const int pageSize = 20;
-            
-            ViewBag.CurrentRole = role;
-            ViewBag.CurrentStatus = status;
-            ViewBag.Roles = await _userManagementService.GetRolesAsync();
+        public async Task<IActionResult> Index(UsersFilterViewModel filter)
+            => await ListUsersAsync(filter);
 
-            if (role.HasValue)
-            {
-                var pagedUsersByRole = await _userManagementService.GetUsersByRoleAsync(role.Value, page, pageSize);
-                return View(pagedUsersByRole);
-            }
+        //Formulario de filtros por tipo de usuario y estado.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName(nameof(Index))]
+        public async Task<IActionResult> IndexFilter(UsersFilterViewModel filter)
+            => await ListUsersAsync(filter);
+        #endregion
 
-            var pagedUsers = await _userManagementService.GetUsersAsync(page, pageSize, status);
-            return View(pagedUsers);
-        }
-
+        #region crear usuario
         [HttpGet]
         public async Task<IActionResult> Create()
-        {
-            ViewBag.Roles = await _userManagementService.GetRolesAsync();
-            return View();
-        }
+            => View(await BuildCreateFormAsync(EmptyCreateForm()));
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(RegisterRequest request)
+        public async Task<IActionResult> Create(SaveUserViewModel vm)
         {
             if (!ModelState.IsValid)
-            {
-                ViewBag.Roles = await _userManagementService.GetRolesAsync();
-                return View(request);
-            }
+                return View(await BuildCreateFormAsync(vm));
 
-            // El origen es necesario para el enlace de activacion de la WebApp
+            var request = _mapper.Map<RegisterRequest>(vm);
+            //El origen es necesario para el enlace de activacion de la WebApp
             request.Origin = $"{Request.Scheme}://{Request.Host.Value}";
 
             var response = await _accountRegistrationService.RegisterUserAsync(request);
@@ -72,96 +66,58 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.AdminDashboard
             if (response.HasError)
             {
                 ModelState.AddModelError(string.Empty, response.Error ?? "Ha ocurrido un error al registrar el usuario.");
-                ViewBag.Roles = await _userManagementService.GetRolesAsync();
-                return View(request);
+                return View(await BuildCreateFormAsync(vm));
             }
 
             TempData["SuccessMessage"] = "Usuario creado exitosamente. Se ha enviado un correo de activación.";
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
+        #region editar usuario
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
-            var user = await _userManagementService.GetUserByIdAsync(id);
-            if (user == null)
+            //El servicio decide si el usuario puede editarse: existencia, rol y cuenta propia
+            var response = await _userManagementService.GetUserForEditAsync(id);
+
+            if (response.HasError)
             {
-                TempData["ErrorMessage"] = "El usuario seleccionado no existe.";
+                _logger.LogWarning("No fue posible cargar la edicion del usuario con Id {UserId}", id);
+                TempData["ErrorMessage"] = response.Error;
                 return RedirectToAction(nameof(Index));
             }
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (user.Id == currentUserId)
-            {
-                TempData["ErrorMessage"] = "No puede editar su propia cuenta desde este módulo.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            var editUserDto = new EditUserDto
-            {
-                Id = user.Id ?? string.Empty,
-                Name = user.Name,
-                LastName = user.LastName,
-                IDCARD = user.IDCARD,
-                Email = user.Email,
-                UserName = user.UserName,
-                AdditionalAmount = 0
-            };
-
-            ViewBag.IsClient = user.IsClient;
-            return View(editUserDto);
+            return View(_mapper.Map<EditUserViewModel>(response.User!));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, EditUserDto dto)
+        public async Task<IActionResult> Edit(EditUserViewModel vm)
         {
-            if (id != dto.Id)
-            {
-                return BadRequest();
-            }
-
             if (!ModelState.IsValid)
-            {
-                var user = await _userManagementService.GetUserByIdAsync(id);
-                ViewBag.IsClient = user?.IsClient ?? false;
-                return View(dto);
-            }
+                return View(await RestoreClientFlagAsync(vm));
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (id == currentUserId)
-            {
-                TempData["ErrorMessage"] = "No puede editar su propia cuenta desde este módulo.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            var response = await _userManagementService.UpdateUserAsync(id, dto);
+            var response = await _userManagementService.UpdateUserAsync(vm.Id!, _mapper.Map<EditUserDto>(vm));
 
             if (response.HasError)
             {
                 ModelState.AddModelError(string.Empty, response.Error ?? "Ha ocurrido un error al actualizar el usuario.");
-                var user = await _userManagementService.GetUserByIdAsync(id);
-                ViewBag.IsClient = user?.IsClient ?? false;
-                return View(dto);
+                return View(await RestoreClientFlagAsync(vm));
             }
 
             TempData["SuccessMessage"] = "Usuario actualizado exitosamente.";
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
+        #region activar / inactivar usuario
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleStatus(string id)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
-
-            if (id == currentUserId)
-            {
-                TempData["ErrorMessage"] = "No puede modificar el estado de su propia cuenta.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            var response = await _userManagementService.ToggleUserAsync(id, currentUserId);
+            //La cuenta propia la rechaza el servicio: aquí no se conoce al usuario autenticado
+            var response = await _userManagementService.ToggleUserAsync(id);
 
             if (response.HasError)
             {
@@ -174,5 +130,77 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.AdminDashboard
 
             return RedirectToAction(nameof(Index));
         }
+        #endregion
+
+        #region private methods
+        //Comparten el mismo armado de pantalla la carga inicial y el envío del filtro.
+        private async Task<IActionResult> ListUsersAsync(UsersFilterViewModel filter)
+        {
+            var roles = await _userManagementService.GetRolesAsync();
+
+            if (!ModelState.IsValid)
+                return View(nameof(Index), BuildList(filter, roles, EmptyPage(filter)));
+
+            //El tamaño de página lo fija el filtro: el servicio vuelve a acotarlo al máximo
+            var paged = filter.Role.HasValue
+                ? await _userManagementService.GetUsersByRoleAsync(
+                    filter.Role.Value, filter.Page, filter.PageSize)
+                : await _userManagementService.GetUsersAsync(
+                    filter.Page, filter.PageSize, filter.Status);
+
+            return View(nameof(Index), BuildList(filter, roles, paged));
+        }
+
+        private UsersListViewModel BuildList(
+            UsersFilterViewModel filter, List<string> roles, PagedResponseDto<UserDto> paged)
+            => new()
+            {
+                Filter = filter,
+                AvailableRoles = roles,
+                Users = _mapper.Map<IReadOnlyCollection<UserViewModel>>(paged.Items),
+                Page = paged.Page,
+                PageSize = paged.PageSize,
+                TotalRecords = paged.TotalCount,
+                TotalPages = paged.TotalPages
+            };
+
+        //El combo de tipos de usuario se repuebla en cada carga del formulario de creación
+        private async Task<SaveUserViewModel> BuildCreateFormAsync(SaveUserViewModel vm)
+        {
+            vm.AvailableRoles = await _userManagementService.GetRolesAsync();
+            return vm;
+        }
+
+        //El indicador de cliente no viaja en el formulario: decide si se pide monto adicional
+        private async Task<EditUserViewModel> RestoreClientFlagAsync(EditUserViewModel vm)
+        {
+            var user = await _userManagementService.GetUserByIdAsync(vm.Id ?? string.Empty);
+            vm.IsClient = user?.IsClient ?? false;
+            return vm;
+        }
+
+        private static SaveUserViewModel EmptyCreateForm()
+            => new()
+            {
+                FirstName = string.Empty,
+                LastName = string.Empty,
+                IDCARD = string.Empty,
+                Email = string.Empty,
+                UserName = string.Empty,
+                Password = string.Empty,
+                ConfirmPassword = string.Empty,
+                Role = string.Empty
+            };
+
+        //Con un filtro invalido la pantalla se repinta vacía, nunca sin listado
+        private static PagedResponseDto<UserDto> EmptyPage(UsersFilterViewModel filter)
+            => new()
+            {
+                Items = new List<UserDto>(),
+                TotalCount = 0,
+                Page = filter.Page < 1 ? 1 : filter.Page,
+                PageSize = filter.PageSize
+            };
+        #endregion
     }
 }

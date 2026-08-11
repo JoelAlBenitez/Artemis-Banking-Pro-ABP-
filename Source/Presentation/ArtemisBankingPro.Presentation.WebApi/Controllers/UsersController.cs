@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ArtemisBankingPro.Presentation.WebApi.Controllers
@@ -155,8 +154,8 @@ namespace ArtemisBankingPro.Presentation.WebApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
-            var response = await _userManagementService.SetUserStatusAsync(id, request.Status, currentUserId);
+            //La cuenta propia la rechaza el servicio: aquí no se lee el claim del autenticado
+            var response = await _userManagementService.SetUserStatusAsync(id, request.Status);
 
             if (!response.HasError) return NoContent();
             if (response.NotFound) return NotFound(new { error = response.Error });

@@ -22,6 +22,7 @@ namespace ArtemisBankingPro.Integration.Tests.Identity
         private readonly IdentityTestHost _host;
         private readonly Mock<ISavingsAccountsRepository> _savingsAccountsRepository;
         private readonly Mock<ITransactionRepository> _transactionRepository;
+        private readonly Mock<ICurrentUserService> _currentUserService;
         private readonly UserManagementService _service;
 
         public UserManagementServiceTests()
@@ -29,6 +30,7 @@ namespace ArtemisBankingPro.Integration.Tests.Identity
             _host = new IdentityTestHost();
             _savingsAccountsRepository = new Mock<ISavingsAccountsRepository>();
             _transactionRepository = new Mock<ITransactionRepository>();
+            _currentUserService = new Mock<ICurrentUserService>();
 
             _service = new UserManagementService(
                 _host.UserManager,
@@ -36,8 +38,13 @@ namespace ArtemisBankingPro.Integration.Tests.Identity
                 _host.Mapper,
                 NullLogger<UserManagementService>.Instance,
                 _savingsAccountsRepository.Object,
-                _transactionRepository.Object);
+                _transactionRepository.Object,
+                _currentUserService.Object);
         }
+
+        //Las reglas de la cuenta propia dependen del usuario autenticado: sin sesión no aplican
+        private void GivenAuthenticatedUser(string userId)
+            => _currentUserService.Setup(s => s.UserId).Returns(userId);
 
         // ─── Listados ────────────────────────────────────────────────────────
 
