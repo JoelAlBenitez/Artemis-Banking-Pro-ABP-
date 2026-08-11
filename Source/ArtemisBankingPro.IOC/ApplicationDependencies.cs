@@ -13,6 +13,8 @@ using Artemis_Banking_Pro.Core.Application.Services.Loans.LoansValidate;
 using Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts;
 using Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts.SavingsAccountsValidate;
 using Artemis_Banking_Pro.Core.Application.Behaviors;
+using Artemis_Banking_Pro.Core.Application.Contracts.Commerces;
+using Artemis_Banking_Pro.Core.Application.Services.Commerces;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -115,6 +117,11 @@ namespace ArtemisBankingPro.IOC
 
             services.AddScoped<IBeneficiaryServices, BeneficiaryServices>();
             services.AddScoped<IBeneficiaryValidationServices, BeneficiaryValidationServices>();
+            #endregion
+
+            #region commerces y Hermes Pay
+            services.AddScoped<ICommerceAccessService, CommerceAccessService>();
+            services.AddScoped<IHermesPayServices, HermesPayServices>();
             #endregion
 
             #region cash advances
