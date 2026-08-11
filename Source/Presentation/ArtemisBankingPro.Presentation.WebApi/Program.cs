@@ -23,8 +23,7 @@ try
 
 
     builder.Services.AddControllers();
-    // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-    builder.Services.AddOpenApi();
+    builder.Services.AddSwaggerDocumentation();
 
     var app = builder.Build();
 
@@ -37,8 +36,7 @@ try
 
     if (app.Environment.IsDevelopment())
     {
-        app.MapOpenApi().AllowAnonymous();
-        app.MapOpenApi();
+        app.UseSwaggerDocumentation();
     }
 
     app.UseHttpsRedirection();

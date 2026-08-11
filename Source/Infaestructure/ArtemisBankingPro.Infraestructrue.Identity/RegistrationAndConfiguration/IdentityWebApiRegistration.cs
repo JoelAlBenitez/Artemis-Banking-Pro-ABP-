@@ -22,6 +22,12 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguratio
 {
     public static class IdentityWebApiRegistration
     {
+        //Mensajes exigidos por el documento funcional para los rechazos de seguridad
+        private const string UnauthorizedTitle = "No autenticado";
+        private const string UnauthorizedDetail = "No tiene autorización para acceder a este recurso.";
+        private const string ForbiddenTitle = "Acceso denegado";
+        private const string ForbiddenDetail = "Acceso denegado. No tiene permisos para utilizar este recurso.";
+
         public static void AddWebApiIdentity(this IServiceCollection services, IConfiguration configuration)
         {
             GeneralConfiguration.AddGeneralConfiguration(services, configuration);
@@ -108,43 +114,26 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguratio
                         Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"] ?? ""))
                 };
 
+                //401 y 403 no pasan por el Global Exception Handler: los emite el propio
+                //esquema. Se responden con la misma forma Problem Details que el resto de
+                //errores de la API para que el consumidor no tenga que distinguir dos formatos.
                 opt.Events = new JwtBearerEvents
                 {
                     OnAuthenticationFailed = context =>
                     {
                         context.NoResult();
-                        context.Response.StatusCode = 401;
-                        context.Response.ContentType = "application/json";
-                        var result = JsonSerializer.Serialize(new
-                        {
-                            HasError = true,
-                            Error = "No tiene autorización para acceder a este recurso."
-                        });
-                        return context.Response.WriteAsync(result);
+                        return WriteProblemDetailsAsync(context.Response, 401,
+                            UnauthorizedTitle, UnauthorizedDetail);
                     },
                     OnChallenge = context =>
                     {
                         context.HandleResponse();
-                        context.Response.StatusCode = 401;
-                        context.Response.ContentType = "application/json";
-                        var result = JsonSerializer.Serialize(new
-                        {
-                            HasError = true,
-                            Error = "No tiene autorización para acceder a este recurso."
-                        });
-                        return context.Response.WriteAsync(result);
+                        return WriteProblemDetailsAsync(context.Response, 401,
+                            UnauthorizedTitle, UnauthorizedDetail);
                     },
                     OnForbidden = context =>
-                    {
-                        context.Response.StatusCode = 403;
-                        context.Response.ContentType = "application/json";
-                        var result = JsonSerializer.Serialize(new
-                        {
-                            HasError = true,
-                            Error = "Acceso denegado. No tiene permisos para utilizar este recurso."
-                        });
-                        return context.Response.WriteAsync(result);
-                    }
+                        WriteProblemDetailsAsync(context.Response, 403,
+                            ForbiddenTitle, ForbiddenDetail)
                 };
             })
             .AddCookie(IdentityConstants.ApplicationScheme, opt =>
@@ -168,6 +157,23 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguratio
             services.AddScoped<ISecurityStampValidator, SecurityStampValidator<ApplicationUser>>();
 
             #endregion
+        }
+
+        private static Task WriteProblemDetailsAsync(HttpResponse response, int statusCode,
+                                                     string title, string detail)
+        {
+            response.StatusCode = statusCode;
+            response.ContentType = "application/problem+json";
+
+            var problemDetails = JsonSerializer.Serialize(new
+            {
+                title,
+                status = statusCode,
+                detail,
+                instance = response.HttpContext.Request.Path.Value
+            });
+
+            return response.WriteAsync(problemDetails);
         }
     }
 }

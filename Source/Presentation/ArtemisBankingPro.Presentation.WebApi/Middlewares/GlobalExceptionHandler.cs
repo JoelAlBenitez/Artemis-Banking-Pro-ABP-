@@ -59,6 +59,8 @@ namespace ArtemisBankingPro.Presentation.WebApi.Middlewares
             //Una regla de negocio incumplida es una solicitud inválida: el documento reserva
             //el 409 para los choques de estado, que viajan en ConflictException.
             BusinessRuleException => StatusCodes.Status400BadRequest,
+            UnauthorizedException => StatusCodes.Status401Unauthorized,
+            ForbiddenException => StatusCodes.Status403Forbidden,
             NotFoundException => StatusCodes.Status404NotFound,
             ConflictException => StatusCodes.Status409Conflict,
             _ => StatusCodes.Status500InternalServerError
@@ -85,6 +87,8 @@ namespace ArtemisBankingPro.Presentation.WebApi.Middlewares
         private static string GetTitle(int statusCode) => statusCode switch
         {
             StatusCodes.Status400BadRequest => "Solicitud inválida",
+            StatusCodes.Status401Unauthorized => "No autenticado",
+            StatusCodes.Status403Forbidden => "Acceso denegado",
             StatusCodes.Status404NotFound => "Recurso no encontrado",
             StatusCodes.Status409Conflict => "Conflicto de negocio",
             _ => "Error interno del servidor"
