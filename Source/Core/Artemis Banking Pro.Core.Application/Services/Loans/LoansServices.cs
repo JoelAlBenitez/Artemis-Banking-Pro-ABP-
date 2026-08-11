@@ -119,7 +119,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             {
                 _logger.LogInformation("Recuperando los detalles del prestamo con el ID {ID}", loanId);
 
-                //Sin las cuotas la tabla de amortización del detalle saldría vacía
                 var loan = await _loansRepository.GetFirstAsync(x => x.Id == loanId, x => x.loanInstallments);
 
                 if (loan is null)

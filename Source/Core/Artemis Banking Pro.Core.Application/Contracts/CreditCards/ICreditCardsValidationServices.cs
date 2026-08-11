@@ -6,7 +6,13 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.CreditCards
 {
     public interface ICreditCardsValidationServices
     {
+        ValidationResult<string> ValidateAdministratorInSession();
+
+        Task<ValidationResult> ValidateCustomerSelectionAsync(string customerId);
+
         Task<ValidationResult> ValidateAssignmentAsync(CreditCardAssignmentDto dto);
+
+        Task<ValidationResult<string?>> ValidateCustomerCardsQueryAsync(CreditCardFilterDto filter);
 
         Task<ValidationResult<CreditCard>> ValidateActiveCreditCardAsync(int creditCardId);
 
