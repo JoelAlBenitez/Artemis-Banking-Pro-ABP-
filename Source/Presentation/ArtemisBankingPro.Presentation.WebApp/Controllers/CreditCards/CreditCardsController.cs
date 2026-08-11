@@ -69,6 +69,30 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.CreditCards
         #endregion
 
         #region asignar tarjeta
+        //Paso 1: monto promedio de deuda, listado de clientes activos y búsqueda por cédula.
+        [HttpGet]
+        public async Task<IActionResult> Assign(string? idCard = null)
+        {
+            var result = await _creditCardsServices.GetCustomersForAssignmentAsync(idCard);
+
+            if (!result.IsValid)
+            {
+                AddErrors(result);
+
+                return View(new ClientsForCreditCardAssignmentViewModel
+                {
+                    AverageDebt = 0m,
+                    Clients = Array.Empty<ClientCreditCardViewModel>(),
+                    IdCard = idCard
+                });
+            }
+
+            var vm = _mapper.Map<ClientsForCreditCardAssignmentViewModel>(result.Value!);
+            vm.IdCard = idCard;
+
+            return View(vm);
+        }
+
         //Paso 1: llega el cliente elegido en el formulario de selección y se muestra el paso 2.
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -77,7 +101,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.CreditCards
             if (string.IsNullOrWhiteSpace(customerId))
             {
                 _logger.LogWarning("Intento de asignacion de tarjeta de credito sin cliente seleccionado");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Assign));
             }
 
             return View("Create", new CreditCardAssignmentViewModel
@@ -102,9 +126,6 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.CreditCards
                 AddErrors(result);
                 return View(vm);
             }
-
-            //El correo de asignación se envía desde el servicio cuando Identity exponga el
-            //nombre y el correo del cliente; su fallo no revierte la tarjeta creada.
 
             return RedirectToAction(nameof(Index));
         }
@@ -141,9 +162,6 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.CreditCards
                 AddErrors(result);
                 return View(vm);
             }
-
-            //El correo de modificación de límite se envía desde el servicio cuando Identity
-            //exponga el nombre y el correo del cliente; su fallo no revierte el nuevo límite.
 
             return RedirectToAction(nameof(Index));
         }
@@ -200,15 +218,9 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.CreditCards
                     BuildList(filter, PagedResult<CreditCardDto>.Empty(1, DomainConstants.DefaultPageSize)));
             }
 
-            //La cédula del filtro identifica al cliente dentro del project Identity. Mientras el
-            //servicio de consulta de usuarios no esté disponible, el listado no puede traducirla
-            //y la búsqueda por cédula queda sin efecto.
-            //var customer = await _userServices.GetCustomerByIdCardAsync(filter.IdCard);
-            //if (customer is null) -> CreditCardError.NonExistsCustomerByIdCard
-            string? customerId = null;
-
+            //La cédula del filtro la traduce el servicio al Id del cliente en Identity
             var result = await _creditCardsServices.GetPagedCreditCardsAsync(
-                _mapper.Map<CreditCardFilterDto>(filter), customerId);
+                _mapper.Map<CreditCardFilterDto>(filter));
 
             if (!result.IsValid)
             {
