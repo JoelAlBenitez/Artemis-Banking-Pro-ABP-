@@ -115,10 +115,14 @@ namespace Artemis_Banking_Pro.Core.Application.Services.CreditCards
         {
             var result = await base.GetByIdAsync(creditCardId);
 
-            if (result.IsValid)
+            //El servicio genérico no conoce la entidad y responde con el error de registro
+            //inexistente. La API expone el mensaje del módulo, no el genérico.
+            if (!result.IsValid)
             {
-                await FillCustomerDataAsync(new[] { result.Value! });
+                return ValidationResult<CreditCardDto>.Failure(CreditCardError.NonExistsCreditCard);
             }
+
+            await FillCustomerDataAsync(new[] { result.Value! });
 
             return result;
         }
