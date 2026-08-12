@@ -38,21 +38,6 @@ namespace ArtemisBankingPro.IOC
         {
             services.AddAutoMapper(configuration => { }, Assembly.GetAssembly(typeof(ICreditCardsServices))!);
 
-            #region CQRS
-            //Commands, Queries, handlers y validadores viven todos en la capa de aplicación:
-            //un solo assembly alimenta el registro de los tres.
-            var applicationAssembly = Assembly.GetAssembly(typeof(ValidationBehavior<,>))!;
-
-            services.AddMediatR(configuration =>
-            {
-                configuration.RegisterServicesFromAssembly(applicationAssembly);
-                configuration.AddOpenBehavior(typeof(ValidationBehavior<,>));
-            });
-
-            services.AddValidatorsFromAssembly(applicationAssembly);
-            #endregion
-
-
 
             #region Mappings
             services.AddAutoMapper(configuration =>

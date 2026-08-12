@@ -17,6 +17,7 @@ try
 
     // Add services to the container.
     builder.Services.AddApplicationDependecies();
+    builder.Services.AddApiCqrsDependencies();
     builder.Services.AddInfraestructurePersistence(builder.Configuration);
     builder.Services.AddInfraestructureDependencies(builder.Configuration);
     builder.Services.AddWebApiIdentity(builder.Configuration);
@@ -37,6 +38,12 @@ try
     if (app.Environment.IsDevelopment())
     {
         app.UseSwaggerDocumentation();
+
+        //La raíz no es un endpoint de la API: sin esto la política de autorización por defecto
+        //la responde con 401 y parece que la API está caída.
+        app.MapGet("/", () => Results.Redirect("/swagger"))
+           .AllowAnonymous()
+           .ExcludeFromDescription();
     }
 
     app.UseHttpsRedirection();
