@@ -81,7 +81,7 @@ namespace Artemis_Banking_Pro.Core.Application.Features.Loans.Commands.CreateLoa
                     HighRisk = new HighRiskConflictDto
                     {
                         Message = evaluation.Message,
-                        RiskType = evaluation.RiskType.ToString(),
+                        RiskType = ToDocumentRiskType(evaluation.RiskType),
                         CurrentDebt = evaluation.CurrentDebt,
                         ProjectedDebt = evaluation.ProjectedDebt,
                         AverageDebt = evaluation.AverageDebt
@@ -94,6 +94,15 @@ namespace Artemis_Banking_Pro.Core.Application.Features.Loans.Commands.CreateLoa
 
             return new LoanAssignmentResultDto { Loan = await BuildCreatedLoanAsync(command.ClientId) };
         }
+
+        //El documento fija el valor de riskType en la respuesta 409; el nombre del enum del
+        //dominio está en español y no puede viajar tal cual.
+        private static string ToDocumentRiskType(LoanRiskType riskType) => riskType switch
+        {
+            LoanRiskType.DeudaActual => "CurrentHighRisk",
+            LoanRiskType.DeudaProyectada => "ProjectedHighRisk",
+            _ => riskType.ToString()
+        };
 
         //CreateAsync confirma la asignación pero no devuelve el préstamo: se recupera el activo
         //del cliente para responder el 201 con su cuota mensual y su total a pagar.

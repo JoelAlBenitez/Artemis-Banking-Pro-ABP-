@@ -48,6 +48,8 @@ namespace Artemis_Banking_Pro.Core.Application.DTOs.Loans
         public int InstallmentNumber { get; set; }
         public DateTimeOffset DueDate { get; set; }
         public decimal InstallmentAmount { get; set; }
+        public decimal InterestAmount { get; set; }
+        public decimal CapitalAmount { get; set; }
         public decimal PendingInstallmentAmount { get; set; }
         public required string PaymentStatus { get; set; }
         public bool IsLate { get; set; }
