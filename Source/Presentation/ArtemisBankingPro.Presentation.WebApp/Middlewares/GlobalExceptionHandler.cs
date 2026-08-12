@@ -56,8 +56,9 @@ namespace ArtemisBankingPro.Presentation.WebApp.Middlewares
         public static int GetStatusCode(Exception exception) => exception switch
         {
             ValidationException => StatusCodes.Status400BadRequest,
+            BusinessRuleException => StatusCodes.Status400BadRequest,
             NotFoundException => StatusCodes.Status404NotFound,
-            BusinessRuleException => StatusCodes.Status409Conflict,
+            ConflictException => StatusCodes.Status409Conflict,
             _ => StatusCodes.Status500InternalServerError
         };
 

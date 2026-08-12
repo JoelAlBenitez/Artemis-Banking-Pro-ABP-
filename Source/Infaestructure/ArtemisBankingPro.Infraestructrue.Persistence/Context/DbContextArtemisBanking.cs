@@ -4,6 +4,7 @@ using ArtemisBankingPro.Core.Domain.Entities.Loans;
 using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Entities.Transactions;
 using ArtemisBankingPro.Core.Domain.Entities.Beneficiaries;
+using ArtemisBankingPro.Core.Domain.Entities.Commerces;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -32,6 +33,10 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Context
 
         // Beneficiarios
         public DbSet<Beneficiary> Beneficiaries { get; set; }
+
+        //Comercios y procesador de pagos Hermes Pay
+        public DbSet<Commerce> Commerces { get; set; }
+        public DbSet<CommercePayment> CommercePayments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

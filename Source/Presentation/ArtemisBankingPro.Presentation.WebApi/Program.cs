@@ -17,14 +17,14 @@ try
 
     // Add services to the container.
     builder.Services.AddApplicationDependecies();
+    builder.Services.AddApiCqrsDependencies();
     builder.Services.AddInfraestructurePersistence(builder.Configuration);
     builder.Services.AddInfraestructureDependencies(builder.Configuration);
     builder.Services.AddWebApiIdentity(builder.Configuration);
 
 
     builder.Services.AddControllers();
-    // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-    builder.Services.AddOpenApi();
+    builder.Services.AddSwaggerDocumentation();
 
     var app = builder.Build();
 
@@ -37,8 +37,13 @@ try
 
     if (app.Environment.IsDevelopment())
     {
-        app.MapOpenApi().AllowAnonymous();
-        app.MapOpenApi();
+        app.UseSwaggerDocumentation();
+
+        //La raíz no es un endpoint de la API: sin esto la política de autorización por defecto
+        //la responde con 401 y parece que la API está caída.
+        app.MapGet("/", () => Results.Redirect("/swagger"))
+           .AllowAnonymous()
+           .ExcludeFromDescription();
     }
 
     app.UseHttpsRedirection();

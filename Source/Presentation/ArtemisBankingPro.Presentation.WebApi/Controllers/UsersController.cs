@@ -1,188 +1,127 @@
-using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Registration;
-using ArtemisBankingPro.Core.Application.DTOs.Account;
+using Artemis_Banking_Pro.Core.Application.Features.Users.Commands.ChangeUserStatus;
+using Artemis_Banking_Pro.Core.Application.Features.Users.Commands.CreateCommerceUser;
+using Artemis_Banking_Pro.Core.Application.Features.Users.Commands.CreateUser;
+using Artemis_Banking_Pro.Core.Application.Features.Users.Commands.UpdateUser;
+using Artemis_Banking_Pro.Core.Application.Features.Users.Queries.GetAllUsers;
+using Artemis_Banking_Pro.Core.Application.Features.Users.Queries.GetCommerceUsers;
+using Artemis_Banking_Pro.Core.Application.Features.Users.Queries.GetUserById;
+using ArtemisBankingPro.Core.Application.DTOs.Common;
 using ArtemisBankingPro.Core.Application.DTOs.Users;
-using ArtemisBankingPro.Core.Domain.Common.Constants;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace ArtemisBankingPro.Presentation.WebApi.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("api/users")]
     [Authorize(Roles = nameof(Roles.Administrador))]
-    public class UsersController : ControllerBase
+    [SwaggerTag("Administración de los usuarios registrados en el sistema")]
+    public class UsersController : BaseApiController
     {
-        private readonly IUserManagementService _userManagementService;
-        private readonly IAccountRegistrationService _accountRegistrationService;
-
-        public UsersController(
-            IUserManagementService userManagementService,
-            IAccountRegistrationService accountRegistrationService)
-        {
-            _userManagementService = userManagementService;
-            _accountRegistrationService = accountRegistrationService;
-        }
-
-        // GET /api/users
         [HttpGet]
-        public async Task<IActionResult> GetUsers(
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = DomainConstants.DefaultPageSize,
-            [FromQuery] string? role = null)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedApiResponse<UserListItemDto>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [SwaggerOperation(
+            Summary = "Obtener listado de usuarios",
+            Description = "Listado paginado de usuarios excluyendo el rol Comercio, del más reciente al más antiguo")]
+        public async Task<IActionResult> Get([FromQuery] GetAllUsersQuery query)
         {
-            var paginationError = ValidatePagination(page, pageSize);
-            if (paginationError != null) return paginationError;
-
-            if (string.IsNullOrWhiteSpace(role))
-                return Ok(await _userManagementService.GetUsersAsync(page, pageSize, StatusFilter.Todos));
-
-            //Solo se admiten los tres roles de la aplicación web: Comercio tiene su propio endpoint
-            if (!Enum.TryParse<Roles>(role, true, out var roleEnum) || roleEnum == Roles.Comercio)
-                return BadRequest(new { error = "El tipo de usuario solo puede ser Administrador, Cajero o Cliente." });
-
-            return Ok(await _userManagementService.GetUsersByRoleAsync(roleEnum, page, pageSize));
+            return Ok(await Mediator.Send(query));
         }
 
-        // GET /api/users/commerce
         [HttpGet("commerce")]
-        public async Task<IActionResult> GetCommerceUsers(
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = DomainConstants.DefaultPageSize)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedApiResponse<CommerceUserListItemDto>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [SwaggerOperation(
+            Summary = "Obtener listado de usuarios con rol Comercio",
+            Description = "Listado paginado que retorna únicamente usuarios asociados a comercios")]
+        public async Task<IActionResult> GetCommerceUsers([FromQuery] GetCommerceUsersQuery query)
         {
-            var paginationError = ValidatePagination(page, pageSize);
-            if (paginationError != null) return paginationError;
-
-            return Ok(await _userManagementService.GetCommerceUsersAsync(page, pageSize));
+            return Ok(await Mediator.Send(query));
         }
 
-        // GET /api/users/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById(string id)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserApiDetailDto))]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [SwaggerOperation(
+            Summary = "Obtener detalle de usuario",
+            Description = "Información detallada del usuario junto a su cuenta de ahorro principal")]
+        public async Task<IActionResult> GetById(string id)
         {
-            var user = await _userManagementService.GetUserByIdAsync(id);
-            if (user == null)
-                return NotFound(new { error = "El usuario seleccionado no existe." });
-
-            return Ok(user);
+            return Ok(await Mediator.Send(new GetUserByIdQuery { Id = id }));
         }
 
-        // POST /api/users
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] RegisterRequest request)
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserCreatedDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [SwaggerOperation(
+            Summary = "Crear nuevo usuario",
+            Description = "Crea un usuario Administrador, Cajero o Cliente. Queda inactivo y recibe su token de activación por correo")]
+        public async Task<IActionResult> Create([FromBody] CreateUserCommand command)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            //Los usuarios de comercio se crean únicamente desde su endpoint dedicado
-            if (string.Equals(request.Role, nameof(Roles.Comercio), StringComparison.OrdinalIgnoreCase))
-                return BadRequest(new { error = "No se permite crear usuarios de tipo Comercio desde este endpoint." });
-
-            //El correo de la API lleva el token, no un enlace: no se envía origen
-            request.Origin = null;
-
-            var response = await _accountRegistrationService.RegisterUserAsync(request);
-            if (response.HasError)
-                return response.Conflict
-                    ? Conflict(new { error = response.Error })
-                    : BadRequest(new { error = response.Error });
-
-            return CreatedAtAction(nameof(GetUserById), new { id = response.UserId }, new
-            {
-                id = response.UserId,
-                userName = request.UserName,
-                email = request.Email,
-                role = request.Role,
-                isActive = false
-            });
+            var user = await Mediator.Send(command);
+            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
         }
 
-        // POST /api/users/commerce/{commerceId}
         [HttpPost("commerce/{commerceId:int}")]
-        public async Task<IActionResult> CreateCommerceUser(int commerceId, [FromBody] RegisterRequest request)
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CommerceUserCreatedDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [SwaggerOperation(
+            Summary = "Crear nuevo usuario de comercio",
+            Description = "Crea un usuario con rol Comercio y lo asocia al comercio indicado. Cada comercio admite un solo usuario")]
+        public async Task<IActionResult> CreateCommerceUser(
+            int commerceId, [FromBody] CreateCommerceUserCommand command)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            //Pendiente de integración: la validación de existencia del comercio y de que no
-            //tenga otro usuario asociado corresponde al módulo de Gestión de Comercios,
-            //que aún no expone su contrato. Sin él no pueden emitirse los 404 / 409 del documento.
-            request.Role = nameof(Roles.Comercio);
-            request.Origin = null;
-
-            var response = await _accountRegistrationService.RegisterUserAsync(request);
-            if (response.HasError)
-                return response.Conflict
-                    ? Conflict(new { error = response.Error })
-                    : BadRequest(new { error = response.Error });
-
-            return CreatedAtAction(nameof(GetUserById), new { id = response.UserId }, new
-            {
-                id = response.UserId,
-                userName = request.UserName,
-                email = request.Email,
-                role = nameof(Roles.Comercio),
-                commerceId,
-                isActive = false
-            });
+            command.CommerceId = commerceId;
+            var user = await Mediator.Send(command);
+            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
         }
 
-        // PUT /api/users/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(string id, [FromBody] EditUserDto request)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [SwaggerOperation(
+            Summary = "Actualizar usuario",
+            Description = "Modifica los datos del usuario. El rol no puede cambiarse desde este endpoint")]
+        public async Task<IActionResult> Update(string id, [FromBody] UpdateUserCommand command)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var response = await _userManagementService.UpdateUserAsync(id, request);
-            if (!response.HasError) return NoContent();
-
-            if (response.NotFound) return NotFound(new { error = response.Error });
-            if (response.Conflict) return Conflict(new { error = response.Error });
-
-            return BadRequest(new { error = response.Error });
+            command.Id = id;
+            await Mediator.Send(command);
+            return NoContent();
         }
 
-        // PATCH /api/users/{id}/status
         [HttpPatch("{id}/status")]
-        public async Task<IActionResult> ChangeUserStatus(string id, [FromBody] ChangeUserStatusRequest request)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [SwaggerOperation(
+            Summary = "Cambiar estado de usuario",
+            Description = "Activa o inactiva un usuario. El administrador autenticado no puede modificar su propio estado")]
+        public async Task<IActionResult> ChangeStatus(string id, [FromBody] ChangeUserStatusCommand command)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            //La cuenta propia la rechaza el servicio: aquí no se lee el claim del autenticado
-            var response = await _userManagementService.SetUserStatusAsync(id, request.Status);
-
-            if (!response.HasError) return NoContent();
-            if (response.NotFound) return NotFound(new { error = response.Error });
-
-            //El intento de auto-modificación se responde como acceso denegado
-            return StatusCode(StatusCodes.Status403Forbidden, new { error = response.Error });
+            command.Id = id;
+            await Mediator.Send(command);
+            return NoContent();
         }
-
-        //Ningún listado administrativo devuelve más de 20 registros por página
-        private IActionResult? ValidatePagination(int page, int pageSize)
-        {
-            if (page < 1)
-                return BadRequest(new { error = "El número de página debe ser mayor que cero." });
-
-            if (pageSize < 1)
-                return BadRequest(new { error = "La cantidad de registros por página debe ser mayor que cero." });
-
-            if (pageSize > DomainConstants.MaxPageSize)
-                return BadRequest(new { error = $"La cantidad máxima de registros por página es {DomainConstants.MaxPageSize}." });
-
-            return null;
-        }
-    }
-
-    public class ChangeUserStatusRequest
-    {
-        //true activa el usuario, false lo inactiva
-        public required bool Status { get; set; }
     }
 }
