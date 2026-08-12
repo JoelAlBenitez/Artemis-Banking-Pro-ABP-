@@ -17,6 +17,12 @@ namespace ArtemisBankingPro.Core.Application.DTOs.Common
         public int TotalPages => PageSize <= 0 ? 0 : (int)Math.Ceiling(TotalRecords / (double)PageSize);
         public IReadOnlyCollection<T> Data { get; set; } = [];
 
+        /// <summary>
+        /// Página sin coincidencias. Un listado vacío es una respuesta válida, no un error.
+        /// </summary>
+        public static PagedApiResponse<T> Empty(int page, int pageSize)
+            => new() { Page = page, PageSize = pageSize, TotalRecords = 0, Data = [] };
+
         public static PagedApiResponse<T> From<TSource>(
             PagedResult<TSource> source,
             Func<TSource, T> projection)

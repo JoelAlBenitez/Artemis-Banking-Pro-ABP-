@@ -119,11 +119,13 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguratio
                 //errores de la API para que el consumidor no tenga que distinguir dos formatos.
                 opt.Events = new JwtBearerEvents
                 {
+                    //Un token inválido dispara este evento y, acto seguido, OnChallenge. Si aquí
+                    //se escribiera la respuesta, OnChallenge intentaría fijar el estado sobre una
+                    //respuesta ya iniciada, así que este evento solo descarta el resultado.
                     OnAuthenticationFailed = context =>
                     {
                         context.NoResult();
-                        return WriteProblemDetailsAsync(context.Response, 401,
-                            UnauthorizedTitle, UnauthorizedDetail);
+                        return Task.CompletedTask;
                     },
                     OnChallenge = context =>
                     {
@@ -162,6 +164,10 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguratio
         private static Task WriteProblemDetailsAsync(HttpResponse response, int statusCode,
                                                      string title, string detail)
         {
+            //Ningún evento de rechazo puede sobrescribir una respuesta que ya empezó a enviarse.
+            if (response.HasStarted)
+                return Task.CompletedTask;
+
             response.StatusCode = statusCode;
             response.ContentType = "application/problem+json";
 

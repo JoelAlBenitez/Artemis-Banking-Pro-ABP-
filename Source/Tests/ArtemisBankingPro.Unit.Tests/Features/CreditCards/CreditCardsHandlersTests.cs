@@ -59,7 +59,7 @@ namespace ArtemisBankingPro.Unit.Tests.Features.CreditCards
         }
 
         [Fact]
-        public async Task GetAllCreditCards_WithUnknownIdentification_ShouldReportItAsNotFound()
+        public async Task GetAllCreditCards_WithUnknownIdentification_ShouldReturnAnEmptyPage()
         {
             _creditCardsServices
                 .Setup(service => service.GetPagedCreditCardsAsync(It.IsAny<CreditCardFilterDto>()))
@@ -69,10 +69,12 @@ namespace ArtemisBankingPro.Unit.Tests.Features.CreditCards
             var handler = new GetAllCreditCardsQueryHandler(
                 _creditCardsServices.Object, ApiMapperFactory.Create());
 
-            var act = async () => await handler.Handle(
+            var result = await handler.Handle(
                 new GetAllCreditCardsQuery { Identification = "00000000000" }, CancellationToken.None);
 
-            await act.Should().ThrowAsync<NotFoundException>();
+            result.Data.Should().BeEmpty();
+            result.TotalRecords.Should().Be(0);
+            result.Page.Should().Be(1);
         }
 
         #endregion

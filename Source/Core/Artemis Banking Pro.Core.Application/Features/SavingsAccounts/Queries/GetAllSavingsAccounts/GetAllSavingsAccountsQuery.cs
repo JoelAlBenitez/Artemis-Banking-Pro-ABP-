@@ -60,7 +60,10 @@ namespace Artemis_Banking_Pro.Core.Application.Features.SavingsAccounts.Queries.
     {
         //Buscar por una cédula sin cliente o sin cuentas es un recurso inexistente, no un
         //error de datos: el documento lo responde como 404.
-        private static readonly Error[] NotFoundErrors =
+        //El servicio devuelve fallo cuando el filtro no encuentra nada porque la WebApp lo pinta
+        //como mensaje en pantalla. El contrato del listado de la API solo admite 200/400/401/403,
+        //así que aquí "sin coincidencias" es una página vacía, no un 404.
+        private static readonly Error[] EmptyResultErrors =
         [
             SavingsAccountError.NonExistsCustomerByIdCard,
             SavingsAccountError.NonExistsSavingsAccounts
@@ -88,7 +91,10 @@ namespace Artemis_Banking_Pro.Core.Application.Features.SavingsAccounts.Queries.
                 PageSize = query.PageSize
             });
 
-            var page = ValidationResultGuard.EnsureSuccess(result, NotFoundErrors);
+            if (result.Errors.Any(EmptyResultErrors.Contains))
+                return PagedApiResponse<SavingsAccountListItemDto>.Empty(query.Page, query.PageSize);
+
+            var page = ValidationResultGuard.EnsureSuccess(result);
 
             return PagedApiResponse<SavingsAccountListItemDto>.From(
                 page, account => _mapper.Map<SavingsAccountListItemDto>(account));

@@ -50,7 +50,10 @@ namespace Artemis_Banking_Pro.Core.Application.Features.CreditCards.Queries.GetA
     public class GetAllCreditCardsQueryHandler
         : IRequestHandler<GetAllCreditCardsQuery, PagedApiResponse<CreditCardListItemDto>>
     {
-        private static readonly Error[] NotFoundErrors =
+        //El servicio devuelve fallo cuando el filtro no encuentra nada porque la WebApp lo pinta
+        //como mensaje en pantalla. El contrato del listado de la API solo admite 200/400/401/403,
+        //así que aquí "sin coincidencias" es una página vacía, no un 404.
+        private static readonly Error[] EmptyResultErrors =
         [
             CreditCardError.NonExistsCustomerByIdCard,
             CreditCardError.NonExistsCreditCards
@@ -76,7 +79,10 @@ namespace Artemis_Banking_Pro.Core.Application.Features.CreditCards.Queries.GetA
                 PageSize = query.PageSize
             });
 
-            var page = ValidationResultGuard.EnsureSuccess(result, NotFoundErrors);
+            if (result.Errors.Any(EmptyResultErrors.Contains))
+                return PagedApiResponse<CreditCardListItemDto>.Empty(query.Page, query.PageSize);
+
+            var page = ValidationResultGuard.EnsureSuccess(result);
 
             return PagedApiResponse<CreditCardListItemDto>.From(
                 page, card => _mapper.Map<CreditCardListItemDto>(card));

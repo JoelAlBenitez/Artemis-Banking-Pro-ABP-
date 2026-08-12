@@ -1,4 +1,5 @@
 using Artemis_Banking_Pro.Core.Application.Exceptions;
+using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.Common.Errors;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 
@@ -24,6 +25,12 @@ namespace Artemis_Banking_Pro.Core.Application.Common
 
             if (failures.Count == 0)
                 return;
+
+            //Los servicios genéricos no conocen la entidad concreta y señalan la ausencia con
+            //GeneralError.NonExistence. Significa exactamente "no existe", así que se traduce a
+            //404 aunque el handler solo haya declarado el error específico de su módulo.
+            if (failures.Contains(GeneralError.NonExistence))
+                throw new NotFoundException(failures[0]);
 
             if (notFound is not null && failures.Any(failure => notFound.Contains(failure)))
                 throw new NotFoundException(failures[0]);

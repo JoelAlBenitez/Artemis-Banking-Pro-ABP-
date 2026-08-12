@@ -28,19 +28,37 @@ namespace ArtemisBankingPro.Presentation.WebApi.Extensions
         //identificador de correlación.
         public static WebApplication UseLoggingAndExceptionHandling(this WebApplication app)
         {
-            app.UseExceptionHandler();
             app.UseCorrelationId();
+
+            //El log de la petición envuelve al handler de excepciones, nunca al revés. Por dentro
+            //vería la excepción antes de que el handler fije el código real y registraría un 500
+            //en peticiones que terminan en 404, 400 o 409.
+            app.UseSerilogRequestLogging(options =>
+            {
+                //El usuario se resuelve al autenticar, ya dentro de este middleware. Se enriquece
+                //al cerrar la petición, que es cuando el evento se escribe.
+                options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+                {
+                    diagnosticContext.Set(
+                        UserContextLoggingMiddleware.UserLogPropertyName,
+                        UserContextLoggingMiddleware.ResolveUserName(httpContext.User));
+
+                    diagnosticContext.Set(
+                        UserContextLoggingMiddleware.RoleLogPropertyName,
+                        UserContextLoggingMiddleware.ResolveRoles(httpContext.User));
+                };
+            });
+
+            app.UseExceptionHandler();
 
             return app;
         }
 
-        //Se registra DESPUÉS de UseAuthentication. El log de la petición es el que documenta
-        //endpoint y resultado, así que debe caer dentro del contexto de usuario: si se registra
-        //antes de autenticar, los campos obligatorios de usuario y rol salen siempre vacíos.
+        //Se registra DESPUÉS de UseAuthentication: pone usuario y rol en el contexto de log para
+        //todo lo que los handlers registren durante la petición.
         public static WebApplication UseRequestLoggingWithUserContext(this WebApplication app)
         {
             app.UseUserContextLogging();
-            app.UseSerilogRequestLogging();
 
             return app;
         }

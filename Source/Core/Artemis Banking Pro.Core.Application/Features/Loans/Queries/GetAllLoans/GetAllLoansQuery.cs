@@ -50,7 +50,10 @@ namespace Artemis_Banking_Pro.Core.Application.Features.Loans.Queries.GetAllLoan
     public class GetAllLoansQueryHandler
         : IRequestHandler<GetAllLoansQuery, PagedApiResponse<LoanListItemDto>>
     {
-        private static readonly Error[] NotFoundErrors =
+        //El servicio devuelve fallo cuando el filtro no encuentra nada porque la WebApp lo pinta
+        //como mensaje en pantalla. El contrato del listado de la API solo admite 200/400/401/403,
+        //así que aquí "sin coincidencias" es una página vacía, no un 404.
+        private static readonly Error[] EmptyResultErrors =
         [
             LoansError.NonExistsCustomerByIdCard,
             LoansError.NonExistsLoans
@@ -76,7 +79,10 @@ namespace Artemis_Banking_Pro.Core.Application.Features.Loans.Queries.GetAllLoan
                 PageSize = query.PageSize
             });
 
-            var page = ValidationResultGuard.EnsureSuccess(result, NotFoundErrors);
+            if (result.Errors.Any(EmptyResultErrors.Contains))
+                return PagedApiResponse<LoanListItemDto>.Empty(query.Page, query.PageSize);
+
+            var page = ValidationResultGuard.EnsureSuccess(result);
 
             return PagedApiResponse<LoanListItemDto>.From(
                 page, loan => _mapper.Map<LoanListItemDto>(loan));

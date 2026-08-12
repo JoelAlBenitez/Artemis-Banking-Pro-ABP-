@@ -65,7 +65,7 @@ namespace ArtemisBankingPro.Unit.Tests.Features.Loans
 
         //Buscar por una cédula sin cliente registrado es un recurso inexistente, no un 400.
         [Fact]
-        public async Task GetAllLoans_WithUnknownIdentification_ShouldReportItAsNotFound()
+        public async Task GetAllLoans_WithUnknownIdentification_ShouldReturnAnEmptyPage()
         {
             _loansServices
                 .Setup(service => service.GetPagedLoansAsync(It.IsAny<LoansFilterDto>()))
@@ -74,10 +74,12 @@ namespace ArtemisBankingPro.Unit.Tests.Features.Loans
 
             var handler = new GetAllLoansQueryHandler(_loansServices.Object, ApiMapperFactory.Create());
 
-            var act = async () => await handler.Handle(
+            var result = await handler.Handle(
                 new GetAllLoansQuery { Identification = "00000000000" }, CancellationToken.None);
 
-            await act.Should().ThrowAsync<NotFoundException>();
+            result.Data.Should().BeEmpty();
+            result.TotalRecords.Should().Be(0);
+            result.Page.Should().Be(1);
         }
 
         [Fact]
