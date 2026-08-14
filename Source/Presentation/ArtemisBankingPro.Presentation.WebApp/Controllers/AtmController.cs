@@ -35,8 +35,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
-            
-            var result = await _transactionService.GetCashierDailyIndicatorsAsync(userId);
+            var result = await _transactionService.GetAtmCashierDailyIndicatorsAsync(userId);
             
             ViewBag.TotalTransactions = result.IsValid && result.Value != null ? result.Value.TotalTransactions : 0;
             ViewBag.TotalPayments = result.IsValid && result.Value != null ? result.Value.TotalPayments : 0;
