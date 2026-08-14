@@ -62,18 +62,7 @@
         font-size: 1.1rem;
     }
     
-    .role-badge {
-        padding: 0.4rem 0.8rem;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-    .role-admin { background-color: rgba(15, 23, 42, 0.08); color: #0F172A; }
-    .role-client { background-color: rgba(68, 114, 196, 0.1); color: #4472C4; }
-    .role-teller { background-color: rgba(16, 185, 129, 0.1); color: #059669; }
+
     
     .status-dot {
         width: 8px;
@@ -197,24 +186,9 @@
                                 </div>
                             </td>
                             <td>
-                                @if(user.TypeUser == "Administrador")
-                                {
-                                    <span class="role-badge role-admin">
-                                        <i class="bi bi-shield-lock-fill"></i> Administrador
-                                    </span>
-                                }
-                                else if(user.TypeUser == "Cliente")
-                                {
-                                    <span class="role-badge role-client">
-                                        <i class="bi bi-person-fill"></i> Cliente
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="role-badge role-teller">
-                                        <i class="bi bi-cash-stack"></i> @user.TypeUser
-                                    </span>
-                                }
+                                <div class="text-dark fw-medium" style="font-size: 0.9rem;">
+                                    @user.TypeUser
+                                </div>
                             </td>
                             <td>
                                 @if (user.IsActive)
