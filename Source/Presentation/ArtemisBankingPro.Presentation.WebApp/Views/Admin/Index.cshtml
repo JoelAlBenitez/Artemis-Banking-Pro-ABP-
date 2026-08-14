@@ -35,52 +35,58 @@
 </div>
 
 <!-- Fila 1: Transacciones y Pagos -->
-<div class="row g-3 mb-3">
-    <div class="col-sm-6 col-md-3">
-        <div class="metric-card h-100">
-            <div class="d-flex align-items-center mb-2">
-                <div class="icon-box icon-box-dark me-3">
-                    <i class="bi bi-clock-history"></i>
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="metric-card p-0">
+            <div class="row g-0">
+                <div class="col-sm-6 col-md-3 border-end">
+                    <div class="p-3 h-100">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="icon-box icon-box-dark me-3">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <h6 class="text-muted text-uppercase fw-bold mb-0" style="font-size: 0.7rem;">Tx Históricas</h6>
+                        </div>
+                        <h4 class="fw-bolder text-dark mb-0 ms-1">@Model.TotalHistoricalTransactions.ToString("N0")</h4>
+                    </div>
                 </div>
-                <h6 class="text-muted text-uppercase fw-bold mb-0" style="font-size: 0.7rem;">Tx Históricas</h6>
-            </div>
-            <h4 class="fw-bolder text-dark mb-0 ms-1">@Model.TotalHistoricalTransactions.ToString("N0")</h4>
-        </div>
-    </div>
-    
-    <div class="col-sm-6 col-md-3">
-        <div class="metric-card h-100">
-            <div class="d-flex align-items-center mb-2">
-                <div class="icon-box icon-box-dark me-3">
-                    <i class="bi bi-lightning-charge-fill"></i>
+                
+                <div class="col-sm-6 col-md-3 border-end">
+                    <div class="p-3 h-100">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="icon-box icon-box-dark me-3">
+                                <i class="bi bi-lightning-charge-fill"></i>
+                            </div>
+                            <h6 class="text-muted text-uppercase fw-bold mb-0" style="font-size: 0.7rem;">Tx de Hoy</h6>
+                        </div>
+                        <h4 class="fw-bolder text-dark mb-0 ms-1">@Model.DayTransactions.ToString("N0")</h4>
+                    </div>
                 </div>
-                <h6 class="text-muted text-uppercase fw-bold mb-0" style="font-size: 0.7rem;">Tx de Hoy</h6>
-            </div>
-            <h4 class="fw-bolder text-dark mb-0 ms-1">@Model.DayTransactions.ToString("N0")</h4>
-        </div>
-    </div>
-    
-    <div class="col-sm-6 col-md-3">
-        <div class="metric-card h-100">
-            <div class="d-flex align-items-center mb-2">
-                <div class="icon-box icon-box-dark me-3">
-                    <i class="bi bi-wallet2"></i>
+                
+                <div class="col-sm-6 col-md-3 border-end">
+                    <div class="p-3 h-100">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="icon-box icon-box-dark me-3">
+                                <i class="bi bi-wallet2"></i>
+                            </div>
+                            <h6 class="text-muted text-uppercase fw-bold mb-0" style="font-size: 0.7rem;">Pagos Históricos</h6>
+                        </div>
+                        <h4 class="fw-bolder text-dark mb-0 ms-1">@Model.TotalHistoricalPay.ToString("N0")</h4>
+                    </div>
                 </div>
-                <h6 class="text-muted text-uppercase fw-bold mb-0" style="font-size: 0.7rem;">Pagos Históricos</h6>
-            </div>
-            <h4 class="fw-bolder text-dark mb-0 ms-1">@Model.TotalHistoricalPay.ToString("N0")</h4>
-        </div>
-    </div>
-    
-    <div class="col-sm-6 col-md-3">
-        <div class="metric-card h-100">
-            <div class="d-flex align-items-center mb-2">
-                <div class="icon-box icon-box-dark me-3">
-                    <i class="bi bi-cash-stack"></i>
+                
+                <div class="col-sm-6 col-md-3">
+                    <div class="p-3 h-100">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="icon-box icon-box-dark me-3">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                            <h6 class="text-muted text-uppercase fw-bold mb-0" style="font-size: 0.7rem;">Pagos Hoy</h6>
+                        </div>
+                        <h4 class="fw-bolder text-dark mb-0 ms-1">@Model.DayPay.ToString("N0")</h4>
+                    </div>
                 </div>
-                <h6 class="text-muted text-uppercase fw-bold mb-0" style="font-size: 0.7rem;">Pagos Hoy</h6>
             </div>
-            <h4 class="fw-bolder text-dark mb-0 ms-1">@Model.DayPay.ToString("N0")</h4>
         </div>
     </div>
 </div>
