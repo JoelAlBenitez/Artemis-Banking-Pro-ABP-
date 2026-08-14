@@ -54,17 +54,21 @@
         <div asp-validation-summary="All" class="alert alert-warning shadow-sm mb-4"></div>
     }
 
+    <!-- Listado de Clientes y Formulario de Selección -->
+    <form asp-action="SelectCustomer" method="post" id="selectCustomerForm">
+        <input type="hidden" name="fullNameCustomer" id="hiddenFullName" value="" />
+        
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body p-0">
                 <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light text-muted sticky-top" style="font-size: 0.85rem;">
                             <tr>
-                                <th class="ps-4">CÉDULA</th>
+                                <th class="ps-4" style="width: 50px;">SELECCIONAR</th>
+                                <th>CÉDULA</th>
                                 <th>NOMBRE Y APELLIDO</th>
                                 <th>CORREO ELECTRÓNICO</th>
-                                <th class="text-end">MONTO TOTAL DE DEUDA</th>
-                                <th class="text-end pe-4">ACCIÓN</th>
+                                <th class="text-end pe-4">MONTO TOTAL DE DEUDA</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -80,20 +84,14 @@
                             {
                                 foreach (var client in Model.Clients)
                                 {
-                                    <tr>
-                                        <td class="ps-4 fw-bold">@client.IdCard</td>
+                                    <tr onclick="document.getElementById('radio_@client.Id').click();" style="cursor: pointer;">
+                                        <td class="ps-4 text-center">
+                                            <input class="form-check-input fs-5" type="radio" name="customerId" id="radio_@client.Id" value="@client.Id" onchange="updateHiddenName('@client.FullName')" />
+                                        </td>
+                                        <td class="fw-bold">@client.IdCard</td>
                                         <td>@client.FullName</td>
                                         <td>@client.Email</td>
-                                        <td class="text-end text-danger fw-bold">RD$ @client.TotalDebtAmount.ToString("N2")</td>
-                                        <td class="text-end pe-4">
-                                            <form asp-action="SelectCustomer" method="post" class="m-0 p-0 d-inline">
-                                                <input type="hidden" name="customerId" value="@client.Id" />
-                                                <input type="hidden" name="fullNameCustomer" value="@client.FullName" />
-                                                <button type="submit" class="btn btn-sm btn-outline-primary fw-bold shadow-sm px-3">
-                                                    Seleccionar
-                                                </button>
-                                            </form>
-                                        </td>
+                                        <td class="text-end pe-4 text-danger fw-bold">RD$ @client.TotalDebtAmount.ToString("N2")</td>
                                     </tr>
                                 }
                             }
@@ -103,7 +101,34 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-start mt-4">
-            <a asp-action="Index" class="btn btn-light fw-bold shadow-sm px-4 py-2">Volver atrás</a>
+        <div class="d-flex justify-content-end mt-4">
+            <a asp-action="Index" class="btn btn-light fw-bold shadow-sm me-3 px-4 py-2">Volver atrás</a>
+            <button type="submit" class="btn btn-primary fw-bold shadow-sm px-5 py-2" style="background-color: #4472C4; border-color: #4472C4;" id="btnSiguiente">
+                Siguiente paso <i class="bi bi-arrow-right me-1"></i>
+            </button>
         </div>
+    </form>
 </div>
+
+@section Scripts {
+    <script>
+        function updateHiddenName(fullName) {
+            document.getElementById('hiddenFullName').value = fullName;
+        }
+
+        document.getElementById('selectCustomerForm').addEventListener('submit', function(e) {
+            var radios = document.getElementsByName('customerId');
+            var selected = false;
+            for (var i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    selected = true;
+                    break;
+                }
+            }
+            if (!selected) {
+                e.preventDefault();
+                alert('Debe seleccionar un cliente para continuar.');
+            }
+        });
+    </script>
+}
