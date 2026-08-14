@@ -6,217 +6,157 @@
 }
 
 <style>
-    /* Estilos Premium para Dashboard */
-    .dashboard-hero {
-        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-        border-radius: 0 0 2.5rem 2.5rem;
-        padding: 3.5rem 2rem 6rem 2rem;
-        color: white;
-        margin-bottom: -4rem; 
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
-    }
-    
+    /* Estilos limpios y directos para Dashboard */
     .metric-card {
         background: white;
-        border-radius: 1.25rem;
-        padding: 1.5rem;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: 1px solid rgba(0,0,0,0.03);
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(0,0,0,0.06);
+        padding: 1.25rem;
     }
-    
-    .metric-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-    
     .icon-box {
-        width: 52px;
-        height: 52px;
-        border-radius: 14px;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.6rem;
+        font-size: 1.2rem;
     }
-    
     .icon-box-primary { background: rgba(68, 114, 196, 0.1); color: #4472C4; }
     .icon-box-dark { background: rgba(15, 23, 42, 0.06); color: #334155; }
-    
-    .backdrop-blur {
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
-
-    .transition-hover {
-        transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-    .transition-hover:hover {
-        background-color: rgba(255, 255, 255, 0.15) !important;
-        transform: scale(1.02);
-    }
 </style>
 
-<!-- Hero Section superpuesto -->
-<div class="dashboard-hero">
-    <div class="container-fluid px-xl-4">
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <h1 class="fw-bold mb-2" style="font-family: 'Montserrat', sans-serif; letter-spacing: -0.5px; font-size: 2.2rem;">
-                    Resumen Operativo
-                </h1>
-                <p class="text-white-50 fs-6 mb-0 fw-light">Indicadores financieros y comerciales del sistema Artemis.</p>
-            </div>
-            <div class="col-lg-5 text-lg-end mt-4 mt-lg-0">
-                <div class="d-inline-block text-start bg-white bg-opacity-10 rounded-4 p-4 backdrop-blur border border-white border-opacity-10 shadow-sm">
-                    <div class="d-flex align-items-center mb-1">
-                        <i class="bi bi-graph-up-arrow text-info me-2"></i>
-                        <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">Deuda Promedio / Cliente</span>
-                    </div>
-                    <h2 class="fw-bolder mb-0 text-white display-6" style="font-family: 'Montserrat', sans-serif;">
-                        RD$ @Model.AverageDebtAmountPerCustomer.ToString("N2")
-                    </h2>
+<div class="mb-4 mt-2 d-flex justify-content-between align-items-center">
+    <div>
+        <h4 class="fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">Resumen Operativo</h4>
+        <p class="text-muted mb-0 small">Indicadores financieros y comerciales del sistema.</p>
+    </div>
+</div>
+
+<!-- Fila 1: Transacciones y Pagos -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-md-3">
+        <div class="metric-card h-100">
+            <div class="d-flex align-items-center mb-2">
+                <div class="icon-box icon-box-dark me-3">
+                    <i class="bi bi-clock-history"></i>
                 </div>
+                <h6 class="text-muted text-uppercase fw-bold mb-0" style="font-size: 0.7rem;">Tx Históricas</h6>
+            </div>
+            <h4 class="fw-bolder text-dark mb-0 ms-1">@Model.TotalHistoricalTransactions.ToString("N0")</h4>
+        </div>
+    </div>
+    
+    <div class="col-sm-6 col-md-3">
+        <div class="metric-card h-100" style="border: 1px solid rgba(68, 114, 196, 0.3);">
+            <div class="d-flex align-items-center mb-2">
+                <div class="icon-box icon-box-primary me-3">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+                <h6 class="text-primary text-uppercase fw-bold mb-0" style="font-size: 0.7rem;">Tx de Hoy</h6>
+            </div>
+            <h4 class="fw-bolder text-dark mb-0 ms-1">@Model.DayTransactions.ToString("N0")</h4>
+        </div>
+    </div>
+    
+    <div class="col-sm-6 col-md-3">
+        <div class="metric-card h-100">
+            <div class="d-flex align-items-center mb-2">
+                <div class="icon-box icon-box-dark me-3">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+                <h6 class="text-muted text-uppercase fw-bold mb-0" style="font-size: 0.7rem;">Pagos Históricos</h6>
+            </div>
+            <h4 class="fw-bolder text-dark mb-0 ms-1">@Model.TotalHistoricalPay.ToString("N0")</h4>
+        </div>
+    </div>
+    
+    <div class="col-sm-6 col-md-3">
+        <div class="metric-card h-100" style="border: 1px solid rgba(68, 114, 196, 0.3);">
+            <div class="d-flex align-items-center mb-2">
+                <div class="icon-box icon-box-primary me-3">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+                <h6 class="text-primary text-uppercase fw-bold mb-0" style="font-size: 0.7rem;">Pagos Hoy</h6>
+            </div>
+            <h4 class="fw-bolder text-dark mb-0 ms-1">@Model.DayPay.ToString("N0")</h4>
+        </div>
+    </div>
+</div>
+
+<!-- Fila 2: Clientes y Deuda Promedio -->
+<div class="row g-3 mb-4">
+    <!-- Deuda Promedio -->
+    <div class="col-md-5">
+        <div class="metric-card h-100 bg-dark text-white d-flex flex-column justify-content-center shadow-sm" style="background-color: #0F172A !important;">
+            <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-graph-up-arrow text-info me-2"></i>
+                <h6 class="text-white-50 text-uppercase fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 0.5px;">Deuda Promedio por Cliente</h6>
+            </div>
+            <h3 class="fw-bolder mb-0 text-white" style="font-family: 'Montserrat', sans-serif;">
+                RD$ @Model.AverageDebtAmountPerCustomer.ToString("N2")
+            </h3>
+        </div>
+    </div>
+
+    <!-- Población de Clientes -->
+    <div class="col-md-7">
+        <div class="metric-card h-100 d-flex flex-column justify-content-center">
+            <h6 class="text-dark fw-bold mb-3" style="font-family: 'Montserrat', sans-serif;">Población de Clientes</h6>
+            
+            @{
+                int totalClients = Model.CustomerActive + Model.CustomerInactive;
+                int activePct = totalClients > 0 ? (int)Math.Round((double)Model.CustomerActive / totalClients * 100) : 0;
+            }
+            
+            <div class="d-flex justify-content-between align-items-end mb-2">
+                <div>
+                    <span class="fs-4 fw-bolder text-dark">@totalClients</span>
+                    <span class="text-muted small ms-1">Total registrados</span>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 me-2">
+                        @Model.CustomerActive Activos
+                    </span>
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">
+                        @Model.CustomerInactive Inactivos
+                    </span>
+                </div>
+            </div>
+            
+            <div class="progress" style="height: 6px; border-radius: 3px; background-color: #E2E8F0;">
+                <div class="progress-bar" role="progressbar" style="width: @activePct%; background-color: #4472C4 !important;" aria-valuenow="@activePct" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="container-fluid px-xl-4 position-relative" style="z-index: 10;">
-    <!-- Fila de Métricas Principales Flotantes -->
-    <div class="row g-4 mb-5">
-        <div class="col-sm-6 col-xl-3">
-            <div class="metric-card h-100">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <span class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.75rem; letter-spacing: 0.5px;">Tx Históricas</span>
-                        <h2 class="fw-bolder text-dark mb-0">@Model.TotalHistoricalTransactions.ToString("N0")</h2>
-                    </div>
-                    <div class="icon-box icon-box-dark">
-                        <i class="bi bi-clock-history"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-sm-6 col-xl-3">
-            <div class="metric-card h-100">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <span class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.75rem; letter-spacing: 0.5px; color: #4472C4 !important;">Tx de Hoy</span>
-                        <h2 class="fw-bolder text-dark mb-0">@Model.DayTransactions.ToString("N0")</h2>
-                    </div>
-                    <div class="icon-box icon-box-primary">
-                        <i class="bi bi-lightning-charge-fill"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-sm-6 col-xl-3">
-            <div class="metric-card h-100">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <span class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.75rem; letter-spacing: 0.5px;">Pagos Históricos</span>
-                        <h2 class="fw-bolder text-dark mb-0">@Model.TotalHistoricalPay.ToString("N0")</h2>
-                    </div>
-                    <div class="icon-box icon-box-dark">
-                        <i class="bi bi-wallet2"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-sm-6 col-xl-3">
-            <div class="metric-card h-100">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <span class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.75rem; letter-spacing: 0.5px; color: #4472C4 !important;">Pagos Hoy</span>
-                        <h2 class="fw-bolder text-dark mb-0">@Model.DayPay.ToString("N0")</h2>
-                    </div>
-                    <div class="icon-box icon-box-primary">
-                        <i class="bi bi-cash-stack"></i>
-                    </div>
-                </div>
-            </div>
+<!-- Fila 3: Productos Financieros -->
+<h6 class="fw-bold mb-3 text-dark mt-2" style="font-family: 'Montserrat', sans-serif;">Inventario de Productos Activos</h6>
+<div class="row g-3 mb-5">
+    <div class="col-sm-6 col-md-3">
+        <div class="metric-card h-100 text-center" style="background-color: #F8FAFC; border-color: rgba(68, 114, 196, 0.2);">
+            <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">Total General</h6>
+            <h4 class="fw-bolder text-primary mb-0">@Model.TotalFinancialProducts.ToString("N0")</h4>
         </div>
     </div>
-
-    <!-- Paneles Secundarios: Clientes y Productos -->
-    <div class="row g-4 pb-5">
-        <!-- Distribución de Clientes -->
-        <div class="col-lg-5">
-            <div class="metric-card h-100 border-0 p-4 p-xl-5">
-                <h5 class="fw-bold text-dark mb-4" style="font-family: 'Montserrat', sans-serif;">Población de Clientes</h5>
-                
-                @{
-                    int totalClients = Model.CustomerActive + Model.CustomerInactive;
-                    int activePct = totalClients > 0 ? (int)Math.Round((double)Model.CustomerActive / totalClients * 100) : 0;
-                    int inactivePct = totalClients > 0 ? (int)Math.Round((double)Model.CustomerInactive / totalClients * 100) : 0;
-                }
-                
-                <div class="d-flex align-items-end mb-2">
-                    <h1 class="display-4 fw-bolder text-dark mb-0 me-3" style="font-family: 'Montserrat', sans-serif;">@totalClients</h1>
-                    <span class="text-muted mb-2 fw-medium">Clientes registrados</span>
-                </div>
-                
-                <div class="progress my-4" style="height: 14px; border-radius: 7px; background-color: #E2E8F0;">
-                    <div class="progress-bar" role="progressbar" style="width: @activePct%; background-color: #4472C4 !important;" aria-valuenow="@activePct" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                
-                <div class="d-flex justify-content-between mt-2">
-                    <div>
-                        <div class="d-flex align-items-center mb-1">
-                            <span class="badge rounded-pill p-1 me-2" style="background-color: #4472C4; width:10px; height:10px;"></span>
-                            <span class="fw-bold text-dark">Activos</span>
-                        </div>
-                        <h4 class="fw-bolder ms-4 mb-0">@Model.CustomerActive.ToString("N0")</h4>
-                    </div>
-                    <div class="text-end">
-                        <div class="d-flex align-items-center justify-content-end mb-1">
-                            <span class="badge rounded-pill p-1 me-2 bg-secondary bg-opacity-25" style="width:10px; height:10px;"></span>
-                            <span class="fw-bold text-muted">Inactivos</span>
-                        </div>
-                        <h4 class="fw-bolder me-2 mb-0 text-muted">@Model.CustomerInactive.ToString("N0")</h4>
-                    </div>
-                </div>
-            </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="metric-card h-100 text-center">
+            <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">Préstamos Vigentes</h6>
+            <h4 class="fw-bolder text-dark mb-0">@Model.OutstandingLoans.ToString("N0")</h4>
         </div>
-
-        <!-- Desglose de Productos -->
-        <div class="col-lg-7">
-            <div class="metric-card h-100 border-0 p-4 p-xl-5 shadow-lg" style="background: linear-gradient(135deg, #0F172A 0%, #172554 100%); color: white;">
-                <div class="d-flex justify-content-between align-items-center mb-5">
-                    <h5 class="fw-bold mb-0" style="font-family: 'Montserrat', sans-serif;">Inventario de Productos</h5>
-                    <div class="badge bg-white text-dark rounded-pill px-4 py-2 fw-bold shadow-sm" style="font-size: 0.9rem;">
-                        Total general: @Model.TotalFinancialProducts.ToString("N0")
-                    </div>
-                </div>
-                
-                <div class="row g-4 mt-2">
-                    <div class="col-md-4">
-                        <div class="bg-white bg-opacity-10 rounded-4 p-4 h-100 text-center border border-white border-opacity-10 transition-hover">
-                            <i class="bi bi-cash-coin display-5 text-info mb-3 d-block"></i>
-                            <h2 class="fw-bolder mb-1 text-white">@Model.OutstandingLoans.ToString("N0")</h2>
-                            <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">Préstamos</span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="bg-white bg-opacity-10 rounded-4 p-4 h-100 text-center border border-white border-opacity-10 transition-hover">
-                            <i class="bi bi-credit-card display-5 text-warning mb-3 d-block"></i>
-                            <h2 class="fw-bolder mb-1 text-white">@Model.CreditCardActive.ToString("N0")</h2>
-                            <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">Tarjetas</span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="bg-white bg-opacity-10 rounded-4 p-4 h-100 text-center border border-white border-opacity-10 transition-hover">
-                            <i class="bi bi-piggy-bank display-5 text-success mb-3 d-block"></i>
-                            <h2 class="fw-bolder mb-1 text-white">@Model.SavingAccountActive.ToString("N0")</h2>
-                            <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">Cuentas</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="metric-card h-100 text-center">
+            <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">Tarjetas de Crédito</h6>
+            <h4 class="fw-bolder text-dark mb-0">@Model.CreditCardActive.ToString("N0")</h4>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="metric-card h-100 text-center">
+            <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">Cuentas de Ahorro</h6>
+            <h4 class="fw-bolder text-dark mb-0">@Model.SavingAccountActive.ToString("N0")</h4>
         </div>
     </div>
 </div>
