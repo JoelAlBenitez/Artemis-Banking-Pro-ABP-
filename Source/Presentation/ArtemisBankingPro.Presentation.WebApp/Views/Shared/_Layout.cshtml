@@ -38,28 +38,28 @@
                         if (User.IsInRole("Administrador"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "Admin")" asp-area="" asp-controller="Admin" asp-action="Index">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "Admin")" style="@GetInactiveBorderStyle(currentController, "Admin")" asp-area="" asp-controller="Admin" asp-action="Index">
                                     <i class="bi bi-grid-1x2 me-3 fs-5"></i> Home
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "Users")" asp-area="" asp-controller="Users" asp-action="Index">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "Users")" style="@GetInactiveBorderStyle(currentController, "Users")" asp-area="" asp-controller="Users" asp-action="Index">
                                     <i class="bi bi-people me-3 fs-5"></i> Gestión de usuarios
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "Loans")" asp-area="" asp-controller="Loans" asp-action="Index">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "Loans")" style="@GetInactiveBorderStyle(currentController, "Loans")" asp-area="" asp-controller="Loans" asp-action="Index">
                                     <i class="bi bi-cash-coin me-3 fs-5"></i> Gestión de préstamos
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "CreditCards")" asp-area="" asp-controller="CreditCards" asp-action="Index">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "CreditCards")" style="@GetInactiveBorderStyle(currentController, "CreditCards")" asp-area="" asp-controller="CreditCards" asp-action="Index">
                                     <i class="bi bi-credit-card me-3 fs-5"></i> Tarjetas de crédito
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "SavingsAccounts")" asp-area="" asp-controller="SavingsAccounts" asp-action="Index">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "SavingsAccounts")" style="@GetInactiveBorderStyle(currentController, "SavingsAccounts")" asp-area="" asp-controller="SavingsAccounts" asp-action="Index">
                                     <i class="bi bi-piggy-bank me-3 fs-5"></i> Cuentas de ahorro
                                 </a>
                             </li>
@@ -68,12 +68,12 @@
                     else
                     {
                         <li class="nav-item">
-                            <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "Home")" asp-area="" asp-controller="Home" asp-action="Index">
+                            <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "Home")" style="@GetInactiveBorderStyle(currentController, "Home")" asp-area="" asp-controller="Home" asp-action="Index">
                                 <i class="bi bi-house-door me-3 fs-5"></i> Inicio
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @(currentController == "Home" && ViewContext.RouteData.Values["Action"]?.ToString() == "Privacy" ? "bg-white bg-opacity-10 text-white border-start border-3 border-primary" : "text-white opacity-75 sidebar-link border-start border-3 border-transparent")" asp-area="" asp-controller="Home" asp-action="Privacy">
+                            <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @(currentController == "Home" && ViewContext.RouteData.Values["Action"]?.ToString() == "Privacy" ? "bg-white bg-opacity-10 text-white border-start border-3 border-primary" : "text-white opacity-75 sidebar-link border-start border-3")" style="@(currentController != "Home" || ViewContext.RouteData.Values["Action"]?.ToString() != "Privacy" ? "border-color: transparent;" : "")" asp-area="" asp-controller="Home" asp-action="Privacy">
                                 <i class="bi bi-shield-lock me-3 fs-5"></i> Privacidad
                             </a>
                         </li>
@@ -124,6 +124,11 @@
     {
         return currentController == targetController 
             ? "bg-white bg-opacity-10 text-white border-start border-3 border-primary" 
-            : "text-white opacity-75 sidebar-link border-start border-3 border-transparent";
+            : "text-white opacity-75 sidebar-link border-start border-3";
+    }
+    
+    public string GetInactiveBorderStyle(string currentController, string targetController)
+    {
+        return currentController != targetController ? "border-color: transparent;" : "";
     }
 }
