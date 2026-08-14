@@ -10,8 +10,11 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndRevers
         public LoansMappingDtoToViewModelAndReverse()
         {
 
-            //write loans
-            CreateMap<LoansAssignmentDto, LoansAssigmentViewModel>().ReverseMap();
+            //write loans. FullNameCustomer solo existe en el ViewModel: el controlador lo
+            //completa con el cliente elegido en el paso 1 para mostrarlo en el formulario.
+            CreateMap<LoansAssignmentDto, LoansAssigmentViewModel>()
+                .ForMember(d => d.FullNameCustomer, o => o.Ignore())
+                .ReverseMap();
 
             CreateMap<LoansFilterDto, LoansFilterViewModel>().ReverseMap();
             
@@ -21,6 +24,28 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndRevers
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.LoansId));
 
             CreateMap<ClientLoansDto, ClientLoansViewModel>();
+
+
+            //paso 1 de la asignacion: promedio de deuda y clientes elegibles
+            CreateMap<ClientsForLoanAssignmentDto, ClientsForLoanAssignmentViewModel>()
+                .ForMember(d => d.IdCard, o => o.Ignore());
+
+            //pantalla de advertencia de riesgo: los datos del prestamo y los del riesgo se
+            //proyectan por separado sobre el mismo modelo
+            CreateMap<LoansAssignmentDto, RiskWarningViewModel>()
+                .ForMember(d => d.Message, o => o.Ignore())
+                .ForMember(d => d.CurrentDebt, o => o.Ignore())
+                .ForMember(d => d.ProjectedDebt, o => o.Ignore())
+                .ForMember(d => d.AverageDebt, o => o.Ignore());
+
+            CreateMap<LoanRiskEvaluationDto, RiskWarningViewModel>()
+                .ForMember(d => d.CustomerId, o => o.Ignore())
+                .ForMember(d => d.TermLoans, o => o.Ignore())
+                .ForMember(d => d.AmmountLoans, o => o.Ignore())
+                .ForMember(d => d.AnnualInterestRate, o => o.Ignore());
+
+            CreateMap<RiskWarningViewModel, LoansAssignmentDto>()
+                .ForMember(d => d.ConfirmHighRisk, o => o.Ignore());
             //ventana principal de prestamo
             CreateMap<LoansDto, LoansViewModel>()
                 .ForMember(d => d.StateLoans,

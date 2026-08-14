@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Artemis_Banking_Pro.Core.Application.Contracts.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.DTOs.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.Services.Beneficiaries;
@@ -17,6 +13,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+
 namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
 {
     public sealed class BeneficiaryServicesTests
@@ -25,6 +23,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
         private readonly Mock<IBeneficiaryValidationServices> _beneficiaryValidationServicesMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<ILogger<BeneficiaryServices>> _loggerMock;
+        private readonly Mock<IUserManagementService> _userManagementServiceMock;
         private readonly BeneficiaryServices _beneficiaryServices;
 
         public BeneficiaryServicesTests()
@@ -33,12 +32,14 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
             _beneficiaryValidationServicesMock = new Mock<IBeneficiaryValidationServices>();
             _mapperMock = new Mock<IMapper>();
             _loggerMock = new Mock<ILogger<BeneficiaryServices>>();
+            _userManagementServiceMock = new Mock<IUserManagementService>();
 
             _beneficiaryServices = new BeneficiaryServices(
                 _beneficiaryRepositoryMock.Object,
                 _beneficiaryValidationServicesMock.Object,
                 _mapperMock.Object,
-                _loggerMock.Object
+                _loggerMock.Object,
+                _userManagementServiceMock.Object
             );
         }
 

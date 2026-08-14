@@ -6,12 +6,17 @@ using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 namespace Artemis_Banking_Pro.Core.Application.Contracts.CreditCards
 {
     //herencia se debe crear en la implementacion
-    public interface ICreditCardsServices : 
+    public interface ICreditCardsServices :
        IGenericServices<CreditCardAssignmentDto, CreditCardDto, int>
-     
+
     {
+        //La cédula del filtro se traduce internamente al Id del cliente en Identity
         Task<ValidationResult<PagedResult<CreditCardDto>>> GetPagedCreditCardsAsync(
-            CreditCardFilterDto filter, string? customerId);
+            CreditCardFilterDto filter);
+
+        //Paso 1 de la asignación: deuda promedio del sistema y clientes activos con su deuda
+        Task<ValidationResult<ClientsForCreditCardAssignmentDto>> GetCustomersForAssignmentAsync(
+            string? idCard);
 
         Task<ValidationResult<PagedResult<CardConsumptionDto>>> GetPagedConsumptionsAsync(
             int creditCardId, int page);
@@ -25,6 +30,6 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.CreditCards
 
         Task<ValidationResult> CancelCreditCardAsync(int creditCardId);
 
-       
+
     }
 }

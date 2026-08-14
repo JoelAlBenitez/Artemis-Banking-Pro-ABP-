@@ -1,0 +1,224 @@
+[2026-08-04 13:53:36.656] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] User profile is available. Using 'C:\Users\hxdes\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2026-08-04 13:53:37.430] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:53:37.441] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:53:37.442] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:53:37.443] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:53:37.584] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:53:37.620] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:53:37.675] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:53:37.678] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:53:37.731] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:53:37.733] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:53:37.785] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:53:37.787] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:53:37.840] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:53:37.842] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:53:38.099] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Now listening on: https://localhost:7046
+[2026-08-04 13:53:38.100] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Now listening on: http://localhost:5105
+[2026-08-04 13:53:38.168] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Application started. Press Ctrl+C to shut down.
+[2026-08-04 13:53:38.170] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Hosting environment: Development
+[2026-08-04 13:53:38.170] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Content root path: C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApi
+[2026-08-04 13:53:42.401] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/ - null null
+[2026-08-04 13:53:42.578] [INF] [ArtemisBankingPro.WebApi] [Correlacion: d289ab141d9b4cd086955795bd52ebca] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 13:53:42.591] [INF] [ArtemisBankingPro.WebApi] [Correlacion: d289ab141d9b4cd086955795bd52ebca] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 13:53:42.593] [INF] [ArtemisBankingPro.WebApi] [Correlacion: d289ab141d9b4cd086955795bd52ebca] HTTP GET / responded 401 in 99.1728 ms
+[2026-08-04 13:53:42.598] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/ - 401 null application/json 204.2337ms
+[2026-08-04 13:53:42.634] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/favicon.ico - null null
+[2026-08-04 13:53:42.639] [INF] [ArtemisBankingPro.WebApi] [Correlacion: a422331d42d349908b649dba005afead] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 13:53:42.641] [INF] [ArtemisBankingPro.WebApi] [Correlacion: a422331d42d349908b649dba005afead] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 13:53:42.642] [INF] [ArtemisBankingPro.WebApi] [Correlacion: a422331d42d349908b649dba005afead] HTTP GET /favicon.ico responded 401 in 4.5245 ms
+[2026-08-04 13:53:42.644] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/favicon.ico - 401 null application/json 10.6981ms
+[2026-08-04 13:54:12.306] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/openapi/v1.json - null null
+[2026-08-04 13:54:12.316] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 23c533b494c14bdc9b996e0b60b2aeab] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 13:54:12.318] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 23c533b494c14bdc9b996e0b60b2aeab] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 13:54:12.319] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 23c533b494c14bdc9b996e0b60b2aeab] HTTP GET /openapi/v1.json responded 401 in 4.0959 ms
+[2026-08-04 13:54:12.321] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/openapi/v1.json - 401 null application/json 14.4116ms
+[2026-08-04 13:54:12.341] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/favicon.ico - null null
+[2026-08-04 13:54:12.343] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 5c013c33a7a64c8887693457154fb50e] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 13:54:12.344] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 5c013c33a7a64c8887693457154fb50e] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 13:54:12.345] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 5c013c33a7a64c8887693457154fb50e] HTTP GET /favicon.ico responded 401 in 2.3224 ms
+[2026-08-04 13:54:12.347] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/favicon.ico - 401 null application/json 6.1765ms
+[2026-08-04 13:56:06.264] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/api/account/login - null null
+[2026-08-04 13:56:06.278] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 00344adfb6b34db7bf301633e17fa491] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 13:56:06.280] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 00344adfb6b34db7bf301633e17fa491] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 13:56:06.281] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 00344adfb6b34db7bf301633e17fa491] HTTP GET /api/account/login responded 401 in 3.1398 ms
+[2026-08-04 13:56:06.284] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/api/account/login - 401 null application/json 20.152ms
+[2026-08-04 13:56:06.319] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/favicon.ico - null null
+[2026-08-04 13:56:06.321] [INF] [ArtemisBankingPro.WebApi] [Correlacion: d002bec2de6540398dc63b9117d45321] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 13:56:06.323] [INF] [ArtemisBankingPro.WebApi] [Correlacion: d002bec2de6540398dc63b9117d45321] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 13:56:06.324] [INF] [ArtemisBankingPro.WebApi] [Correlacion: d002bec2de6540398dc63b9117d45321] HTTP GET /favicon.ico responded 401 in 2.7914 ms
+[2026-08-04 13:56:06.325] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/favicon.ico - 401 null application/json 6.6721ms
+[2026-08-04 13:59:19.003] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] User profile is available. Using 'C:\Users\hxdes\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2026-08-04 13:59:19.583] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:59:19.593] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:59:19.594] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:59:19.595] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:59:19.741] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:59:19.779] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:59:19.841] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:59:19.843] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:59:19.901] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:59:19.903] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:59:19.964] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:59:19.966] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:59:20.050] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:59:20.054] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:59:20.458] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Now listening on: https://localhost:7046
+[2026-08-04 13:59:20.459] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Now listening on: http://localhost:5105
+[2026-08-04 13:59:20.525] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Application started. Press Ctrl+C to shut down.
+[2026-08-04 13:59:20.527] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Hosting environment: Development
+[2026-08-04 13:59:20.528] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Content root path: C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApi
+[2026-08-04 13:59:31.898] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/openapi/v1.json - null null
+[2026-08-04 13:59:32.066] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 026e85879e874be4aa5bee11fe0f563d] Executing endpoint 'HTTP: GET /openapi/{documentName}.json'
+[2026-08-04 13:59:32.210] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 026e85879e874be4aa5bee11fe0f563d] Executed endpoint 'HTTP: GET /openapi/{documentName}.json'
+[2026-08-04 13:59:32.214] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 026e85879e874be4aa5bee11fe0f563d] HTTP GET /openapi/v1.json responded 200 in 210.8348 ms
+[2026-08-04 13:59:32.221] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/openapi/v1.json - 200 null application/json;charset=utf-8 332.2369ms
+[2026-08-04 13:59:32.253] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/favicon.ico - null null
+[2026-08-04 13:59:32.260] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 1a0a3b22e8a64913a37a8db59d711647] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 13:59:32.270] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 1a0a3b22e8a64913a37a8db59d711647] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 13:59:32.271] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 1a0a3b22e8a64913a37a8db59d711647] HTTP GET /favicon.ico responded 401 in 14.7679 ms
+[2026-08-04 13:59:32.273] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/favicon.ico - 401 null application/json 19.9124ms
+[2026-08-04 14:05:05.989] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/api/account/ - null null
+[2026-08-04 14:05:06.030] [INF] [ArtemisBankingPro.WebApi] [Correlacion: d62d3fa1e1bb46b5b2517f64cff0d2ea] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:05:06.032] [INF] [ArtemisBankingPro.WebApi] [Correlacion: d62d3fa1e1bb46b5b2517f64cff0d2ea] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 14:05:06.033] [INF] [ArtemisBankingPro.WebApi] [Correlacion: d62d3fa1e1bb46b5b2517f64cff0d2ea] HTTP GET /api/account/ responded 401 in 4.2666 ms
+[2026-08-04 14:05:06.035] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/api/account/ - 401 null application/json 45.8853ms
+[2026-08-04 14:05:06.069] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/favicon.ico - null null
+[2026-08-04 14:05:06.071] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 642a5edb06ef45e48e364555d95c40ec] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:05:06.072] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 642a5edb06ef45e48e364555d95c40ec] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 14:05:06.073] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 642a5edb06ef45e48e364555d95c40ec] HTTP GET /favicon.ico responded 401 in 2.1931 ms
+[2026-08-04 14:05:06.075] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/favicon.ico - 401 null application/json 5.8901ms
+[2026-08-04 14:06:09.833] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] User profile is available. Using 'C:\Users\hxdes\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2026-08-04 14:06:10.393] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:06:10.403] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:06:10.404] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:06:10.405] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:06:10.543] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:06:10.581] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:06:10.636] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:06:10.639] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:06:10.696] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:06:10.698] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:06:10.753] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:06:10.755] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:06:10.808] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:06:10.809] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:06:11.079] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Now listening on: https://localhost:7046
+[2026-08-04 14:06:11.080] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Now listening on: http://localhost:5105
+[2026-08-04 14:06:11.178] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Application started. Press Ctrl+C to shut down.
+[2026-08-04 14:06:11.180] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Hosting environment: Development
+[2026-08-04 14:06:11.181] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Content root path: C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApi
+[2026-08-04 14:06:18.226] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/api/account/login - null null
+[2026-08-04 14:06:18.360] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 0cb329126b1f48bfb842604a4742c697] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:06:18.374] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 0cb329126b1f48bfb842604a4742c697] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 14:06:18.376] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 0cb329126b1f48bfb842604a4742c697] HTTP GET /api/account/login responded 401 in 61.7626 ms
+[2026-08-04 14:06:18.382] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/api/account/login - 401 null application/json 164.1922ms
+[2026-08-04 14:06:18.417] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/favicon.ico - null null
+[2026-08-04 14:06:18.420] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 9ca393631e264c6a977471e68ec50dd1] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:06:18.422] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 9ca393631e264c6a977471e68ec50dd1] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 14:06:18.423] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 9ca393631e264c6a977471e68ec50dd1] HTTP GET /favicon.ico responded 401 in 3.6803 ms
+[2026-08-04 14:06:18.425] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/favicon.ico - 401 null application/json 7.6026ms
+[2026-08-04 14:06:23.831] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/api/account/login - null null
+[2026-08-04 14:06:23.839] [INF] [ArtemisBankingPro.WebApi] [Correlacion: d0fb46d960db46e48d92f7865a6be462] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:06:23.840] [INF] [ArtemisBankingPro.WebApi] [Correlacion: d0fb46d960db46e48d92f7865a6be462] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 14:06:23.842] [INF] [ArtemisBankingPro.WebApi] [Correlacion: d0fb46d960db46e48d92f7865a6be462] HTTP GET /api/account/login responded 401 in 4.6555 ms
+[2026-08-04 14:06:23.844] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/api/account/login - 401 null application/json 12.5987ms
+[2026-08-04 14:06:23.862] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/favicon.ico - null null
+[2026-08-04 14:06:23.864] [INF] [ArtemisBankingPro.WebApi] [Correlacion: f975e9ec962047949436b4cf59c2947f] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:06:23.865] [INF] [ArtemisBankingPro.WebApi] [Correlacion: f975e9ec962047949436b4cf59c2947f] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 14:06:23.866] [INF] [ArtemisBankingPro.WebApi] [Correlacion: f975e9ec962047949436b4cf59c2947f] HTTP GET /favicon.ico responded 401 in 2.6497 ms
+[2026-08-04 14:06:23.868] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/favicon.ico - 401 null application/json 6.6926ms
+[2026-08-04 14:10:29.510] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] User profile is available. Using 'C:\Users\hxdes\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2026-08-04 14:10:30.320] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:10:30.331] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:10:30.332] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:10:30.334] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:10:30.485] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:10:30.525] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:10:30.587] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:10:30.590] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:10:30.643] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:10:30.645] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:10:30.711] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:10:30.713] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:10:30.775] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:10:30.779] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:10:31.088] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Now listening on: https://localhost:7046
+[2026-08-04 14:10:31.089] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Now listening on: http://localhost:5105
+[2026-08-04 14:10:31.169] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Application started. Press Ctrl+C to shut down.
+[2026-08-04 14:10:31.170] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Hosting environment: Development
+[2026-08-04 14:10:31.171] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Content root path: C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApi
+[2026-08-04 14:11:17.553] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/ - null null
+[2026-08-04 14:11:17.688] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 808e07c2449842f1a6b4d297c7d7f3b8] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:11:17.705] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 808e07c2449842f1a6b4d297c7d7f3b8] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 14:11:17.708] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 808e07c2449842f1a6b4d297c7d7f3b8] HTTP GET / responded 401 in 65.6713 ms
+[2026-08-04 14:11:17.714] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/ - 401 null application/json 167.3065ms
+[2026-08-04 14:11:17.750] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/favicon.ico - null null
+[2026-08-04 14:11:17.754] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 8625d46ac57d4587a209cf90c27f8cab] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:11:17.756] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 8625d46ac57d4587a209cf90c27f8cab] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 14:11:17.760] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 8625d46ac57d4587a209cf90c27f8cab] HTTP GET /favicon.ico responded 401 in 7.4246 ms
+[2026-08-04 14:11:17.762] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/favicon.ico - 401 null application/json 12.1794ms
+[2026-08-04 14:13:01.464] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] User profile is available. Using 'C:\Users\hxdes\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2026-08-04 14:13:02.245] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:13:02.257] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:13:02.258] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:13:02.259] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:13:02.403] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:13:02.442] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:13:02.499] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:13:02.502] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:13:02.558] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:13:02.561] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:13:02.619] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:13:02.622] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:13:02.683] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:13:02.685] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:13:02.951] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Now listening on: https://localhost:7046
+[2026-08-04 14:13:02.952] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Now listening on: http://localhost:5105
+[2026-08-04 14:13:03.038] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Application started. Press Ctrl+C to shut down.
+[2026-08-04 14:13:03.040] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Hosting environment: Development
+[2026-08-04 14:13:03.041] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Content root path: C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApi
+[2026-08-04 14:13:14.768] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/ - null null
+[2026-08-04 14:13:14.907] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 8e0e46141113410eb02ddd29a753c7a4] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:13:14.922] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 8e0e46141113410eb02ddd29a753c7a4] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 14:13:14.924] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 8e0e46141113410eb02ddd29a753c7a4] HTTP GET / responded 401 in 63.7777 ms
+[2026-08-04 14:13:14.930] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/ - 401 null application/json 169.0683ms
+[2026-08-04 14:13:14.956] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7046/favicon.ico - null null
+[2026-08-04 14:13:14.960] [INF] [ArtemisBankingPro.WebApi] [Correlacion: da72ed8fbd3e48d49b291ccc372a71e3] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:13:14.961] [INF] [ArtemisBankingPro.WebApi] [Correlacion: da72ed8fbd3e48d49b291ccc372a71e3] AuthenticationScheme: Bearer was challenged.
+[2026-08-04 14:13:14.963] [INF] [ArtemisBankingPro.WebApi] [Correlacion: da72ed8fbd3e48d49b291ccc372a71e3] HTTP GET /favicon.ico responded 401 in 4.0531 ms
+[2026-08-04 14:13:14.964] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7046/favicon.ico - 401 null application/json 8.2774ms
+[2026-08-04 14:16:26.043] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/1.1 POST https://localhost:7046/api/account/login - application/json 67
+[2026-08-04 14:16:26.049] [INF] [ArtemisBankingPro.WebApi] [Correlacion: c6976007171746589e146199b6848ff4] Executing endpoint 'ArtemisBankingPro.Presentation.WebApi.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApi)'
+[2026-08-04 14:16:26.064] [INF] [ArtemisBankingPro.WebApi] [Correlacion: c6976007171746589e146199b6848ff4] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(ArtemisBankingPro.Core.Application.Dtos.Account.AuthenticationRequest) on controller ArtemisBankingPro.Presentation.WebApi.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApi).
+[2026-08-04 14:16:26.246] [INF] [ArtemisBankingPro.WebApi] [Correlacion: c6976007171746589e146199b6848ff4] AuthenticationScheme: Identity.Application signed in.
+[2026-08-04 14:16:26.289] [INF] [ArtemisBankingPro.WebApi] [Correlacion: c6976007171746589e146199b6848ff4] Executing OkObjectResult, writing value of type '<>f__AnonymousType1`1[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+[2026-08-04 14:16:26.296] [INF] [ArtemisBankingPro.WebApi] [Correlacion: c6976007171746589e146199b6848ff4] Executed action ArtemisBankingPro.Presentation.WebApi.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApi) in 228.426ms
+[2026-08-04 14:16:26.298] [INF] [ArtemisBankingPro.WebApi] [Correlacion: c6976007171746589e146199b6848ff4] Executed endpoint 'ArtemisBankingPro.Presentation.WebApi.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApi)'
+[2026-08-04 14:16:26.299] [INF] [ArtemisBankingPro.WebApi] [Correlacion: c6976007171746589e146199b6848ff4] HTTP POST /api/account/login responded 200 in 252.3111 ms
+[2026-08-04 14:16:26.302] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/1.1 POST https://localhost:7046/api/account/login - 200 null application/json; charset=utf-8 258.6991ms
+[2026-08-04 14:16:34.738] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request starting HTTP/1.1 POST https://localhost:7046/api/account/login - application/json 67
+[2026-08-04 14:16:34.741] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 7689bb55b5e5422daa1ec45042369da3] Executing endpoint 'ArtemisBankingPro.Presentation.WebApi.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApi)'
+[2026-08-04 14:16:34.742] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 7689bb55b5e5422daa1ec45042369da3] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(ArtemisBankingPro.Core.Application.Dtos.Account.AuthenticationRequest) on controller ArtemisBankingPro.Presentation.WebApi.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApi).
+[2026-08-04 14:16:34.784] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 7689bb55b5e5422daa1ec45042369da3] Executing ObjectResult, writing value of type '<>f__AnonymousType0`1[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+[2026-08-04 14:16:34.787] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 7689bb55b5e5422daa1ec45042369da3] Executed action ArtemisBankingPro.Presentation.WebApi.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApi) in 43.8396ms
+[2026-08-04 14:16:34.788] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 7689bb55b5e5422daa1ec45042369da3] Executed endpoint 'ArtemisBankingPro.Presentation.WebApi.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApi)'
+[2026-08-04 14:16:34.788] [INF] [ArtemisBankingPro.WebApi] [Correlacion: 7689bb55b5e5422daa1ec45042369da3] HTTP POST /api/account/login responded 403 in 47.9264 ms
+[2026-08-04 14:16:34.790] [INF] [ArtemisBankingPro.WebApi] [Correlacion: ] Request finished HTTP/1.1 POST https://localhost:7046/api/account/login - 403 null application/json; charset=utf-8 51.7559ms

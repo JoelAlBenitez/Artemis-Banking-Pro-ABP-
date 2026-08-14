@@ -1,5 +1,7 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.SavingsAccounts;
 using Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Session;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.CodeErrors.SavingsAccountsErrors;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
@@ -11,21 +13,39 @@ using Microsoft.Extensions.Logging;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts.SavingsAccountsValidate
 {
-    //Único lugar donde viven las reglas de negocio del módulo de cuentas de ahorro.
-    //Las validaciones se ejecutan siempre antes de escribir en la base de datos.
+  
     public sealed class SavingsAccountsValidateServices : ISavingsAccountsValidateServices
     {
         private readonly ISavingsAccountsRepository _savingsAccountsRepository;
+        private readonly IUserManagementService _userManagementService;
+        private readonly ICurrentUserService _currentUserService;
         private readonly ILogger<SavingsAccountsValidateServices> _logger;
-
-        //integrar el ICurrentUserServices para el administrador responsable y su rol
 
         public SavingsAccountsValidateServices(
             ISavingsAccountsRepository savingsAccountsRepository,
+            IUserManagementService userManagementService,
+            ICurrentUserService currentUserService,
             ILogger<SavingsAccountsValidateServices> logger)
         {
             _savingsAccountsRepository = savingsAccountsRepository;
+            _userManagementService = userManagementService;
+            _currentUserService = currentUserService;
             _logger = logger;
+        }
+
+        
+        public ValidationResult<string> ValidateAdministratorInSession()
+        {
+            var adminUserId = _currentUserService.UserId;
+
+            if (string.IsNullOrWhiteSpace(adminUserId)
+                || !_currentUserService.IsInRole(Roles.Administrador.ToString()))
+            {
+                _logger.LogWarning("Operación de cuentas de ahorro sin un administrador autenticado que atribuir");
+                return ValidationResult<string>.Failure(SavingsAccountError.AdminUserRequired);
+            }
+
+            return ValidationResult<string>.Success(adminUserId);
         }
 
         public async Task<ValidationResult> ValidateCustomerSelectionAsync(string customerId)
@@ -41,15 +61,21 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts.SavingsA
 
             try
             {
-                //La existencia del cliente y su estado activo se validan contra el project Identity.
-                //Cuando el servicio de consulta de usuarios esté disponible, esta validación debe consultarlo
-                //y agregar SavingsAccountError.NonExistsCustomerByIdCard o SavingsAccountError.CustomerIsNotActive.
-                //var customer = await _userServices.GetCustomerByIdAsync(customerId);
-                //if (customer is null) return ValidationResult.Failure(SavingsAccountError.NonExistsCustomerByIdCard);
-                //if (!customer.IsActive) return ValidationResult.Failure(SavingsAccountError.CustomerIsNotActive);
+                //La existencia del cliente y su estado activo los resuelve Identity
+                var customer = await _userManagementService.ValidateUserExistsByIdAsync(customerId);
 
-                //La cuenta principal activa sí pertenece a este módulo y se verifica aquí.
-                //Basta con saber si existe: no se materializa la fila.
+                if (!customer.Exists)
+                {
+                    _logger.LogWarning("El cliente {CustomerId} no existe", customerId);
+                    return ValidationResult.Failure(SavingsAccountError.NonExistsCustomerByIdCard);
+                }
+
+                if (!customer.IsActive)
+                {
+                    _logger.LogWarning("El cliente {CustomerId} no se encuentra activo", customerId);
+                    return ValidationResult.Failure(SavingsAccountError.CustomerIsNotActive);
+                }
+
                 var hasActivePrimaryAccount = await _savingsAccountsRepository.ExistElementByConsult(
                     account => account.CustomerId == customerId
                         && account.AccountType == SavingsAccountType.Principal
@@ -93,7 +119,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts.SavingsA
 
             var errors = new List<Error>();
 
-            //El balance inicial puede ser RD$0.00, pero nunca negativo
             if (dto.InitialBalance < 0m)
             {
                 errors.Add(SavingsAccountError.NegativeInitialBalance);
@@ -166,7 +191,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts.SavingsA
 
             try
             {
-                //Debe existir una principal activa que reciba el balance remanente
                 var hasActivePrimaryAccount = await _savingsAccountsRepository.ExistElementByConsult(
                     account => account.CustomerId == savingsAccount.CustomerId
                         && account.AccountType == SavingsAccountType.Principal
@@ -191,28 +215,40 @@ namespace Artemis_Banking_Pro.Core.Application.Services.SavingsAccounts.SavingsA
             }
         }
 
-        public Task<ValidationResult> ValidateCustomerAccountsQueryAsync(SavingsAccountFilterDto filter)
+        public async Task<ValidationResult<string?>> ValidateCustomerAccountsQueryAsync(SavingsAccountFilterDto filter)
         {
             if (filter is null)
             {
                 _logger.LogWarning("Filtros de consulta de cuentas de ahorro inválidos");
-                return Task.FromResult(ValidationResult.Failure(GeneralError.DataInvalid));
+                return ValidationResult<string?>.Failure(GeneralError.DataInvalid);
             }
 
             if (string.IsNullOrWhiteSpace(filter.IdCard))
             {
-                return Task.FromResult(ValidationResult.Success());
+                return ValidationResult<string?>.Success(null);
             }
 
-            //La cédula identifica al cliente dentro del project Identity. Cuando el servicio de
-            //consulta de usuarios esté disponible, esta validación debe traducirla a su ID y
-            //devolver SavingsAccountError.NonExistsCustomerByIdCard cuando no exista.
-            //var customer = await _userServices.GetCustomerByIdCardAsync(filter.IdCard);
-            //if (customer is null) return ValidationResult.Failure(SavingsAccountError.NonExistsCustomerByIdCard);
+            try
+            {
+                //La cédula identifica al cliente dentro de Identity: aquí se traduce a su Id,
+                //que es la única clave con la que este módulo relaciona las cuentas.
+                var customer = await _userManagementService.GetClientByIdCardAsync(filter.IdCard);
 
-            _logger.LogInformation("Consulta de cuentas de ahorro por la cédula {IdCard}", filter.IdCard);
+                if (customer is null)
+                {
+                    _logger.LogWarning("No existe un cliente registrado con la cédula {IdCard}", filter.IdCard);
+                    return ValidationResult<string?>.Failure(SavingsAccountError.NonExistsCustomerByIdCard);
+                }
 
-            return Task.FromResult(ValidationResult.Success());
+                _logger.LogInformation("Consulta de cuentas de ahorro por la cédula {IdCard}", filter.IdCard);
+
+                return ValidationResult<string?>.Success(customer.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al resolver el cliente de la cédula {IdCard}", filter.IdCard);
+                return ValidationResult<string?>.Failure(GeneralError.UnexpectedError);
+            }
         }
     }
 }

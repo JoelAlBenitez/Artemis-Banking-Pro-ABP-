@@ -25,8 +25,7 @@ namespace ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts
 
         //Collections
 
-        //El historial de transacciones pertenece al módulo Cliente: ni la entidad ni su
-        //repositorio se desarrollan aquí. Se habilita cuando ese módulo la exponga.
         public IReadOnlyCollection<Transaction>? Transactions { get; set; } = null;
+
     }
 }

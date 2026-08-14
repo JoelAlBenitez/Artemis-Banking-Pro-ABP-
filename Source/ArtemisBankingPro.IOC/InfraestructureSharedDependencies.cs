@@ -22,9 +22,7 @@ namespace ArtemisBankingPro.IOC
             services.AddScoped<ICardNumberGenerator, CardNumberGenerator>();
             services.AddSingleton<ICvcHasher, CvcHasher>();
 
-            //Las cuentas de ahorro no registran generador: su número de 9 dígitos lo emite
-            //SavingsAccountNumberSequence desde el repositorio.
-
+         
             return services;
         }
     }

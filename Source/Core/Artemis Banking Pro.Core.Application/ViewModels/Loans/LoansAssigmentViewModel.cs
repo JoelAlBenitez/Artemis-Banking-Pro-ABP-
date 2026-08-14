@@ -21,5 +21,11 @@ namespace Artemis_Banking_Pro.Core.Application.ViewModels.Loans
         [Required(ErrorMessage = "Debe indicar un interes anual para el prestamo.")]
         [Range(typeof(decimal), "0.0", "999999999999.99", ErrorMessage = "Debe ingresar un valor mayor o igual a 0.")]
         public required decimal AnnualInterestRate { get; set; }
+
+
+        public bool ConfirmHighRisk { get; set; }
+
+        //Solo lectura: el nombre del cliente elegido en el paso 1 se muestra en el formulario
+        public string? FullNameCustomer { get; set; }
     }
 }

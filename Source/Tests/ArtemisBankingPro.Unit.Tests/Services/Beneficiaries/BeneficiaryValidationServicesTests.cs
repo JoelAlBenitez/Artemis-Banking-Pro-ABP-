@@ -1,6 +1,4 @@
-using System;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Artemis_Banking_Pro.Core.Application.DTOs.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.Services.Beneficiaries;
 using ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros;
@@ -14,6 +12,9 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+using ArtemisBankingPro.Core.Application.DTOs.Users;
+
 namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
 {
     public sealed class BeneficiaryValidationServicesTests
@@ -21,6 +22,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
         private readonly Mock<ISavingsAccountsRepository> _savingsAccountsRepositoryMock;
         private readonly Mock<IBeneficiaryRepository> _beneficiaryRepositoryMock;
         private readonly Mock<ILogger<BeneficiaryValidationServices>> _loggerMock;
+        private readonly Mock<IUserManagementService> _userManagementServiceMock;
         private readonly BeneficiaryValidationServices _validationServices;
 
         public BeneficiaryValidationServicesTests()
@@ -28,11 +30,16 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Beneficiaries
             _savingsAccountsRepositoryMock = new Mock<ISavingsAccountsRepository>();
             _beneficiaryRepositoryMock = new Mock<IBeneficiaryRepository>();
             _loggerMock = new Mock<ILogger<BeneficiaryValidationServices>>();
+            _userManagementServiceMock = new Mock<IUserManagementService>();
+
+            _userManagementServiceMock.Setup(u => u.ValidateUserExistsByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new UserExistenceDto { Exists = true, IsActive = true });
 
             _validationServices = new BeneficiaryValidationServices(
                 _savingsAccountsRepositoryMock.Object,
                 _beneficiaryRepositoryMock.Object,
-                _loggerMock.Object
+                _loggerMock.Object,
+                _userManagementServiceMock.Object
             );
         }
 

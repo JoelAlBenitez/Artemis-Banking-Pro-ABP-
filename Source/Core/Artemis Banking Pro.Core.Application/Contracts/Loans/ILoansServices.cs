@@ -11,7 +11,8 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.Loans
         Task<ValidationResult<DetailLoansDto>> GetDetailLoanAsync(int loanId);
         Task<ValidationResult<EditAnnualInterestRateDto>> GetLoanForEditRateAsync(int loanId);
         Task<ValidationResult> EditAnnualInterestRateAsync(EditAnnualInterestRateDto dto);
-
-       
+        Task<ValidationResult<ClientsForLoanAssignmentDto>> GetCustomersForAssignmentAsync(string? idCard);
+        Task<ValidationResult<LoanRiskEvaluationDto>> EvaluateRiskAsync(LoansAssignmentDto dto);
+        Task<ValidationResult<IReadOnlyCollection<LoansDto>>> GetActiveLoansByCustomerAsync(string customerId);
     }
 }

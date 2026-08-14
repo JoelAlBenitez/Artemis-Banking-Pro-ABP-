@@ -1,8 +1,11 @@
+using Artemis_Banking_Pro.Core.Application.Contracts.Debts;
 using Artemis_Banking_Pro.Core.Application.Contracts.EmailSerives;
 using Artemis_Banking_Pro.Core.Application.Contracts.Loans;
 using Artemis_Banking_Pro.Core.Application.DTOs.Loans;
 using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
 using Artemis_Banking_Pro.Core.Application.Services.Generic;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
+using ArtemisBankingPro.Core.Application.DTOs.Users;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.CodeErrors.LoansErros;
 using ArtemisBankingPro.Core.Domain.Common.Constants;
@@ -10,101 +13,102 @@ using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Common.Pagination;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
 using ArtemisBankingPro.Core.Domain.Entities.Loans;
+using ArtemisBankingPro.Core.Domain.Entities.Transactions;
 using ArtemisBankingPro.Core.Domain.Interfaces.Loans;
+using ArtemisBankingPro.Core.Domain.Interfaces.SavingsAccounts;
+using ArtemisBankingPro.Core.Domain.Interfaces.Transactions;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 
 namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 {
-     public sealed class LoansServices :
-        GenericServices<LoansAssignmentDto, LoansDto, int, Loan>,
-        ILoansServices
+    public sealed class LoansServices :
+       GenericServices<LoansAssignmentDto, LoansDto, int, Loan>,
+       ILoansServices
     {
         private readonly ILoansRepository _loansRepository;
         private readonly ILoanInstallmentRepository _loanInstallmentRepository;
+        private readonly ISavingsAccountsRepository _savingsAccountsRepository;
+        private readonly ITransactionRepository _transactionRepository;
         private readonly IAmortizationCalculator _amortizationCalculator;
+        private readonly IDebtCalculator _debtCalculator;
         private readonly IEmailServices _emailServices;
+        private readonly IUserManagementService _userManagementService;
         private readonly ILoansValidateServices _loansValidateServices;
         private readonly ILogger<LoansServices> _logger;
 
         public LoansServices(
             ILoansRepository loansRepository,
             ILoanInstallmentRepository loanInstallmentRepository,
+            ISavingsAccountsRepository savingsAccountsRepository,
+            ITransactionRepository transactionRepository,
             IAmortizationCalculator amortizationCalculator,
+            IDebtCalculator debtCalculator,
             IEmailServices emailServices,
+            IUserManagementService userManagementService,
             IMapper mapper,
             ILoansValidateServices loansValidateServices,
-            ILoggerFactory  logger
-           ) : base(loansRepository, mapper, logger.CreateLogger<LoansServices>())
-
+            ILogger<LoansServices> logger
+           ) : base(loansRepository, mapper, logger)
         {
+            _userManagementService = userManagementService;
             _loansRepository = loansRepository;
             _loanInstallmentRepository = loanInstallmentRepository;
+            _savingsAccountsRepository = savingsAccountsRepository;
+            _transactionRepository = transactionRepository;
             _amortizationCalculator = amortizationCalculator;
+            _debtCalculator = debtCalculator;
             _emailServices = emailServices;
             _loansValidateServices = loansValidateServices;
-            _logger = logger.CreateLogger<LoansServices>(); 
+            _logger = logger;
         }
-
 
         #region query methods
         public async Task<ValidationResult<PagedResult<LoansDto>>> GetPagedLoansAsync(LoansFilterDto filter)
         {
             try
             {
-                #region consulta de prestamos de un determinado cliente
-                if (!string.IsNullOrWhiteSpace(filter.IdCard))
+                var validation = await _loansValidateServices.GetLoansByCustomerValidateAsync(filter);
+                if (!validation.IsValid)
                 {
-                    _logger.LogInformation("Recuperando resultado de la validaciones de los filtros ingresados" +
-                        " por el usuario para consulta del cliente con cédula {idCard}", filter.IdCard);
-                    var resultV = await _loansValidateServices.GetLoansByCustomerValidateAsync(filter);
-                    if (!resultV.IsValid) return (ValidationResult<PagedResult<LoansDto>>)resultV;
-
-                    //agregar aqui obtencion del usuario de la cedula ingresada en el filtro | en espera de adrian
-
-                    ////
-                    ///
-                    
-                    _logger.LogInformation("Recuperando datos del cliente con Id {ID}", 0); //por cambiar
-                    var result = await _loansRepository.GetPagedLoansAsync(
-                        filter.Page,
-                        DomainConstants.DefaultPageSize,
-                         ToLoanStatus(filter.Status),
-                        "");
-
-                    //agregar mapeo extra para pasar al dto el full name del customer 
-                    _logger.LogInformation("Mapeando entidad al dto con ID {ID}", 0); //por cambiar
-                    var items = _mapper.Map<IReadOnlyCollection<LoansDto>>(result.Items);
-
-                    _logger.LogInformation("Retornando prestamos del cliente consultado con paginación.");
-                    var paged = new PagedResult<LoansDto>(
-                        items, result.Page, result.PageSize, result.TotalRecords);
-                    return ValidationResult<PagedResult<LoansDto>>.Success(paged);
+                    return ValidationResult<PagedResult<LoansDto>>.Failure(validation.Errors.ToList());
                 }
-                #endregion
-                #region consulta de todos los prestamos sin importar estado
-                _logger.LogInformation("Recuperando todos los prestamos segun el estado seleccionado. Indepedencia del cliente indicado.");
-                var resultAll = await _loansRepository.GetAllAsync(
-                    filter.Page, DomainConstants.DefaultPageSize,
-                    x => x.Status == ToLoanStatus(filter.Status), 
-                    orderBy: x => x.OrderBy(q => q.Status),
-                    x => x.loanInstallments
-                    );
 
-                //falta pasar el name full del customer
-                _logger.LogInformation("Mapeando los datos recuperados");
-                var itemsAll = _mapper.Map<IReadOnlyCollection<LoansDto>>(resultAll.Items);
+                //La validación traduce la cédula al Id del cliente en Identity
+                var customerId = validation.Value;
 
-                _logger.LogInformation("Retornanado el listado de prestamo según el estado {Status}", filter.Status.ToString());
-                var pagedAll = new PagedResult<LoansDto>(
-                        itemsAll, resultAll.Page, resultAll.PageSize, resultAll.TotalRecords);
-                return ValidationResult<PagedResult<LoansDto>>.Success(pagedAll);
-                #endregion
+                _logger.LogInformation("Recuperando el listado de prestamos. Pagina {Pagina}, estado {Estado}",
+                    filter.Page, filter.Status);
 
+                var result = await _loansRepository.GetPagedLoansAsync(
+                    filter.Page,
+                    filter.PageSize,
+                    ToLoanStatus(filter.Status),
+                    customerId);
+
+                if (!string.IsNullOrWhiteSpace(filter.IdCard) && result.TotalRecords == 0)
+                {
+                    _logger.LogWarning("El cliente consultado no tiene prestamos registrados");
+
+                    return ValidationResult<PagedResult<LoansDto>>.Failure(
+                        filter.Status == LoanStatusFilter.Todos
+                            ? LoansError.NonExistsLoans
+                            : LoansError.NonExistLoansByIndicateState);
+                }
+
+                var items = _mapper.Map<IReadOnlyCollection<LoansDto>>(result.Items);
+
+                //El nombre del titular vive en Identity: se completa por página, una sola
+                //consulta por cliente distinto (máximo 20 filas).
+                await FillCustomerNamesAsync(items);
+
+                var paged = new PagedResult<LoansDto>(items, result.Page, result.PageSize, result.TotalRecords);
+
+                return ValidationResult<PagedResult<LoansDto>>.Success(paged);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al recuperar el listado de prestamos del cliente con ID {ID}", 0); //por cambiar
+                _logger.LogError(ex, "Error al recuperar el listado de prestamos");
                 return ValidationResult<PagedResult<LoansDto>>.Failure(GeneralError.UnexpectedError);
             }
         }
@@ -114,14 +118,21 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             try
             {
                 _logger.LogInformation("Recuperando los detalles del prestamo con el ID {ID}", loanId);
-                var loan = await _loansRepository.GetFirstAsync(x => x.Id == loanId);
+
+                var loan = await _loansRepository.GetFirstAsync(x => x.Id == loanId, x => x.loanInstallments);
+
                 if (loan is null)
                 {
                     _logger.LogWarning("Detalles del prestamo con ID {ID} no fueron encontrados", loanId);
                     return ValidationResult<DetailLoansDto>.Failure(LoansError.NonExistsLoan);
                 }
+
+                var detail = _mapper.Map<DetailLoansDto>(loan);
+                detail.FullNameCustomer =
+                    await _userManagementService.GetFullNameByIdAsync(loan.CustomerId) ?? string.Empty;
+
                 _logger.LogInformation("Retornando los detalles del prestamo con ID {ID}", loanId);
-                return ValidationResult<DetailLoansDto>.Success(_mapper.Map<DetailLoansDto>(loan));
+                return ValidationResult<DetailLoansDto>.Success(detail);
             }
             catch (Exception ex)
             {
@@ -134,20 +145,16 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
         {
             try
             {
-                #region validations
-                _logger.LogInformation("Recuperando el prestamo con ID {ID}", loanId);
-                var loan = await _loansRepository.GetByIdAsync(loanId);
-
                 _logger.LogInformation("Validando la existencia del prestamo con ID {ID}", loanId);
                 var result = await _loansValidateServices.EditValidateAnnualInterestRateAsync(loanId);
-                if (!result.IsValid) return (ValidationResult<EditAnnualInterestRateDto>)result;
-                #endregion
-
-                _logger.LogInformation("Mapeando entidad a dto con el ID {Id}", loanId);
-                var dto = _mapper.Map<EditAnnualInterestRateDto>(loan);
+                if (!result.IsValid)
+                {
+                    return ValidationResult<EditAnnualInterestRateDto>.Failure(result.Errors.ToList());
+                }
 
                 _logger.LogInformation("Retornando el dto del prestamo seleccionado con ID {ID}", loanId);
-                return ValidationResult<EditAnnualInterestRateDto>.Success(dto);
+                return ValidationResult<EditAnnualInterestRateDto>.Success(
+                    _mapper.Map<EditAnnualInterestRateDto>(result.Value!));
             }
             catch (Exception ex)
             {
@@ -156,39 +163,319 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             }
         }
 
-        public override async Task<ValidationResult<PagedResult<LoansDto>>> GetAllAsync(int page, int pageSize)
+        public async Task<ValidationResult<IReadOnlyCollection<LoansDto>>> GetActiveLoansByCustomerAsync(string customerId)
         {
             try
             {
-                _logger.LogInformation("Recuperando los registro de los prestamos");
-                var result = await _loansRepository.GetAllAsync(page, pageSize,
-                    null,
-                    orderBy: x => x.OrderBy(q => q.Status),
-                    x => x.loanInstallments
-                    );
+                if (string.IsNullOrWhiteSpace(customerId))
+                {
+                    return ValidationResult<IReadOnlyCollection<LoansDto>>.Failure(LoansError.NonSelectedCustomer);
+                }
 
-                //agregar mapeo del full name de los clientes pertinentes 
-                _logger.LogInformation("Mapeando los datos recuperados");
-                var itemsAll = _mapper.Map<IReadOnlyCollection<LoansDto>>(result.Items);
+                _logger.LogInformation("Recuperando los prestamos activos del cliente con ID {ID}", customerId);
 
-                _logger.LogInformation("Retornanado el listado de prestamos ");
-                var pagedAll = new PagedResult<LoansDto>(
-                        itemsAll, result.Page, result.PageSize, result.TotalRecords);
-                return ValidationResult<PagedResult<LoansDto>>.Success(pagedAll);
+                var loans = await _loansRepository.GetAllFindAsync(
+                    loan => loan.CustomerId == customerId && loan.Status == LoanStatus.Activo,
+                    loan => loan.loanInstallments);
 
+                return ValidationResult<IReadOnlyCollection<LoansDto>>.Success(
+                    _mapper.Map<IReadOnlyCollection<LoansDto>>(loans));
             }
-            catch (Exception ex) {
-
-                _logger.LogError(ex, "Error al recuperar los registro de los prestamos");
-                return ValidationResult<PagedResult<LoansDto>>.Failure(GeneralError.UnexpectedError);
-
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al recuperar los prestamos activos del cliente con ID {ID}", customerId);
+                return ValidationResult<IReadOnlyCollection<LoansDto>>.Failure(GeneralError.UnexpectedError);
             }
-
         }
-        
+
+        public async Task<ValidationResult<ClientsForLoanAssignmentDto>> GetCustomersForAssignmentAsync(string? idCard)
+        {
+            try
+            {
+                _logger.LogInformation("Recuperando los clientes elegibles para la asignacion de un prestamo");
+
+                //Los clientes activos vienen de Identity; la cédula, cuando llega, reduce el
+                //listado a uno solo.
+                List<ClientSummaryDto> activeCustomers;
+
+                if (string.IsNullOrWhiteSpace(idCard))
+                {
+                    activeCustomers = await _userManagementService.GetActiveClientsAsync();
+                }
+                else
+                {
+                    var customer = await _userManagementService.GetClientByIdCardAsync(idCard);
+
+                    if (customer is null)
+                    {
+                        _logger.LogWarning("No existe un cliente activo registrado con la cedula {IdCard}", idCard);
+                        return ValidationResult<ClientsForLoanAssignmentDto>.Failure(
+                            LoansError.NonExistsCustomerByIdCard);
+                    }
+
+                    activeCustomers = new List<ClientSummaryDto> { customer };
+                }
+
+                //El promedio se calcula sobre TODOS los clientes activos, no solo los elegibles:
+                //es el umbral de riesgo del sistema, no una media del listado que se muestra.
+                var allActiveIds = string.IsNullOrWhiteSpace(idCard)
+                    ? activeCustomers.Select(customer => customer.Id).ToList()
+                    : (await _userManagementService.GetActiveClientIdsAsync()).ToList();
+
+                var averageDebt = await _debtCalculator.GetAverageDebtAsync(allActiveIds);
+
+                //Un cliente solo puede tener un préstamo activo: los que ya lo tienen no son
+                //elegibles y no se muestran en el paso 1.
+                var customerIds = activeCustomers.Select(customer => customer.Id).ToList();
+
+                var withActiveLoan = await _loansRepository.GetAllFindAsync(
+                    loan => loan.Status == LoanStatus.Activo && customerIds.Contains(loan.CustomerId));
+
+                var eligible = activeCustomers
+                    .Where(customer => withActiveLoan.All(loan => loan.CustomerId != customer.Id))
+                    .ToList();
+
+                var debts = await _debtCalculator.GetCustomersDebtAsync(
+                    eligible.Select(customer => customer.Id).ToList());
+
+                var clients = eligible.Select(customer => new ClientLoansDto
+                {
+                    Id = customer.Id,
+                    IdCard = customer.IDCARD,
+                    FullName = customer.FullName,
+                    Email = customer.Email,
+                    TotalDebtAmount = debts.TryGetValue(customer.Id, out var debt) ? debt : 0m
+                }).ToList();
+
+                _logger.LogInformation("{Elegibles} clientes elegibles de {Activos} activos. Deuda promedio del sistema RD${Promedio}",
+                    clients.Count, activeCustomers.Count, averageDebt);
+
+                var result = new ClientsForLoanAssignmentDto
+                {
+                    AverageDebt = averageDebt,
+                    Clients = clients
+                };
+
+                return ValidationResult<ClientsForLoanAssignmentDto>.Success(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al recuperar los clientes elegibles para la asignacion de un prestamo");
+                return ValidationResult<ClientsForLoanAssignmentDto>.Failure(GeneralError.UnexpectedError);
+            }
+        }
+
+        public override async Task<ValidationResult<PagedResult<LoansDto>>> GetAllAsync(int page, int pageSize)
+            => await GetPagedLoansAsync(new LoansFilterDto
+            {
+                Status = LoanStatusFilter.Todos,
+                Page = page,
+                PageSize = pageSize
+            });
         #endregion
 
-        #region write methos
+        #region write methods
+        public async Task<ValidationResult<LoanRiskEvaluationDto>> EvaluateRiskAsync(LoansAssignmentDto dto)
+        {
+            try
+            {
+                if (dto is null || string.IsNullOrWhiteSpace(dto.CustomerId))
+                {
+                    return ValidationResult<LoanRiskEvaluationDto>.Failure(LoansError.NonSelectedCustomer);
+                }
+
+                _logger.LogInformation("Evaluando el riesgo del cliente con ID {ID} antes de registrar el prestamo",
+                    dto.CustomerId);
+
+                //El umbral es el promedio de los clientes activos de Identity, no el de quienes
+                //hoy tienen deuda: ese es el divisor que exige el documento funcional.
+                var activeClientIds = await _userManagementService.GetActiveClientIdsAsync();
+
+                var averageDebt = await _debtCalculator.GetAverageDebtAsync(activeClientIds);
+                var currentDebt = await _debtCalculator.GetCustomerDebtAsync(dto.CustomerId);
+
+                //El total a pagar sale de la suma de las cuotas de la tabla de amortización: se
+                //calcula en memoria, sin persistir nada, porque el préstamo aún no existe. La
+                //auditoría no importa aquí: esta tabla no se persiste.
+                var totalPayable = BuildAmortizationTable(dto, DateTimeOffset.UtcNow, DomainConstants.SystemUserId)
+                    .Sum(installment => installment.InstallmentValue);
+
+                var projectedDebt = _debtCalculator.GetProjectedDebt(currentDebt, totalPayable);
+
+                var evaluation = new LoanRiskEvaluationDto
+                {
+                    RiskType = LoanRiskType.SinRiesgo,
+                    Message = string.Empty,
+                    CurrentDebt = currentDebt,
+                    ProjectedDebt = projectedDebt,
+                    AverageDebt = averageDebt
+                };
+
+                if (currentDebt > averageDebt)
+                {
+                    evaluation.RiskType = LoanRiskType.DeudaActual;
+                    evaluation.Message = LoansError.CustomerWithCurrentHighRisk.Description;
+                }
+                else if (projectedDebt > averageDebt)
+                {
+                    evaluation.RiskType = LoanRiskType.DeudaProyectada;
+                    evaluation.Message = LoansError.CustomerWithProjectedHighRisk.Description;
+                }
+
+                _logger.LogInformation(
+                    "Riesgo del cliente con ID {ID}: {Riesgo}. Deuda actual RD${Actual}, proyectada RD${Proyectada}, promedio RD${Promedio}",
+                    dto.CustomerId, evaluation.RiskType, currentDebt, projectedDebt, averageDebt);
+
+                return ValidationResult<LoanRiskEvaluationDto>.Success(evaluation);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al evaluar el riesgo del cliente con ID {ID}", dto?.CustomerId);
+                return ValidationResult<LoanRiskEvaluationDto>.Failure(GeneralError.UnexpectedError);
+            }
+        }
+
+        public override async Task<ValidationResult> CreateAsync(LoansAssignmentDto dto)
+        {
+            _logger.LogInformation("Inicio de la asignacion de un prestamo al cliente con ID {ID}", dto.CustomerId);
+
+            //El administrador responsable sale de la sesión, nunca de un parámetro
+            var adminValidation = _loansValidateServices.ValidateAdministratorInSession();
+            if (!adminValidation.IsValid)
+            {
+                return ValidationResult.Failure(adminValidation.Errors.ToList());
+            }
+
+            var adminUserId = adminValidation.Value!;
+
+            //Las validaciones de negocio van antes de tocar la base de datos
+            var validation = await _loansValidateServices.AssigmentLoansValidateAsync(dto);
+            if (!validation.IsValid) return validation;
+
+            var risk = await EvaluateRiskAsync(dto);
+            if (!risk.IsValid) return ValidationResult.Failure(risk.Errors.ToList());
+
+            //Sin confirmación del administrador el préstamo no se crea: la WebApp muestra la
+            //pantalla de advertencia y la Web API responde 409 Conflict con el mismo mensaje.
+            if (risk.Value!.RequiresConfirmation && !dto.ConfirmHighRisk)
+            {
+                _logger.LogWarning("Asignacion detenida: el cliente con ID {ID} es de alto riesgo ({Riesgo})",
+                    dto.CustomerId, risk.Value.RiskType);
+
+                return ValidationResult.Failure(risk.Value.RiskType == LoanRiskType.DeudaActual
+                    ? LoansError.CustomerWithCurrentHighRisk
+                    : LoansError.CustomerWithProjectedHighRisk);
+            }
+
+            try
+            {
+                //Número de 9 dígitos emitido por LoanNumberSequence. Su rango es disjunto del de
+                //las cuentas de ahorro, así que la unicidad entre ambos productos está garantizada
+                //por la base de datos sin consultar registros.
+                var loanNumber = await _loansRepository.GetNextLoanNumberAsync();
+                if (string.IsNullOrWhiteSpace(loanNumber))
+                {
+                    _logger.LogError("No fue posible generar un numero de prestamo para el cliente con ID {ID}",
+                        dto.CustomerId);
+
+                    return ValidationResult.Failure(LoansError.FailedGenerateLoanNumber);
+                }
+
+                var assignedAt = DateTimeOffset.UtcNow;
+
+                //Receptora del desembolso. La validación ya garantizó que existe y está activa.
+                var primaryAccount = await _savingsAccountsRepository.GetFirstAsync(
+                    account => account.CustomerId == dto.CustomerId
+                        && account.AccountType == SavingsAccountType.Principal
+                        && account.Status == SavingsAccountStatus.Activa);
+
+                if (primaryAccount is null)
+                {
+                    _logger.LogWarning("Asignacion abortada: el cliente con ID {ID} dejo de tener una cuenta principal activa",
+                        dto.CustomerId);
+
+                    return ValidationResult.Failure(LoansError.NonExistAccountFirstActive);
+                }
+
+                var installments = BuildAmortizationTable(dto, assignedAt, adminUserId);
+                if (installments.Count == 0)
+                {
+                    _logger.LogError("No fue posible generar la tabla de amortizacion del prestamo {LoanNumber}", loanNumber);
+                    return ValidationResult.Failure(LoansError.FaildGenerateLoansInstallment);
+                }
+
+                var loan = _mapper.Map<Loan>(dto);
+                loan.LoanNumber = loanNumber;
+                loan.Status = LoanStatus.Activo;
+                loan.MonthlyInstallment = installments[0].InstallmentValue;
+                loan.TotalPayable = installments.Sum(installment => installment.InstallmentValue);
+                loan.PendingAmount = loan.TotalPayable;
+                loan.CreatedAt = assignedAt;
+                loan.CreateByUserId = adminUserId;
+
+                //Las cuotas viajan en la navegación: EF les asigna el LoanId al insertar el préstamo
+                foreach (var installment in installments) loan.loanInstallments.Add(installment);
+
+                await _loansRepository.AddAsync(loan);
+
+                //Desembolso: el capital aprobado se suma al balance de la cuenta principal y queda
+                //registrado como una transacción de tipo CRÉDITO cuyo origen es el préstamo.
+                primaryAccount.Balance += dto.AmmountLoans;
+                primaryAccount.ModifiedAt = assignedAt;
+                primaryAccount.LastModifiedByIdUser = adminUserId;
+
+                await _savingsAccountsRepository.UpdateAsync(primaryAccount);
+
+                await _transactionRepository.AddAsync(new Transaction
+                {
+                    SavingsAccountId = primaryAccount.Id,
+                    Amount = dto.AmmountLoans,
+                    TransactionType = TransactionType.Credito,
+                    OperationType = OperationType.DesembolsoPrestamo,
+                    Origin = loanNumber,
+                    Beneficiary = primaryAccount.AccountNumber,
+                    Status = TransactionStatus.Aprobada,
+                    PerformedByUserId = adminUserId,
+                    Channel = ChannelPayment.Administrador,
+                    CreatedAt = assignedAt,
+                    CreateByUserId = adminUserId
+                });
+
+                //Un único SaveChangesAsync confirma el préstamo, sus n cuotas, el nuevo balance de
+                //la principal y el asiento de CRÉDITO: la operación es atómica.
+                var result = await _loansRepository.SaveChangesAsync();
+                if (result <= 0)
+                {
+                    _logger.LogWarning("El prestamo {LoanNumber} del cliente con ID {ID} fallo en su asignacion",
+                        loanNumber, dto.CustomerId);
+
+                    return ValidationResult.Failure(LoansError.FailedProcessLoan);
+                }
+
+                _logger.LogInformation(
+                    "Prestamo {LoanNumber} asignado al cliente con ID {ID}. Capital RD${Capital} desembolsado en la cuenta {Cuenta}",
+                    loanNumber, dto.CustomerId, dto.AmmountLoans, primaryAccount.AccountNumber);
+
+                //Fuera de la transacción: un fallo de correo no revierte el préstamo
+                await SendLoanApprovedNotificationAsync(new LoanAssignedDto
+                {
+                    CustomerId = dto.CustomerId,
+                    LoanNumber = loanNumber,
+                    ApprovedAmount = dto.AmmountLoans,
+                    Term = (int)dto.TermLoans,
+                    AnnualInterestRate = dto.AnnualInterestRate,
+                    MonthlyInstallment = loan.MonthlyInstallment
+                });
+
+                return ValidationResult.Success();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear el prestamo al cliente con ID {ID}", dto.CustomerId);
+                return ValidationResult.Failure(LoansError.FailedProcessLoan);
+            }
+        }
+
         public async Task<ValidationResult> EditAnnualInterestRateAsync(EditAnnualInterestRateDto dto)
         {
             if (dto.AnnualInterestRate < 0m)
@@ -196,29 +483,32 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                 return ValidationResult.Failure(LoansError.NegativeAnnualInterestRate);
             }
 
+            var adminValidation = _loansValidateServices.ValidateAdministratorInSession();
+            if (!adminValidation.IsValid)
+            {
+                return ValidationResult.Failure(adminValidation.Errors.ToList());
+            }
+
+            var adminUserId = adminValidation.Value!;
+
+            _logger.LogInformation("Validando las reglas del negocio del prestamo con ID {ID}", dto.Id);
+            var validation = await _loansValidateServices.EditValidateAnnualInterestRateAsync(dto.Id);
+            if (!validation.IsValid) return ValidationResult.Failure(validation.Errors.ToList());
+
             try
             {
-                #region validacion de logica y obtencion de recalculo de cuotas
-                _logger.LogInformation("Validando las reglas del negocio del prestamo con ID {ID}", dto.Id);
-                var validate = await _loansValidateServices.EditValidateAnnualInterestRateAsync(dto.Id);
-                if (!validate.IsValid) return validate;
-
-                _logger.LogInformation("Recuperando los datos del prestamo con ID {ID}", dto.Id);
-                var loan = await _loansRepository.GetFirstAsync(x => x.Id == dto.Id);
+                var loan = validation.Value!;
                 var today = DateTimeOffset.UtcNow;
-                var futureInstallments = loan!.loanInstallments
-                    .Where(i => i.paymentStatus == PaymentStatus.Pendiente && i.DueDate > today)
-                    .ToList();
 
                 //Solo se redistribuye el capital que aún no ha sido amortizado
-                _logger.LogInformation("Recalculando las cuotas futuras pendientes del prestamo con ID {ID}", loan.Id);
-                var pendingCapital = futureInstallments.Sum(i => i.CapitalAmount);
-                var recalculated = _amortizationCalculator.RecalculateFutureInstallments(loan.loanInstallments.ToList(), pendingCapital, dto.AnnualInterestRate, today);
-                #endregion
+                var pendingCapital = loan.loanInstallments
+                    .Where(i => i.paymentStatus == PaymentStatus.Pendiente && i.DueDate > today)
+                    .Sum(i => i.CapitalAmount);
 
-                #region mapeo de datos 
-                _logger.LogInformation("Mapeo de datos del dto a la entidad de prestamos con ID {ID}", loan.Id);
-                //cambiando campos especificos del prestamo
+                _logger.LogInformation("Recalculando las cuotas futuras pendientes del prestamo con ID {ID}", loan.Id);
+                var recalculated = _amortizationCalculator.RecalculateFutureInstallments(
+                    loan.loanInstallments.ToList(), pendingCapital, dto.AnnualInterestRate, today, adminUserId);
+
                 loan.AnnualInterestRate = dto.AnnualInterestRate;
                 loan.MonthlyInstallment = recalculated[0].InstallmentValue;
                 loan.TotalPayable = loan.loanInstallments.Sum(i => i.InstallmentValue);
@@ -226,61 +516,73 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                     .Where(i => i.paymentStatus != PaymentStatus.Pagada)
                     .Sum(i => i.PendingBalance);
                 loan.ModifiedAt = today;
+                loan.LastModifiedByIdUser = adminUserId;
 
-                //loan.LastModifiedByIdUser = adminUserId; // cambiar por el ICurrentUserServices | en espera por parte de adrian
-                #endregion
+                _logger.LogInformation("Intento de modificacion del prestamo y sus cuotas con ID {ID}", loan.Id);
+                await _loansRepository.UpdateAsync(loan);
+                await _loanInstallmentRepository.UpdateRangeLoansInstallmentAsync(recalculated.ToList());
 
-               _logger.LogInformation("Intento de modificacion de los datos del prestamo y sus cuotas con ID {ID}", loan.Id);
-               await _loansRepository.UpdateAsync(loan);
-               await _loanInstallmentRepository.UpdateRangeLoansInstallmentAsync(recalculated.ToList());
-               var result = await _loansRepository.SaveChangesAsync();
-               if(result  < 0)
-               {
-                    _logger.LogError("Fallo al intentar modificar el prestamo y sus cuotas futuras con ID {ID}, registros modificados {r}", loan.Id, result);
+                var result = await _loansRepository.SaveChangesAsync();
+                if (result <= 0)
+                {
+                    _logger.LogError("Fallo al modificar el prestamo y sus cuotas futuras con ID {ID}, registros modificados {r}",
+                        loan.Id, result);
+
                     return ValidationResult.Failure(GeneralError.UnexpectedError);
                 }
 
-               //agregar aqui llamada al envio del correo electronico con la actualizacion de cuotas
-               //cuando se integre el ICurrentUserServices para obtener email, full name....del cliente de este prestamo 
+                //Fuera de la transacción: un fallo de correo no revierte la nueva tasa
+                var nextInstallment = recalculated.OrderBy(i => i.InstallmentNumber).First();
 
-               return ValidationResult.Success();
+                await SendRateUpdateNotificationAsync(new LoanRateUpdatedDto
+                {
+                    CustomerId = loan.CustomerId,
+                    LoanNumber = loan.LoanNumber,
+                    AnnualInterestRate = loan.AnnualInterestRate,
+                    NextInstallmentValue = nextInstallment.InstallmentValue,
+                    NextInstallmentDueDate = nextInstallment.DueDate
+                });
+
+                return ValidationResult.Success();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al editar la tarifa del prestamo con ID {ID} ", dto.Id);
+                _logger.LogError(ex, "Error al editar la tasa del prestamo con ID {ID} ", dto.Id);
                 return ValidationResult.Failure(GeneralError.UnexpectedError);
             }
-        }
-
-        public override async Task<ValidationResult> CreateAsync(LoansAssignmentDto dto)
-        {
-            try
-            {
-                _logger.LogInformation("Verificando los datos de la asignación del prestamo al cliente con ID {ID}", dto.CustomerId);
-                var result = await  _loansValidateServices.AssigmentLoansValidateAsync(dto);
-                if (!result.IsValid) return result;
-
-                //agregar aqui validaciones de alto riesgo crear metodo privado
-                
-
-                //agregar creacion de la entidad de loans, loans installment, envio de email pertinente 
-                //return base.CreateAsync(dto);
-                return ValidationResult.Success();
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex, "Error al crear el prestamo al cliente con ID {ID}", dto.CustomerId);
-                return ValidationResult.Failure(GeneralError.UnexpectedError);
-            }
-
-           
         }
         #endregion
 
-        //modificar el metodo de envio de actualizacion de cuotas por tarifa
-
-        //agregar el envio de correo electronico de una asignacion de prestamo
         #region private methods
+        private List<LoanInstallment> BuildAmortizationTable(
+            LoansAssignmentDto dto, DateTimeOffset createdAt, string createdByUserId)
+            => _amortizationCalculator.GenerateAmortizationTable(
+                dto.AmmountLoans,
+                dto.AnnualInterestRate,
+                (int)dto.TermLoans,
+                createdAt,
+                0,
+                createdByUserId).ToList();
+
+        //Una sola consulta a Identity por cliente distinto de la página
+        private async Task FillCustomerNamesAsync(IReadOnlyCollection<LoansDto> loans)
+        {
+            if (loans.Count == 0) return;
+
+            var names = new Dictionary<string, string>();
+
+            foreach (var loan in loans)
+            {
+                if (!names.TryGetValue(loan.CustomerId, out var fullName))
+                {
+                    fullName = await _userManagementService.GetFullNameByIdAsync(loan.CustomerId) ?? string.Empty;
+                    names[loan.CustomerId] = fullName;
+                }
+
+                loan.FullNameCustomer = fullName;
+            }
+        }
+
         private static string BuildRateUpdateBody(LoanRateUpdatedDto rateUpdated, string customerFullName)
             => $"<p>Hola {customerFullName},</p>" +
                $"<p>La tasa de interés de su préstamo {rateUpdated.LoanNumber} ha sido actualizada.</p>" +
@@ -289,41 +591,107 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
                $"Fecha de vencimiento de la próxima cuota: {rateUpdated.NextInstallmentDueDate:dd/MM/yyyy}</p>" +
                "<p>Esta modificación aplica únicamente a las cuotas futuras pendientes.</p>";
 
+        private static string BuildLoanApprovedBody(LoanAssignedDto assigned, string customerFullName)
+            => $"<p>Hola {customerFullName},</p>" +
+               "<p>Su préstamo ha sido aprobado correctamente.</p>" +
+               $"<p>Número de préstamo: {assigned.LoanNumber}<br/>" +
+               $"Monto aprobado: RD${assigned.ApprovedAmount:N2}<br/>" +
+               $"Plazo: {assigned.Term} meses<br/>" +
+               $"Tasa de interés anual: {assigned.AnnualInterestRate}%<br/>" +
+               $"Cuota mensual: RD${assigned.MonthlyInstallment:N2}</p>" +
+               "<p>El monto aprobado ha sido depositado en su cuenta de ahorro principal.</p>";
 
-        private static string BuildAssigmentLoansBody(string customerFullName,
-            string numberLoan, decimal AmountAproveched, int term, decimal rate, decimal rateMonlty)
-            => $"<p>Hola {customerFullName}, </p>" +
-            "<p>Su préstamo ha sido aprobado correctamente.</p>"
-            + $"<p>Número de prestamo: {numberLoan}</p>" +
-            $"<p>Plazo: {term} </p>" +
-            $"<p>Tasa de interés anual: {rate}</p>"
-            + $"<p>Cuota mensual: {rateMonlty} </p>"
-            ;
-
-        private async Task<ValidationResult> SendRateUpdateNotificationAsync(
-            LoanRateUpdatedDto rateUpdated, string customerEmail, string customerFullName)
+        private async Task<ValidationResult> SendLoanApprovedNotificationAsync(LoanAssignedDto assigned)
         {
-            var message = new MessageDto
+            try
             {
-                To = customerEmail,
-                Subject = "Actualización de tasa de interés de préstamo",
-                Message = BuildRateUpdateBody(rateUpdated, customerFullName)
-            };
+                var customer = await _userManagementService.GetUserByIdAsync(assigned.CustomerId);
 
-            var sent = await _emailServices.SendNotification(message);
+                if (customer is null)
+                {
+                    _logger.LogWarning("Sin datos de contacto del cliente con ID {ID}: no se envia el correo de aprobacion",
+                        assigned.CustomerId);
 
-            return sent
-                ? ValidationResult.Success()
-                : ValidationResult.Failure(LoansError.RateUpdatedWithoutNotification);
+                    return ValidationResult.Failure(LoansError.LoanCreatedWithoutNotification);
+                }
+
+                var message = new MessageDto
+                {
+                    To = customer.Email,
+                    Subject = "Préstamo aprobado",
+                    Message = BuildLoanApprovedBody(assigned, $"{customer.Name} {customer.LastName}".Trim())
+                };
+
+                var sent = await _emailServices.SendNotification(message);
+
+                if (!sent)
+                {
+                    _logger.LogWarning("No fue posible enviar el correo de aprobacion del prestamo {LoanNumber}. La operacion no se revierte",
+                        assigned.LoanNumber);
+
+                    return ValidationResult.Failure(LoansError.LoanCreatedWithoutNotification);
+                }
+
+                return ValidationResult.Success();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error al enviar el correo de aprobacion del prestamo {LoanNumber}. La operacion no se revierte",
+                    assigned.LoanNumber);
+
+                return ValidationResult.Failure(LoansError.LoanCreatedWithoutNotification);
+            }
         }
 
-        private static LoanStatus ToLoanStatus(LoanStatusFilter filter)
+        private async Task<ValidationResult> SendRateUpdateNotificationAsync(LoanRateUpdatedDto rateUpdated)
+        {
+            try
+            {
+                var customer = await _userManagementService.GetUserByIdAsync(rateUpdated.CustomerId);
+
+                if (customer is null)
+                {
+                    _logger.LogWarning("Sin datos de contacto del cliente con ID {ID}: no se envia el correo de tasa",
+                        rateUpdated.CustomerId);
+
+                    return ValidationResult.Failure(LoansError.RateUpdatedWithoutNotification);
+                }
+
+                var message = new MessageDto
+                {
+                    To = customer.Email,
+                    Subject = "Actualización de tasa de interés de préstamo",
+                    Message = BuildRateUpdateBody(rateUpdated, $"{customer.Name} {customer.LastName}".Trim())
+                };
+
+                var sent = await _emailServices.SendNotification(message);
+
+                if (!sent)
+                {
+                    _logger.LogWarning("No fue posible enviar el correo de actualizacion de tasa del prestamo {LoanNumber}. La operacion no se revierte",
+                        rateUpdated.LoanNumber);
+
+                    return ValidationResult.Failure(LoansError.RateUpdatedWithoutNotification);
+                }
+
+                return ValidationResult.Success();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error al enviar el correo de actualizacion de tasa del prestamo {LoanNumber}. La operacion no se revierte",
+                    rateUpdated.LoanNumber);
+
+                return ValidationResult.Failure(LoansError.RateUpdatedWithoutNotification);
+            }
+        }
+
+        private static LoanStatus? ToLoanStatus(LoanStatusFilter filter)
             => filter switch
             {
                 LoanStatusFilter.Activos => LoanStatus.Activo,
-                LoanStatusFilter.Todos => LoanStatus.Activo,
-                _ => LoanStatus.Completado
-                };
+                LoanStatusFilter.Completados => LoanStatus.Completado,
+                _ => null
+            };
         #endregion
 
     }

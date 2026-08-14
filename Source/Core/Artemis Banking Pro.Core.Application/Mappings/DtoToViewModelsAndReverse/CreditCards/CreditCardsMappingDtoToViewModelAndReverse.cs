@@ -10,6 +10,11 @@ namespace Artemis_Banking_Pro.Core.Application.Mappings.DtoToViewModelsAndRevers
         public CreditCardsMappingDtoToViewModelAndReverse()
         {
             CreateMap<ClientCreditCardDto, ClientCreditCardViewModel>().ReverseMap();
+
+            //La cédula buscada la conserva el controlador para repintar el formulario
+            CreateMap<ClientsForCreditCardAssignmentDto, ClientsForCreditCardAssignmentViewModel>()
+                .ForMember(d => d.IdCard, o => o.Ignore());
+
             CreateMap<CreditCardAssignmentDto, CreditCardAssignmentViewModel>().ReverseMap();
             CreateMap<CreditCardFilterDto, CreditCardFilterViewModel>().ReverseMap();
 
