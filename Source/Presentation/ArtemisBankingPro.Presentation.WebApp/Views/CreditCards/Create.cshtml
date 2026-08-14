@@ -1,0 +1,53 @@
+@using Artemis_Banking_Pro.Core.Application.ViewModels.CreditCards
+@model CreditCardAssignmentViewModel
+
+@{
+    ViewData["Title"] = "Configurar Tarjeta de Crédito";
+}
+
+<div class="container mt-4 mb-5 d-flex justify-content-center">
+    <div class="card shadow-sm border-0" style="max-width: 600px; width: 100%;">
+        <!-- Header -->
+        <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+            <h2 class="fw-bold" style="font-family: 'Montserrat', sans-serif; color: #0F172A;">
+                <a asp-action="Assign" class="text-decoration-none text-muted me-2" title="Volver a Selección">
+                    <i class="bi bi-arrow-left-circle"></i>
+                </a>
+                Paso 2: Configurar Tarjeta
+            </h2>
+            <p class="text-muted small mb-0">Establezca el límite de crédito inicial para el cliente seleccionado.</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+            <div class="alert alert-info border-0 shadow-sm small mb-4">
+                <i class="bi bi-info-circle-fill me-2"></i> La deuda inicial de esta tarjeta será de <strong>RD$ 0.00</strong>.
+            </div>
+
+            <form asp-action="Create" method="post">
+                <input type="hidden" asp-for="CustomerId" />
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger shadow-sm mb-4"></div>
+
+                <div class="mb-4">
+                    <label asp-for="CreditLimit" class="form-label fw-bold" style="color: #0F172A;">Límite de Crédito Aprobado</label>
+                    <div class="input-group shadow-sm">
+                        <span class="input-group-text bg-success text-white fw-bold">RD$</span>
+                        <input asp-for="CreditLimit" type="number" step="0.01" min="0.01" class="form-control form-control-lg bg-light text-center fw-bold fs-4" placeholder="0.00" />
+                    </div>
+                    <span asp-validation-for="CreditLimit" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-end mt-5">
+                    <a asp-action="Assign" class="btn btn-light fw-bold shadow-sm me-3 px-4 py-2">Volver atrás</a>
+                    <button type="submit" class="btn btn-primary fw-bold shadow-sm px-5 py-2" style="background-color: #4472C4; border-color: #4472C4;">
+                        Asignar tarjeta <i class="bi bi-check-circle ms-1"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
