@@ -9,7 +9,7 @@
     /* Estilos limpios y directos para Dashboard */
     .metric-card {
         background: white;
-        border-radius: 10px;
+        border-radius: 6px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
         border: 1px solid rgba(0,0,0,0.06);
         padding: 1.25rem;
@@ -17,7 +17,7 @@
     .icon-box {
         width: 40px;
         height: 40px;
-        border-radius: 8px;
+        border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -145,21 +145,21 @@
             
             <div class="row g-3">
                 <div class="col-md-4">
-                    <div class="bg-white bg-opacity-10 rounded-3 p-3 h-100 text-center border border-white border-opacity-10" style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.15)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">
+                    <div class="bg-white bg-opacity-10 rounded-2 p-3 h-100 text-center border border-white border-opacity-10" style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.15)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">
                         <i class="bi bi-cash-coin fs-2 text-info mb-2 d-block"></i>
                         <h3 class="fw-bolder mb-1 text-white">@Model.OutstandingLoans.ToString("N0")</h3>
                         <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Préstamos Vigentes</span>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="bg-white bg-opacity-10 rounded-3 p-3 h-100 text-center border border-white border-opacity-10" style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.15)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">
+                    <div class="bg-white bg-opacity-10 rounded-2 p-3 h-100 text-center border border-white border-opacity-10" style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.15)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">
                         <i class="bi bi-credit-card fs-2 text-warning mb-2 d-block"></i>
                         <h3 class="fw-bolder mb-1 text-white">@Model.CreditCardActive.ToString("N0")</h3>
                         <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Tarjetas de Crédito</span>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="bg-white bg-opacity-10 rounded-3 p-3 h-100 text-center border border-white border-opacity-10" style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.15)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">
+                    <div class="bg-white bg-opacity-10 rounded-2 p-3 h-100 text-center border border-white border-opacity-10" style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.15)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">
                         <i class="bi bi-piggy-bank fs-2 text-success mb-2 d-block"></i>
                         <h3 class="fw-bolder mb-1 text-white">@Model.SavingAccountActive.ToString("N0")</h3>
                         <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Cuentas de Ahorro</span>
