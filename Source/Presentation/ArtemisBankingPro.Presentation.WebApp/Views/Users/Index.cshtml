@@ -246,7 +246,7 @@
             @for (int i = 1; i <= Model.TotalPages; i++)
             {
                 <li class="page-item @(i == Model.Page ? "active" : "")">
-                    <a class="page-link px-3 fw-bold" style="@(i == Model.Page ? "background-color: #0F172A; border-color: #0F172A;" : "")" asp-action="Index" asp-route-filter.Page="@i" asp-route-filter.Role="@Model.Filter.Role">
+                    <a class="page-link px-3 fw-bold" style="@(i == Model.Page ? "background-color: #1E293B; border-color: #1E293B;" : "")" asp-action="Index" asp-route-filter.Page="@i" asp-route-filter.Role="@Model.Filter.Role">
                         @i
                     </a>
                 </li>
