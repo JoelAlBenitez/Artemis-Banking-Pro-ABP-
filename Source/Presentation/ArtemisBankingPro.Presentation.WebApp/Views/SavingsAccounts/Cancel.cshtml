@@ -1,0 +1,44 @@
+@using Artemis_Banking_Pro.Core.Application.ViewModels.SavingsAccounts
+@model CancelSavingsAccountViewModel
+
+@{
+    ViewData["Title"] = "Cancelar Cuenta Secundaria";
+}
+
+<div class="container mt-5 mb-5 d-flex justify-content-center">
+    <div class="card shadow-lg border-0" style="max-width: 600px; width: 100%;">
+        <div class="card-header bg-danger text-white d-flex align-items-center p-4 border-0 rounded-top">
+            <i class="bi bi-x-octagon-fill fs-1 me-3"></i>
+            <div>
+                <h3 class="fw-bolder mb-0">Confirmar Cancelación</h3>
+                <p class="mb-0 fw-bold opacity-75">Esta acción desactivará la cuenta permanentemente.</p>
+            </div>
+        </div>
+        
+        <div class="card-body p-4 p-md-5 text-center">
+            <i class="bi bi-piggy-bank-fill text-danger mb-3" style="font-size: 4rem;"></i>
+            
+            <h4 class="fw-bold text-dark mb-4">@Model.ConfirmationMessage</h4>
+
+            <div class="alert alert-warning border-0 shadow-sm small text-start mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i>
+                Si la cuenta secundaria posee balance disponible, el total de los fondos será <strong>transferido automáticamente</strong> a la cuenta principal del cliente.
+            </div>
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger shadow-sm mb-4 text-start"></div>
+
+            <form asp-action="Cancel" method="post" class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                <input type="hidden" asp-for="SavingsAccountId" />
+                <input type="hidden" asp-for="AccountNumber" />
+
+                <a asp-action="Index" class="btn btn-light fw-bold shadow-sm px-4 py-3 flex-fill">
+                    Volver atrás
+                </a>
+                
+                <button type="submit" class="btn btn-danger fw-bold shadow-sm px-4 py-3 flex-fill">
+                    Aceptar y Cancelar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
