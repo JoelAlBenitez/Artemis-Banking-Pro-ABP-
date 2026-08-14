@@ -234,6 +234,19 @@
             display: none;
         }
 
+        /* Ocultar el boton de ojo por defecto, mostrar solo cuando el input tiene foco o texto */
+        #togglePassword {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .input-group:focus-within #togglePassword,
+        #passwordInput:not(:placeholder-shown) + #togglePassword {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         /* Animaciones */
         @@keyframes fadeIn {
             from { opacity: 0; transform: translateX(20px); }
@@ -305,7 +318,7 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-lock"></i></span>
                             <input asp-for="Password" type="password" id="passwordInput" class="form-control" placeholder="Ingrese su contraseña" required />
-                            <button class="btn border-0 text-muted" type="button" id="togglePassword" style="box-shadow: none; padding-right: 1.2rem; display: flex; align-items: center; background-color: transparent;">
+                            <button type="button" id="togglePassword" style="border: none; outline: none; background: transparent; padding-right: 1.2rem; display: flex; align-items: center; color: #6B7280; cursor: pointer;">
                                 <i class="bi bi-eye-slash" id="toggleIcon"></i>
                             </button>
                         </div>
