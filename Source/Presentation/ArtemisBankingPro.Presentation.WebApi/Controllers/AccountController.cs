@@ -1,105 +1,68 @@
-using ArtemisBankingPro.Core.Application.Contracts.Users.InternalUsers;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Password;
-using ArtemisBankingPro.Core.Application.Contracts.Users.Registration;
+using Artemis_Banking_Pro.Core.Application.Features.Account.Commands.ConfirmAccount;
+using Artemis_Banking_Pro.Core.Application.Features.Account.Commands.GetResetToken;
+using Artemis_Banking_Pro.Core.Application.Features.Account.Commands.Login;
+using Artemis_Banking_Pro.Core.Application.Features.Account.Commands.ResetPassword;
 using ArtemisBankingPro.Core.Application.DTOs.Account;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace ArtemisBankingPro.Presentation.WebApi.Controllers
 {
     //Flujo de autenticación: ninguno de estos endpoints puede exigir un JWT previo, porque
     //quien todavía no ha activado su cuenta o perdió su contraseña no puede tener uno.
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("account")]
     [AllowAnonymous]
-    public class AccountController : ControllerBase
+    [SwaggerTag("Autenticación, activación de cuenta y restablecimiento de contraseña")]
+    public class AccountController : BaseApiController
     {
-        private readonly IAuthWebApiService _authService;
-        private readonly IAccountRegistrationService _accountRegistrationService;
-        private readonly IPasswordRecoveryService _passwordRecoveryService;
-
-        public AccountController(
-            IAuthWebApiService authService,
-            IAccountRegistrationService accountRegistrationService,
-            IPasswordRecoveryService passwordRecoveryService)
-        {
-            _authService = authService;
-            _accountRegistrationService = accountRegistrationService;
-            _passwordRecoveryService = passwordRecoveryService;
-        }
-
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] AuthenticationRequest request)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JwtTokenDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [SwaggerOperation(
+            Summary = "Iniciar sesión",
+            Description = "Valida las credenciales de un usuario Administrador o Comercio y retorna su token JWT")]
+        public async Task<IActionResult> Login([FromBody] LoginCommand command)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var response = await _authService.LoginAsync(request);
-
-            if (response.HasError)
-            {
-                if (response.Forbidden)
-                    return StatusCode(StatusCodes.Status403Forbidden, new { error = response.Error });
-
-                return Unauthorized(new { error = response.Error });
-            }
-
-            return Ok(new { jwt = response.Token });
+            return Ok(await Mediator.Send(command));
         }
 
         [HttpPost("confirm")]
-        public async Task<IActionResult> ConfirmAccount([FromBody] ConfirmAccountRequest request)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [SwaggerOperation(
+            Summary = "Confirmar cuenta",
+            Description = "Activa la cuenta de un usuario mediante el token de confirmación enviado por correo")]
+        public async Task<IActionResult> Confirm([FromBody] ConfirmAccountCommand command)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var response = await _accountRegistrationService.ConfirmAccountAsync(request.UserId, request.Token);
-
-            if (response.HasError)
-                return BadRequest(new { error = response.Message });
-
+            await Mediator.Send(command);
             return NoContent();
         }
 
         [HttpPost("get-reset-token")]
-        public async Task<IActionResult> GetResetToken([FromBody] ForgotPasswordRequest request)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [SwaggerOperation(
+            Summary = "Obtener token de restablecimiento",
+            Description = "Inactiva temporalmente la cuenta, genera el token de restablecimiento y lo envía al correo del usuario")]
+        public async Task<IActionResult> GetResetToken([FromBody] GetResetTokenCommand command)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var response = await _passwordRecoveryService.ForgotPasswordApiAsync(request);
-
-            if (response.HasError)
-                return BadRequest(new { error = response.Error });
-
+            await Mediator.Send(command);
             return NoContent();
         }
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordApiRequest request)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [SwaggerOperation(
+            Summary = "Restablecer contraseña",
+            Description = "Cambia la contraseña usando el token de restablecimiento y deja la cuenta activa")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var response = await _passwordRecoveryService.ResetPasswordApiAsync(request);
-
-            if (response.HasError)
-                return BadRequest(new { error = response.Error });
-
+            await Mediator.Send(command);
             return NoContent();
         }
-    }
-
-    public class ConfirmAccountRequest
-    {
-        //El token de Identity va cifrado y no permite recuperar al usuario: el identificador
-        //viaja junto a él y se envía en el mismo correo de activación.
-        [Required(AllowEmptyStrings = false)]
-        public required string UserId { get; set; }
-
-        [Required(AllowEmptyStrings = false)]
-        public required string Token { get; set; }
     }
 }

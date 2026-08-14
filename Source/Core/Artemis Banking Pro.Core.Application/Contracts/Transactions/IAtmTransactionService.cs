@@ -9,7 +9,7 @@ namespace Artemis_Banking_Pro.Core.Application.Contracts.Transactions
         Task<ValidationResult> ProcessAtmCreditCardPaymentAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardPaymentDto dto);
         Task<ValidationResult> ProcessAtmLoanPaymentAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanPaymentDto dto);
         Task<ValidationResult> ProcessAtmThirdPartyTransferAsync(Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmThirdPartyTransferDto dto);
-        Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmIndicatorsDto>> GetCashierDailyIndicatorsAsync(string cashierId);
+        Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmIndicatorsDto>> GetAtmCashierDailyIndicatorsAsync(string cashierId);
         Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmAccountDetailsDto>> GetAtmAccountDetailsAsync(string accountNumber);
         Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardDetailsDto>> GetAtmCreditCardDetailsAsync(string cardNumber);
         Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanDetailsDto>> GetAtmLoanDetailsAsync(string loanNumber);

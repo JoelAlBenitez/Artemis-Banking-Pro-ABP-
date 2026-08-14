@@ -1218,7 +1218,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             }
         }
 
-        public async Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmIndicatorsDto>> GetCashierDailyIndicatorsAsync(string cashierId)
+        public async Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmIndicatorsDto>> GetAtmCashierDailyIndicatorsAsync(string cashierId)
         {
             var today = DateTimeOffset.UtcNow.Date;
             

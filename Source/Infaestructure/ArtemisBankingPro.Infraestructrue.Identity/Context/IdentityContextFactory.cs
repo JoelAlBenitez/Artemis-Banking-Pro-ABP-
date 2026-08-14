@@ -3,21 +3,23 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace ArtemisBankingPro.Infraestructrue.Identity.Context
 {
-    //Solo se usa en tiempo de diseño (dotnet ef migrations add / script).
-    //En ejecución el contexto lo registra GeneralConfiguration, que hoy sigue apuntando a la
-    //base en memoria hasta que se habilite la conexión real de SQL Server.
+    //Solo se usa en tiempo de diseño (dotnet ef migrations add / database update).
+    //En ejecución el contexto lo registra GeneralConfiguration leyendo DefaultConnection.
     public class IdentityContextFactory : IDesignTimeDbContextFactory<IdentityContext>
     {
-        //La cadena no se conecta durante el scaffolding: EF solo necesita el proveedor para
-        //saber qué tipos y qué SQL generar.
+        //Misma base que el contexto de negocio: las tablas de Identity y las del banco conviven
+        //en ArtemisBankingPro, cada contexto con su propia tabla de historial de migraciones.
         private const string DesignTimeConnection =
-            "Server=(localdb)\\MSSQLLocalDB;Database=ArtemisBankingProIdentity;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
+            "Server=.\\DEVELOPER;Database=ArtemisBankingPro;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
 
         public IdentityContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<IdentityContext>();
             optionsBuilder.UseSqlServer(DesignTimeConnection, sql =>
-                sql.MigrationsAssembly(typeof(IdentityContext).Assembly.FullName));
+            {
+                sql.MigrationsAssembly(typeof(IdentityContext).Assembly.FullName);
+                sql.MigrationsHistoryTable("__EFMigrationsHistory_Identity");
+            });
 
             return new IdentityContext(optionsBuilder.Options);
         }

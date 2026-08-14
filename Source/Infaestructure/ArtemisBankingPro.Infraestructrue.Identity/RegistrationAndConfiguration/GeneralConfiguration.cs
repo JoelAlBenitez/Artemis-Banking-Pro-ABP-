@@ -20,7 +20,13 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguratio
         public static void AddGeneralConfiguration(IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<IdentityContext>(options =>
-                options.UseInMemoryDatabase("ArtemisBankingPro_Identity")
+                options.UseSqlServer(
+                    configuration.GetConnectionString("DefaultConnection"),
+                    sql =>
+                    {
+                        sql.MigrationsAssembly(typeof(IdentityContext).Assembly.FullName);
+                        sql.MigrationsHistoryTable("__EFMigrationsHistory_Identity");
+                    })
             );
 
             services.AddAutoMapper(config => config.AddProfile<IdentityProfile>());
