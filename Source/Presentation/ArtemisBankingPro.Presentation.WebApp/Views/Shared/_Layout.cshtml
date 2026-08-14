@@ -80,20 +80,19 @@
             
             @if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                <div class="p-3 border-top border-secondary border-opacity-25 mt-auto">
-                    <div class="d-flex align-items-center px-3 mb-3">
-                        <div class="bg-primary rounded-circle d-flex justify-content-center align-items-center text-white shadow-sm me-3" style="width: 40px; height: 40px; font-weight: bold; background-color: #4472C4 !important;">
+                <div class="p-3 border-top border-secondary border-opacity-25 mt-auto dropdown dropup">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle p-2 rounded" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.05)'" onmouseout="this.style.backgroundColor='transparent'">
+                        <div class="bg-primary rounded-circle d-flex justify-content-center align-items-center text-white shadow-sm me-3 flex-shrink-0" style="width: 40px; height: 40px; font-weight: bold; background-color: #4472C4 !important;">
                             @User.Identity.Name?.Substring(0, 1).ToUpper()
                         </div>
-                        <div class="text-truncate">
+                        <div class="text-truncate me-auto">
                             <div class="fw-bold text-white fs-6">@User.Identity.Name</div>
                             <div class="text-white opacity-50 small">En línea</div>
                         </div>
-                    </div>
-
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link text-danger fw-bold d-flex align-items-center py-2 px-3 rounded sidebar-logout" asp-area="" asp-controller="Account" asp-action="Logout">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow border-0 mb-2 w-100" aria-labelledby="dropdownUser" style="background-color: #1E293B; border-radius: 8px;">
+                        <li>
+                            <a class="dropdown-item text-danger fw-bold d-flex align-items-center py-2" asp-area="" asp-controller="Account" asp-action="Logout">
                                 <i class="bi bi-box-arrow-right me-3 fs-5"></i> Cerrar sesión
                             </a>
                         </li>
