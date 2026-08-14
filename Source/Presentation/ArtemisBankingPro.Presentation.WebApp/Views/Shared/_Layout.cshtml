@@ -4,80 +4,114 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Artemis Banking Pro</title>
+    
     <!-- Google Fonts for Artemis Branding -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ArtemisBankingPro.Presentation.WebApp.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand fw-bold" style="font-family: 'Montserrat', sans-serif; letter-spacing: 1px;" asp-area="" asp-controller="Home" asp-action="Index">ARTEMIS<span style="color: #4472C4;">.</span></a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
-                        {
-                            if (User.IsInRole("Administrador"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Home</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Gestión de usuarios</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Loans" asp-action="Index">Gestión de préstamos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="CreditCards" asp-action="Index">Gestión de tarjetas de crédito</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="SavingsAccounts" asp-action="Index">Gestión de cuentas de ahorro</a>
-                                </li>
-                            }
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                            </li>
-                        }
-                    </ul>
+<body style="background-color: #F8FAFC; overflow: hidden;">
+    <div class="d-flex min-vh-100">
+        <!-- Sidebar -->
+        <aside class="sidebar text-white d-flex flex-column shadow-lg" style="width: 280px; min-height: 100vh; background-color: #0F172A; z-index: 1000;">
+            <div class="p-4 border-bottom border-secondary border-opacity-25 text-center">
+                <a class="navbar-brand fw-bold text-white fs-4 text-decoration-none" style="font-family: 'Montserrat', sans-serif; letter-spacing: 2px;" asp-area="" asp-controller="Home" asp-action="Index">
+                    ARTEMIS<span style="color: #4472C4;">.</span>
+                </a>
+            </div>
+            
+            <div class="flex-grow-1 p-3 pt-4">
+                <ul class="nav flex-column gap-2">
                     @if (User.Identity != null && User.Identity.IsAuthenticated)
                     {
-                        <ul class="navbar-nav">
+                        if (User.IsInRole("Administrador"))
+                        {
                             <li class="nav-item">
-                                <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="Account" asp-action="Logout">Cerrar sesión</a>
+                                <a class="nav-link text-white opacity-75 sidebar-link rounded d-flex align-items-center py-2 px-3 fw-bold" asp-area="" asp-controller="Admin" asp-action="Index">
+                                    <i class="bi bi-grid-1x2 me-3 fs-5"></i> Home
+                                </a>
                             </li>
-                        </ul>
+                            <li class="nav-item mt-2">
+                                <span class="text-uppercase text-muted small fw-bolder ms-3 mb-1 d-block" style="font-size: 0.7rem; letter-spacing: 1px;">Módulos</span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white opacity-75 sidebar-link rounded d-flex align-items-center py-2 px-3 fw-bold" asp-area="" asp-controller="Users" asp-action="Index">
+                                    <i class="bi bi-people me-3 fs-5"></i> Gestión de usuarios
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white opacity-75 sidebar-link rounded d-flex align-items-center py-2 px-3 fw-bold" asp-area="" asp-controller="Loans" asp-action="Index">
+                                    <i class="bi bi-cash-coin me-3 fs-5"></i> Gestión de préstamos
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white opacity-75 sidebar-link rounded d-flex align-items-center py-2 px-3 fw-bold" asp-area="" asp-controller="CreditCards" asp-action="Index">
+                                    <i class="bi bi-credit-card me-3 fs-5"></i> Tarjetas de crédito
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white opacity-75 sidebar-link rounded d-flex align-items-center py-2 px-3 fw-bold" asp-area="" asp-controller="SavingsAccounts" asp-action="Index">
+                                    <i class="bi bi-piggy-bank me-3 fs-5"></i> Cuentas de ahorro
+                                </a>
+                            </li>
+                        }
                     }
-                </div>
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white opacity-75 sidebar-link rounded d-flex align-items-center py-2 px-3 fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door me-3 fs-5"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white opacity-75 sidebar-link rounded d-flex align-items-center py-2 px-3 fw-bold" asp-area="" asp-controller="Home" asp-action="Privacy">
+                                <i class="bi bi-shield-lock me-3 fs-5"></i> Privacidad
+                            </a>
+                        </li>
+                    }
+                </ul>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
+            
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <div class="p-3 border-top border-secondary border-opacity-25 mt-auto">
+                    <div class="d-flex align-items-center px-3 mb-3">
+                        <div class="bg-primary rounded-circle d-flex justify-content-center align-items-center text-white shadow-sm me-3" style="width: 40px; height: 40px; font-weight: bold; background-color: #4472C4 !important;">
+                            @User.Identity.Name?.Substring(0, 1).ToUpper()
+                        </div>
+                        <div class="text-truncate">
+                            <div class="fw-bold text-white fs-6">@User.Identity.Name</div>
+                            <div class="text-white opacity-50 small">En línea</div>
+                        </div>
+                    </div>
+
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-danger fw-bold d-flex align-items-center py-2 px-3 rounded sidebar-logout" asp-area="" asp-controller="Account" asp-action="Logout">
+                                <i class="bi bi-box-arrow-right me-3 fs-5"></i> Cerrar sesión
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            }
+        </aside>
+
+        <!-- Main Content -->
+        <main role="main" class="flex-grow-1 w-100" style="background-color: #F8FAFC; height: 100vh; overflow-y: auto;">
+            <div class="container-fluid p-4 p-md-5">
+                @RenderBody()
+            </div>
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - ArtemisBankingPro.Presentation.WebApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
