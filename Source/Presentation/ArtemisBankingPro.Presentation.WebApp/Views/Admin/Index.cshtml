@@ -89,12 +89,12 @@
 <div class="row g-3 mb-4">
     <!-- Deuda Promedio -->
     <div class="col-md-5">
-        <div class="metric-card h-100 bg-dark text-white d-flex flex-column justify-content-center shadow-sm" style="background-color: #0F172A !important;">
+        <div class="metric-card h-100 d-flex flex-column justify-content-center shadow-sm">
             <div class="d-flex align-items-center mb-2">
-                <i class="bi bi-graph-up-arrow text-info me-2"></i>
-                <h6 class="text-white-50 text-uppercase fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 0.5px;">Deuda Promedio por Cliente</h6>
+                <i class="bi bi-graph-up-arrow text-danger me-2"></i>
+                <h6 class="text-muted text-uppercase fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 0.5px;">Deuda Promedio por Cliente</h6>
             </div>
-            <h3 class="fw-bolder mb-0 text-white" style="font-family: 'Montserrat', sans-serif;">
+            <h3 class="fw-bolder mb-0 text-danger" style="font-family: 'Montserrat', sans-serif;">
                 RD$ @Model.AverageDebtAmountPerCustomer.ToString("N2")
             </h3>
         </div>
