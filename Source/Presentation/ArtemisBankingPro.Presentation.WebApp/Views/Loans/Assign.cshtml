@@ -64,7 +64,7 @@
                                 <th>NOMBRE Y APELLIDO</th>
                                 <th>CORREO ELECTRÓNICO</th>
                                 <th class="text-end">MONTO TOTAL DE DEUDA</th>
-                                <th class="text-end pe-4" style="width: 150px;">ACCIÓN</th>
+                                <th class="text-end pe-4">ACCIÓN</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -89,8 +89,8 @@
                                             <form asp-action="SelectCustomer" method="post" class="m-0 p-0 d-inline">
                                                 <input type="hidden" name="customerId" value="@client.Id" />
                                                 <input type="hidden" name="fullNameCustomer" value="@client.FullName" />
-                                                <button type="submit" class="btn btn-sm btn-primary fw-bold shadow-sm px-3" style="background-color: #4472C4; border-color: #4472C4;">
-                                                    Seleccionar <i class="bi bi-arrow-right ms-1"></i>
+                                                <button type="submit" class="btn btn-sm btn-outline-primary fw-bold shadow-sm px-3">
+                                                    Seleccionar
                                                 </button>
                                             </form>
                                         </td>
