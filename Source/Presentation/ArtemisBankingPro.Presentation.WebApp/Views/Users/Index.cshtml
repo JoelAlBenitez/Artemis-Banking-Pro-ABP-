@@ -12,7 +12,7 @@
         height: 48px;
         border-radius: 12px;
         background: rgba(68, 114, 196, 0.1);
-        color: #4472C4;
+        color: #0F172A;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -53,7 +53,7 @@
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #4472C4 0%, #1E293B 100%);
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
         color: white;
         display: flex;
         align-items: center;
@@ -95,7 +95,7 @@
         </div>
     </div>
     <div>
-        <a asp-controller="Users" asp-action="Create" class="btn btn-primary fw-bold shadow-sm" style="background-color: #4472C4; border: none; border-radius: 8px; padding: 0.6rem 1.2rem;">
+        <a asp-controller="Users" asp-action="Create" class="btn btn-primary fw-bold shadow-sm" style="background-color: #0F172A; border: none; border-radius: 8px; padding: 0.6rem 1.2rem;">
             <i class="bi bi-person-plus-fill me-2"></i> Crear nuevo
         </a>
     </div>
@@ -246,7 +246,7 @@
             @for (int i = 1; i <= Model.TotalPages; i++)
             {
                 <li class="page-item @(i == Model.Page ? "active" : "")">
-                    <a class="page-link px-3 fw-bold" style="@(i == Model.Page ? "background-color: #4472C4; border-color: #4472C4;" : "")" asp-action="Index" asp-route-filter.Page="@i" asp-route-filter.Role="@Model.Filter.Role">
+                    <a class="page-link px-3 fw-bold" style="@(i == Model.Page ? "background-color: #0F172A; border-color: #0F172A;" : "")" asp-action="Index" asp-route-filter.Page="@i" asp-route-filter.Role="@Model.Filter.Role">
                         @i
                     </a>
                 </li>
