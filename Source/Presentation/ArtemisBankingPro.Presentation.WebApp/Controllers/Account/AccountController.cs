@@ -144,7 +144,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
 
             if (User.IsInRole(nameof(Roles.Administrador)))
             {
-                homeController = "AdminHome";
+                homeController = "Admin";
                 homeAction = "Index";
             }
             else if (User.IsInRole(nameof(Roles.Cajero)))

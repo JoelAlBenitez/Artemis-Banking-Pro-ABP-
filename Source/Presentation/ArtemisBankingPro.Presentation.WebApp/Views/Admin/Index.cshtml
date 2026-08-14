@@ -1,0 +1,124 @@
+@using Artemis_Banking_Pro.Core.Application.ViewModels.AdminDashboard
+@model AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Panel del Administrador";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold" style="font-family: 'Montserrat', sans-serif; color: #0F172A;">
+                Dashboard General
+            </h2>
+            <p class="text-muted">Resumen de indicadores y operaciones del sistema Artemis.</p>
+        </div>
+    </div>
+
+    <!-- Primera Fila: Transacciones y Pagos -->
+    <div class="row g-4 mb-4">
+        <!-- Transacciones -->
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm border-0 border-start border-4 border-primary">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Transacciones Históricas</h6>
+                    <h2 class="mb-0 fw-bolder text-dark">@Model.TotalHistoricalTransactions.ToString("N0")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm border-0 border-start border-4 border-info">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Transacciones Hoy</h6>
+                    <h2 class="mb-0 fw-bolder text-info">@Model.DayTransactions.ToString("N0")</h2>
+                </div>
+            </div>
+        </div>
+        <!-- Pagos -->
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm border-0 border-start border-4 border-success">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Pagos Históricos</h6>
+                    <h2 class="mb-0 fw-bolder text-dark">@Model.TotalHistoricalPay.ToString("N0")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm border-0 border-start border-4 border-warning">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Pagos Hoy</h6>
+                    <h2 class="mb-0 fw-bolder text-warning">@Model.DayPay.ToString("N0")</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Segunda Fila: Clientes y Deuda Promedio -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6 class="text-muted text-uppercase fw-bold mb-3" style="font-size: 0.8rem;">Estado de Clientes</h6>
+                    <div class="d-flex justify-content-around">
+                        <div>
+                            <h3 class="fw-bolder text-success mb-0">@Model.CustomerActive.ToString("N0")</h3>
+                            <span class="text-muted small">Activos</span>
+                        </div>
+                        <div>
+                            <h3 class="fw-bolder text-danger mb-0">@Model.CustomerInactive.ToString("N0")</h3>
+                            <span class="text-muted small">Inactivos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card h-100 shadow-sm border-0 bg-light">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <h6 class="text-muted text-uppercase fw-bold mb-2" style="font-size: 0.8rem;">Promedio de Deuda por Cliente</h6>
+                    <h1 class="display-6 fw-bolder mb-0" style="color: #0F172A;">
+                        RD$ @Model.AverageDebtAmountPerCustomer.ToString("N2")
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tercera Fila: Productos Financieros -->
+    <h5 class="fw-bold mb-3 mt-5" style="color: #0F172A;">Productos Financieros Activos</h5>
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card text-white h-100 shadow border-0" style="background-color: #4472C4;">
+                <div class="card-body">
+                    <h6 class="text-uppercase fw-bold mb-1" style="font-size: 0.8rem; opacity: 0.8;">Total Productos</h6>
+                    <h2 class="mb-0 fw-bolder">@Model.TotalFinancialProducts.ToString("N0")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Préstamos Vigentes</h6>
+                    <h2 class="mb-0 fw-bolder text-dark">@Model.OutstandingLoans.ToString("N0")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Tarjetas de Crédito</h6>
+                    <h2 class="mb-0 fw-bolder text-dark">@Model.CreditCardActive.ToString("N0")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Cuentas de Ahorro</h6>
+                    <h2 class="mb-0 fw-bolder text-dark">@Model.SavingAccountActive.ToString("N0")</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
