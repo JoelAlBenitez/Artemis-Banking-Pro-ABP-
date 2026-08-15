@@ -64,6 +64,53 @@
                                 </a>
                             </li>
                         }
+                        else if (User.IsInRole("Cliente"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "Customer")" asp-area="" asp-controller="Customer" asp-action="Index">
+                                    <i class="bi bi-grid-1x2 me-3 fs-5"></i> Home
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @(currentController == "Transactions" ? "bg-white bg-opacity-10 text-white" : "text-white opacity-75 sidebar-link")" data-bs-toggle="collapse" href="#transactionsMenu" role="button" aria-expanded="false" aria-controls="transactionsMenu">
+                                    <i class="bi bi-arrow-left-right me-3 fs-5"></i> Transacciones
+                                    <i class="bi bi-chevron-down ms-auto fs-6"></i>
+                                </a>
+                                <div class="collapse @(currentController == "Transactions" ? "show" : "")" id="transactionsMenu">
+                                    <ul class="nav flex-column ms-4 mt-2 gap-1 border-start border-secondary border-opacity-25 ps-2">
+                                        <li class="nav-item">
+                                            <a class="nav-link rounded py-1 px-2 text-white opacity-75" asp-area="" asp-controller="Transactions" asp-action="Express">Express</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link rounded py-1 px-2 text-white opacity-75" asp-area="" asp-controller="Transactions" asp-action="PayCard">Tarjeta de crédito</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link rounded py-1 px-2 text-white opacity-75" asp-area="" asp-controller="Transactions" asp-action="PayLoan">Préstamo</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link rounded py-1 px-2 text-white opacity-75" asp-area="" asp-controller="Transactions" asp-action="Beneficiary">Beneficiarios</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "Beneficiaries")" asp-area="" asp-controller="Beneficiaries" asp-action="Index">
+                                    <i class="bi bi-person-lines-fill me-3 fs-5"></i> Beneficiarios
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "CashAdvance")" asp-area="" asp-controller="CashAdvance" asp-action="Index">
+                                    <i class="bi bi-cash me-3 fs-5"></i> Avance de efectivo
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-bold @GetActiveStyle(currentController, "AccountTransfer")" asp-area="" asp-controller="AccountTransfer" asp-action="Index">
+                                    <i class="bi bi-arrow-repeat me-3 fs-5"></i> Transferencia
+                                </a>
+                            </li>
+                        }
                     }
                     else
                     {
