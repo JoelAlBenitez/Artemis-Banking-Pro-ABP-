@@ -149,7 +149,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
             }
             else if (User.IsInRole(nameof(Roles.Cajero)))
             {
-                homeController = "CashierHome";
+                homeController = "Atm";
                 homeAction = "Index";
             }
             else if (User.IsInRole(nameof(Roles.Cliente)))
@@ -181,7 +181,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
 
             //Pendiente: el módulo Cajero todavía no tiene su controlador en la WebApp
             if (userRoles.Contains(nameof(Roles.Cajero)))
-                return RedirectToAction("Index", "CashierHome");
+                return RedirectToAction("Index", "Atm");
 
             if (userRoles.Contains(nameof(Roles.Cliente)))
                 return RedirectToAction("Index", "Customer");

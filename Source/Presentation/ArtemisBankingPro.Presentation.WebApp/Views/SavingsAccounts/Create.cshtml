@@ -7,7 +7,6 @@
 
 <div class="container mt-4 mb-5 d-flex justify-content-center">
     <div class="card shadow-sm border-0" style="max-width: 600px; width: 100%;">
-        <!-- Header -->
         <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
             <h2 class="fw-bold" style="font-family: 'Montserrat', sans-serif; color: #0F172A;">
                 <a asp-action="Assign" class="text-decoration-none text-muted me-2" title="Volver a Selección">
@@ -18,7 +17,7 @@
             <p class="text-muted small mb-0">Establezca el balance inicial para la nueva cuenta secundaria de <strong>@Model.FullNameCustomer</strong>.</p>
         </div>
 
-        <div class="card-body p-4 p-md-5">
+        <div class="card-body p-3">
             <div class="alert alert-info border-0 shadow-sm small mb-4">
                 <i class="bi bi-info-circle-fill me-2"></i> El balance inicial puede ser <strong>RD$ 0.00</strong>. Si se ingresa un monto mayor, se registrará como un CRÉDITO inicial.
             </div>
@@ -33,7 +32,7 @@
                     <label asp-for="InitialBalance" class="form-label fw-bold" style="color: #0F172A;">Balance Inicial de la Cuenta</label>
                     <div class="input-group shadow-sm">
                         <span class="input-group-text bg-success text-white fw-bold">RD$</span>
-                        <input asp-for="InitialBalance" type="number" step="0.01" min="0" class="form-control form-control-lg bg-light text-center fw-bold fs-4" placeholder="0.00" />
+                        <input asp-for="InitialBalance" type="number" step="0.01" min="0" class="form-control form-control-sm bg-light text-center fw-bold fs-4" placeholder="0.00" />
                     </div>
                     <span asp-validation-for="InitialBalance" class="text-danger small"></span>
                 </div>

@@ -1,99 +1,122 @@
 @{
-    ViewData["Title"] = "Home Cajero";
+    ViewData["Title"] = "Cajero - Home";
 }
 
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-12 text-center">
-            <h2 class="fw-bold text-primary">Bienvenido, Cajero</h2>
-            <p class="text-muted">Resumen de operaciones del día</p>
+<div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Panel Principal</h2>
+            <p class="text-secondary mb-0">Resumen operativo de hoy para el cajero activo.</p>
+        </div>
+        <div>
+            <span class="badge bg-white text-dark shadow-sm px-3 py-2 border rounded-pill">
+                <i class="bi bi-calendar-event me-2 text-primary"></i> @DateTime.Now.ToString("dd MMMM yyyy")
+            </span>
         </div>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-    
-    @if (TempData["WarningMessage"] != null)
-    {
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            @TempData["WarningMessage"]
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 rounded-3" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <!-- Indicadores -->
-    <div class="row text-center mb-5">
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-0 bg-light">
-                <div class="card-body">
-                    <h5 class="card-title text-secondary">Transacciones hoy</h5>
-                    <h2 class="fw-bold text-dark">@ViewBag.TotalTransactions</h2>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 rounded-3" role="alert">
+            <i class="bi bi-exclamation-octagon-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-3 h-100 overflow-hidden" style="background: linear-gradient(135deg, #4472C4 0%, #2A4880 100%); color: white;">
+                <div class="card-body p-4 position-relative">
+                    <i class="bi bi-activity position-absolute end-0 bottom-0 opacity-25" style="font-size: 5rem; transform: translate(10%, 20%);"></i>
+                    <h6 class="text-uppercase fw-bold opacity-75 mb-3" style="letter-spacing: 1px;">Transacciones de hoy</h6>
+                    <h2 class="display-5 fw-bold mb-0">@ViewBag.TotalTransactions</h2>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-0 bg-light">
-                <div class="card-body">
-                    <h5 class="card-title text-secondary">Pagos hoy</h5>
-                    <h2 class="fw-bold text-primary">@ViewBag.TotalPayments</h2>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-3 h-100 overflow-hidden" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white;">
+                <div class="card-body p-4 position-relative">
+                    <i class="bi bi-credit-card-fill position-absolute end-0 bottom-0 opacity-25" style="font-size: 5rem; transform: translate(10%, 20%);"></i>
+                    <h6 class="text-uppercase fw-bold opacity-75 mb-3" style="letter-spacing: 1px;">Pagos de hoy</h6>
+                    <h2 class="display-5 fw-bold mb-0">@ViewBag.TotalPayments</h2>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-0 bg-light">
-                <div class="card-body">
-                    <h5 class="card-title text-secondary">Depósitos hoy</h5>
-                    <h2 class="fw-bold text-success">@ViewBag.TotalDeposits</h2>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-3 h-100 overflow-hidden" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white;">
+                <div class="card-body p-4 position-relative">
+                    <i class="bi bi-box-arrow-in-down position-absolute end-0 bottom-0 opacity-25" style="font-size: 5rem; transform: translate(10%, 20%);"></i>
+                    <h6 class="text-uppercase fw-bold opacity-75 mb-3" style="letter-spacing: 1px;">Depósitos de hoy</h6>
+                    <h2 class="display-5 fw-bold mb-0">@ViewBag.TotalDeposits</h2>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-0 bg-light">
-                <div class="card-body">
-                    <h5 class="card-title text-secondary">Retiros hoy</h5>
-                    <h2 class="fw-bold text-danger">@ViewBag.TotalWithdrawals</h2>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-3 h-100 overflow-hidden" style="background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); color: white;">
+                <div class="card-body p-4 position-relative">
+                    <i class="bi bi-box-arrow-up position-absolute end-0 bottom-0 opacity-25" style="font-size: 5rem; transform: translate(10%, 20%);"></i>
+                    <h6 class="text-uppercase fw-bold opacity-75 mb-3" style="letter-spacing: 1px;">Retiros de hoy</h6>
+                    <h2 class="display-5 fw-bold mb-0">@ViewBag.TotalWithdrawals</h2>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Menú de Operaciones -->
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg border-0 rounded-3">
-                <div class="card-header bg-primary text-white text-center py-3">
-                    <h4 class="mb-0"><i class="bi bi-grid-fill"></i> Opciones de Operación</h4>
-                </div>
-                <div class="card-body p-4">
-                    <div class="d-grid gap-3">
-                        <a asp-action="Deposit" class="btn btn-outline-success btn-lg text-start px-4">
-                            <i class="bi bi-box-arrow-in-down me-2"></i> Depósito a cuenta de ahorro
-                        </a>
-                        <a asp-action="Withdrawal" class="btn btn-outline-danger btn-lg text-start px-4">
-                            <i class="bi bi-box-arrow-up me-2"></i> Retiro de cuenta de ahorro
-                        </a>
-                        <a asp-action="CreditCardPayment" class="btn btn-outline-primary btn-lg text-start px-4">
-                            <i class="bi bi-credit-card me-2"></i> Pago a tarjeta de crédito
-                        </a>
-                        <a asp-action="LoanPayment" class="btn btn-outline-info btn-lg text-start px-4">
-                            <i class="bi bi-bank me-2"></i> Pago a préstamo
-                        </a>
-                        <a asp-action="ThirdPartyTransfer" class="btn btn-outline-secondary btn-lg text-start px-4">
-                            <i class="bi bi-arrow-left-right me-2"></i> Transacciones a cuentas de terceros
-                        </a>
-                        <form asp-controller="Account" asp-action="Logout" method="post" class="mt-2">
-                            <button type="submit" class="btn btn-dark btn-lg w-100 text-start px-4">
-                                <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
-                            </button>
-                        </form>
+    <h4 class="fw-bold mb-3 text-secondary">Acciones Rápidas</h4>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <a asp-controller="Atm" asp-action="Deposit" class="card border-0 shadow-sm rounded-3 text-decoration-none text-dark h-100 hover-elevate transition-all">
+                <div class="card-body p-4 text-center">
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-box-arrow-in-down fs-3"></i>
                     </div>
+                    <h5 class="fw-bold">Depósito</h5>
+                    <p class="small text-muted mb-0">Acreditar fondos a una cuenta de ahorro.</p>
                 </div>
-            </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a asp-controller="Atm" asp-action="Withdrawal" class="card border-0 shadow-sm rounded-3 text-decoration-none text-dark h-100 hover-elevate transition-all">
+                <div class="card-body p-4 text-center">
+                    <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-box-arrow-up fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold">Retiro</h5>
+                    <p class="small text-muted mb-0">Descontar fondos de una cuenta de ahorro.</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a asp-controller="Atm" asp-action="CreditCardPayment" class="card border-0 shadow-sm rounded-3 text-decoration-none text-dark h-100 hover-elevate transition-all">
+                <div class="card-body p-4 text-center">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-credit-card fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold">Pago de Tarjeta</h5>
+                    <p class="small text-muted mb-0">Pagar tarjeta con cargo a cuenta.</p>
+                </div>
+            </a>
         </div>
     </div>
 </div>
+
+<style>
+    .hover-elevate:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    .transition-all {
+        transition: all .3s ease;
+    }
+</style>

@@ -1,40 +1,59 @@
-@model ArtemisBankingPro.Core.Application.ViewModels.Atm.ThirdPartyTransferViewModel
+@using ArtemisBankingPro.Core.Application.ViewModels.Atm
+@model ThirdPartyTransferViewModel
 @{
-    ViewData["Title"] = "Third-Party Transfer";
+    ViewData["Title"] = "Cajero - Transferencia a Terceros";
 }
 
-<div class="container mt-5">
+<div class="container-fluid py-5" style="font-family: 'Montserrat', sans-serif;">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Third-Party Transfer</h4>
-                </div>
-                <div class="card-body">
-                    <form asp-action="ThirdPartyTransfer" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="col-md-10 col-lg-8 col-xl-6">
+            
+            <div class="mb-4 text-center">
+                <h2 class="fw-bold mb-2" style="color: #0F172A;">
+                    <i class="bi bi-arrow-left-right text-primary me-2"></i> Transferencia a Terceros
+                </h2>
+                <p class="text-muted mb-0 fs-5">Transferir fondos entre cuentas de ahorro de diferentes clientes.</p>
+            </div>
 
-                        <div class="form-group mb-3">
-                            <label asp-for="OriginAccountNumber" class="control-label">Origin Account Number</label>
-                            <input asp-for="OriginAccountNumber" class="form-control" placeholder="Enter origin account number" />
-                            <span asp-validation-for="OriginAccountNumber" class="text-danger"></span>
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-4 p-md-5">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4">
+                            <i class="bi bi-exclamation-circle-fill me-2"></i>
+                            <strong>¡Atención!</strong>
+                            <div asp-validation-summary="All" class="mt-2 mb-0 small"></div>
+                        </div>
+                    }
+
+                    <form asp-controller="Atm" asp-action="ThirdPartyTransfer" method="post">
+                        
+                        <div class="mb-4">
+                            <label asp-for="OriginAccountNumber" class="form-label fw-bold text-secondary">Número de cuenta origen <span class="text-danger">*</span></label>
+                            <input asp-for="OriginAccountNumber" type="text" class="form-control form-control-lg" placeholder="Ej: 123456789" autocomplete="off" />
+                            <span asp-validation-for="OriginAccountNumber" class="text-danger small mt-1 d-block"></span>
+                            <div class="form-text small text-muted">Cuenta desde donde se descontará el dinero.</div>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label asp-for="DestinationAccountNumber" class="control-label">Destination Account Number</label>
-                            <input asp-for="DestinationAccountNumber" class="form-control" placeholder="Enter destination account number" />
-                            <span asp-validation-for="DestinationAccountNumber" class="text-danger"></span>
+                        <div class="mb-4">
+                            <label asp-for="DestinationAccountNumber" class="form-label fw-bold text-secondary">Número de cuenta destino <span class="text-danger">*</span></label>
+                            <input asp-for="DestinationAccountNumber" type="text" class="form-control form-control-lg" placeholder="Ej: 987654321" autocomplete="off" />
+                            <span asp-validation-for="DestinationAccountNumber" class="text-danger small mt-1 d-block"></span>
+                            <div class="form-text small text-muted">Cuenta que recibirá los fondos.</div>
                         </div>
 
-                        <div class="form-group mb-4">
-                            <label asp-for="Amount" class="control-label">Amount to Transfer</label>
-                            <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0.01" placeholder="Enter amount" />
-                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        <div class="mb-5">
+                            <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto a transferir <span class="text-danger">*</span></label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light text-secondary fw-bold">RD$</span>
+                                <input asp-for="Amount" type="number" step="0.01" class="form-control form-control-lg fw-bold" placeholder="0.00" autocomplete="off" />
+                            </div>
+                            <span asp-validation-for="Amount" class="text-danger small mt-1 d-block"></span>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">Make Transfer</button>
-                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                        <div class="d-flex gap-3 justify-content-end pt-4 mt-2 border-top">
+                            <a asp-controller="Atm" asp-action="Index" class="btn btn-light btn-lg px-4">Cancelar</a>
+                            <button type="submit" class="btn btn-dark btn-lg px-5">Siguiente</button>
                         </div>
                     </form>
                 </div>
@@ -44,5 +63,5 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <partial name="_ValidationScriptsPartial" />
 }

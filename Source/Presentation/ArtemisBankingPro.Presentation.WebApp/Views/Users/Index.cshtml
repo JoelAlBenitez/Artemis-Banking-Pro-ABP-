@@ -87,23 +87,23 @@
     }
 </style>
 
-<div class="mt-2 mb-4 d-flex justify-content-between align-items-center">
-    <div class="d-flex align-items-center">
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">Gestión de Usuarios</h4>
-            <p class="text-muted mb-0 small">Administra los accesos y roles del sistema Artemis.</p>
+            <h2 class="fw-bold" style="font-family: 'Montserrat', sans-serif; color: #0F172A;">
+                Gestión de Usuarios
+            </h2>
+            <p class="text-muted mb-0">Administra los accesos y roles del sistema Artemis.</p>
+        </div>
+        <div>
+            <a asp-controller="Users" asp-action="Create" class="btn btn-primary fw-bold shadow-sm" style="background-color: #1E293B; border-color: #1E293B;">
+                <i class="bi bi-person-plus-fill me-2"></i> Crear nuevo
+            </a>
         </div>
     </div>
-    <div>
-        <a asp-controller="Users" asp-action="Create" class="btn btn-primary fw-bold shadow-sm" style="background-color: #0F172A; border: none; border-radius: 8px; padding: 0.6rem 1.2rem;">
-            <i class="bi bi-person-plus-fill me-2"></i> Crear nuevo
-        </a>
-    </div>
-</div>
 
-<!-- Filters -->
 <div class="table-container mb-4 p-3 d-flex justify-content-between align-items-center" style="background-color: #F8FAFC; border: 1px solid #E2E8F0;">
-    <form asp-action="IndexFilter" method="post" class="d-flex align-items-center m-0">
+    <form asp-action="Index" method="post" class="d-flex align-items-center m-0">
         <div class="d-flex align-items-center bg-white rounded-3 shadow-sm border px-2 py-1">
             <i class="bi bi-funnel text-muted ms-2"></i>
             <select asp-for="Filter.Role" class="form-select border-0 shadow-none fw-medium text-dark" style="background-color: transparent; min-width: 200px;" asp-items="@(new SelectList(Model.AvailableRoles))">
@@ -137,7 +137,6 @@
     </div>
 }
 
-<!-- Users Table -->
 <div class="table-container mb-4">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
@@ -232,7 +231,6 @@
     </div>
 </div>
 
-<!-- Pagination -->
 @if (Model.TotalPages > 1)
 {
     <nav class="d-flex justify-content-center align-items-center mb-4">
@@ -261,13 +259,12 @@
     </nav>
 }
 
-<!-- Modal de Confirmación para Activar/Inactivar -->
 <div class="modal fade" id="toggleUserModal" tabindex="-1" aria-labelledby="toggleUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header border-bottom-0 pb-0">
                 <h5 class="modal-title fw-bold" id="toggleUserModalLabel" style="font-family: 'Montserrat', sans-serif; color: #0F172A;">
-                    <i class="bi bi-exclamation-circle-fill text-warning me-2"></i> Confirmar Acción
+                    Confirmar Acción
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -283,6 +280,8 @@
             </div>
         </div>
     </div>
+</div>
+
 </div>
 
 @section Scripts {
