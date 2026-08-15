@@ -34,9 +34,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
             if (User.Identity != null && User.Identity.IsAuthenticated)
                 return RedirectToRoleHome();
 
-            if (Request.Query.ContainsKey("denied"))
-                ModelState.AddModelError(string.Empty, "No tiene permiso para acceder a esta sección.");
-            else if (Request.Query.ContainsKey("expired"))
+            if (Request.Query.ContainsKey("expired"))
                 ModelState.AddModelError(string.Empty, "Su sesión ha expirado. Inicie sesión nuevamente.");
 
             return View(new AuthenticationRequest { UserName = "", Password = "" });
@@ -146,7 +144,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
 
             if (User.IsInRole(nameof(Roles.Administrador)))
             {
-                homeController = "AdminHome";
+                homeController = "Admin";
                 homeAction = "Index";
             }
             else if (User.IsInRole(nameof(Roles.Cajero)))

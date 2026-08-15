@@ -94,6 +94,7 @@ namespace ArtemisBankingPro.IOC
             #region transactions 
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IAtmTransactionService, TransactionService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<ITransactionsValidationServices, TransactionsValidationServices>();
             #endregion

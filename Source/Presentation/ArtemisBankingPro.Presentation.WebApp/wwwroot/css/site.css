@@ -29,3 +29,13 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* Sidebar Styles */
+.sidebar-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    opacity: 1 !important;
+}
+
+.sidebar-logout:hover {
+    background-color: rgba(220, 53, 69, 0.15);
+}

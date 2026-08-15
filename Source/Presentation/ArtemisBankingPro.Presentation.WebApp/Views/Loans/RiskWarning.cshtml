@@ -1,0 +1,60 @@
+@using Artemis_Banking_Pro.Core.Application.ViewModels.Loans
+@model RiskWarningViewModel
+
+@{
+    ViewData["Title"] = "Advertencia de Riesgo";
+}
+
+<div class="container mt-5 mb-5 d-flex justify-content-center">
+    <div class="card shadow-lg border-0" style="max-width: 650px; width: 100%;">
+        <div class="card-header bg-warning text-dark d-flex align-items-center p-4 border-0 rounded-top">
+            <i class="bi bi-exclamation-triangle-fill fs-1 me-3"></i>
+            <div>
+                <h3 class="fw-bolder mb-0">Advertencia de Alto Riesgo</h3>
+                <p class="mb-0 fw-bold opacity-75">El cliente excede el límite recomendado de deuda.</p>
+            </div>
+        </div>
+        
+        <div class="card-body p-4 p-md-5">
+            <h5 class="fw-bold text-dark mb-4 text-center">@Model.Message</h5>
+
+            <div class="row g-3 mb-5">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between border-bottom pb-2">
+                        <span class="text-muted fw-bold">Promedio de Deuda del Sistema:</span>
+                        <span class="fw-bold">RD$ @Model.AverageDebt.ToString("N2")</span>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="d-flex justify-content-between border-bottom pb-2">
+                        <span class="text-muted fw-bold">Deuda Actual del Cliente:</span>
+                        <span class="fw-bold text-dark">RD$ @Model.CurrentDebt.ToString("N2")</span>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="d-flex justify-content-between pb-2 bg-light p-2 rounded mt-2">
+                        <span class="text-danger fw-bolder">Deuda Proyectada (Con Préstamo):</span>
+                        <span class="fw-bolder text-danger">RD$ @Model.ProjectedDebt.ToString("N2")</span>
+                    </div>
+                </div>
+            </div>
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger shadow-sm mb-4"></div>
+
+            <form asp-action="RiskWarning" method="post" class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                <input type="hidden" asp-for="CustomerId" />
+                <input type="hidden" asp-for="TermLoans" />
+                <input type="hidden" asp-for="AmmountLoans" />
+                <input type="hidden" asp-for="AnnualInterestRate" />
+
+                <a asp-action="Index" class="btn btn-light fw-bold shadow-sm px-4 py-3 flex-fill">
+                    <i class="bi bi-x-circle me-2"></i> Cancelar Asignación
+                </a>
+                
+                <button type="submit" class="btn btn-danger fw-bold shadow-sm px-4 py-3 flex-fill">
+                    <i class="bi bi-check-circle me-2"></i> Confirmar Asignación
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -10,7 +10,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Context
         //Misma base que el contexto de negocio: las tablas de Identity y las del banco conviven
         //en ArtemisBankingPro, cada contexto con su propia tabla de historial de migraciones.
         private const string DesignTimeConnection =
-            "Server=.\\DEVELOPER;Database=ArtemisBankingPro;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
+            "Server=localhost;Database=ArtemisBankingPro;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
 
         public IdentityContext CreateDbContext(string[] args)
         {

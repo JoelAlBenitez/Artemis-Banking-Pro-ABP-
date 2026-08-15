@@ -36,7 +36,7 @@ namespace Artemis_Banking_Pro.Core.Application.ViewModels.Users
         public required string Role { get; set; }
 
         //Solo aplica al rol Cliente: es el saldo de apertura de su cuenta de ahorro principal
-        [Range(typeof(decimal), "0", "999999999999.99", ErrorMessage = "El monto inicial no puede ser negativo.")]
+        [Range(typeof(decimal), "0", "999999999999", ErrorMessage = "El monto inicial no puede ser negativo.")]
         public decimal? InitialAmount { get; set; }
 
         //Roles del combo. No viaja en el formulario: lo repuebla el controlador en cada carga.
