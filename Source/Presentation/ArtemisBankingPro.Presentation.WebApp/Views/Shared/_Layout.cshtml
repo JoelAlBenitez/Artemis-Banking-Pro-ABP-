@@ -107,12 +107,27 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @GetActiveStyle(currentController, "Transactions")" style="font-size: 0.9rem;" asp-area="" asp-controller="Transactions" asp-action="Index">
-                                    <i class="bi bi-arrow-left-right me-3 fs-5"></i> Transferencias y Pagos
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @(currentController == "Transactions" && ViewContext.RouteData.Values["Action"]?.ToString() == "Express" ? "bg-white bg-opacity-10 text-white" : "text-white opacity-75 sidebar-link")" style="font-size: 0.9rem;" asp-area="" asp-controller="Transactions" asp-action="Express">
+                                    <i class="bi bi-arrow-left-right me-3 fs-5"></i> Transferencia Exprés
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @GetActiveStyle(currentController, "CashAdvances")" style="font-size: 0.9rem;" asp-area="" asp-controller="CashAdvances" asp-action="Index">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @(currentController == "Transactions" && ViewContext.RouteData.Values["Action"]?.ToString() == "Beneficiary" ? "bg-white bg-opacity-10 text-white" : "text-white opacity-75 sidebar-link")" style="font-size: 0.9rem;" asp-area="" asp-controller="Transactions" asp-action="Beneficiary">
+                                    <i class="bi bi-person-lines-fill me-3 fs-5"></i> A Beneficiario
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @(currentController == "Transactions" && ViewContext.RouteData.Values["Action"]?.ToString() == "PayCard" ? "bg-white bg-opacity-10 text-white" : "text-white opacity-75 sidebar-link")" style="font-size: 0.9rem;" asp-area="" asp-controller="Transactions" asp-action="PayCard">
+                                    <i class="bi bi-credit-card me-3 fs-5"></i> Pago de Tarjeta
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @(currentController == "Transactions" && ViewContext.RouteData.Values["Action"]?.ToString() == "PayLoan" ? "bg-white bg-opacity-10 text-white" : "text-white opacity-75 sidebar-link")" style="font-size: 0.9rem;" asp-area="" asp-controller="Transactions" asp-action="PayLoan">
+                                    <i class="bi bi-cash-coin me-3 fs-5"></i> Pago de Préstamo
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @GetActiveStyle(currentController, "CashAdvance")" style="font-size: 0.9rem;" asp-area="" asp-controller="CashAdvance" asp-action="Index">
                                     <i class="bi bi-cash me-3 fs-5"></i> Avances de Efectivo
                                 </a>
                             </li>
