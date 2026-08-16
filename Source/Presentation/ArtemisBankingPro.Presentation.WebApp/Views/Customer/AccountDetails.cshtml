@@ -1,84 +1,65 @@
-@using Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts
-@using ArtemisBankingPro.Core.Domain.Common.Enum
-@model IReadOnlyCollection<TransactionDto>
+@using Artemis_Banking_Pro.Core.Application.DTOs.Transactions
+@model IReadOnlyCollection<TransactionResultDto>
 @{
     ViewData["Title"] = "Detalles de Cuenta";
 }
 
 <div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
-    <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary border-opacity-25 pb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">Historial de Transacciones</h2>
-            <p class="text-secondary mb-0">Revisa los movimientos registrados en tu cuenta de ahorro.</p>
+            <h2 class="fw-bold mb-1" style="color: #0F172A;">Movimientos de la Cuenta</h2>
+            <p class="text-muted mb-0">Historial de transacciones de tu cuenta de ahorro.</p>
         </div>
-        <a asp-controller="Customer" asp-action="Index" class="btn btn-outline-secondary rounded-pill fw-bold px-4">
-            <i class="bi bi-arrow-left me-2"></i> Volver atrás
-        </a>
+        <div>
+            <a asp-action="Index" class="btn btn-light shadow-sm rounded-pill px-4 fw-bold"><i class="bi bi-arrow-left me-2"></i> Volver</a>
+        </div>
     </div>
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info shadow-sm border-0 rounded-4 d-flex align-items-center p-4">
-            <i class="bi bi-info-circle-fill fs-3 text-info me-3"></i>
-            <div>
-                <h5 class="fw-bold mb-1">Sin transacciones</h5>
-                <p class="mb-0 text-secondary">Esta cuenta no tiene transacciones registradas todavía.</p>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-borderless align-middle mb-0">
-                    <thead class="bg-light text-secondary">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th class="py-3 px-4 fw-bold">FECHA</th>
-                            <th class="py-3 px-4 fw-bold">TIPO</th>
-                            <th class="py-3 px-4 fw-bold">ORIGEN</th>
-                            <th class="py-3 px-4 fw-bold">BENEFICIARIO</th>
-                            <th class="py-3 px-4 fw-bold">ESTADO</th>
-                            <th class="py-3 px-4 fw-bold text-end">MONTO</th>
+                            <th class="ps-4 py-3 text-secondary fw-bold">Fecha</th>
+                            <th class="py-3 text-secondary fw-bold">Tipo</th>
+                            <th class="py-3 text-secondary fw-bold">Monto</th>
+                            <th class="pe-4 py-3 text-secondary fw-bold text-end">Estado</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var transaction in Model)
+                        @if (Model == null || !Model.Any())
                         {
-                            <tr class="border-bottom border-secondary border-opacity-10">
-                                <td class="py-3 px-4">
-                                    <div class="fw-bold text-dark">@transaction.TransactionDate.ToString("dd MMM yyyy")</div>
-                                    <div class="small text-secondary">@transaction.TransactionDate.ToString("hh:mm tt")</div>
-                                </td>
-                                <td class="py-3 px-4">
-                                    @if (transaction.TypeTransaction == TransactionType.DEBITO)
-                                    {
-                                        <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2 fw-bold">DÉBITO</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-bold">CRÉDITO</span>
-                                    }
-                                </td>
-                                <td class="py-3 px-4 font-monospace text-secondary">@transaction.Origin</td>
-                                <td class="py-3 px-4 font-monospace text-secondary">@transaction.Beneficiary</td>
-                                <td class="py-3 px-4">
-                                    @if (transaction.StateTransaction == TransactionStatus.APROBADA)
-                                    {
-                                        <span class="badge bg-success rounded-pill px-3 py-2 fw-bold"><i class="bi bi-check-circle me-1"></i> APROBADA</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold"><i class="bi bi-x-circle me-1"></i> RECHAZADA</span>
-                                    }
-                                </td>
-                                <td class="py-3 px-4 text-end fw-bold @(transaction.TypeTransaction == TransactionType.DEBITO ? "text-danger" : "text-success")">
-                                    @(transaction.TypeTransaction == TransactionType.DEBITO ? "-" : "+")RD$ @transaction.Amount.ToString("N2")
-                                </td>
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">No hay movimientos registrados.</td>
                             </tr>
+                        }
+                        else
+                        {
+                            foreach (var txn in Model.OrderByDescending(x => x.CreatedAt))
+                            {
+                                <tr>
+                                    <td class="ps-4 py-3">@txn.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")</td>
+                                    <td class="py-3 fw-bold">@txn.TransactionType</td>
+                                    <td class="py-3 fw-bold @(txn.TransactionType.ToString() == "Deposito" ? "text-success" : "text-dark")">
+                                        @(txn.TransactionType.ToString() == "Deposito" ? "+" : "-") RD$ @txn.EffectiveAmount.ToString("N2")
+                                    </td>
+                                    <td class="pe-4 py-3 text-end">
+                                        @if (txn.Status.ToString() == "Success")
+                                        {
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2">Completado</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2">Fallido</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
             </div>
         </div>
-    }
+    </div>
 </div>

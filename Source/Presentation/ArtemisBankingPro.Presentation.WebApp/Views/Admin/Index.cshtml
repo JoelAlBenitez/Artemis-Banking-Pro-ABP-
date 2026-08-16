@@ -8,11 +8,11 @@
 <style>
     /* Estilos limpios y directos para Dashboard */
     :root {
-        /* Soften Bootstrap default colors */
-        --bs-success: #10b981;
-        --bs-success-rgb: 16, 185, 129;
-        --bs-danger: #e11d48;
-        --bs-danger-rgb: 225, 29, 72;
+        /* Soften Bootstrap default colors to medium opaque tones */
+        --bs-success: #059669;
+        --bs-success-rgb: 5, 150, 105;
+        --bs-danger: #BE123C;
+        --bs-danger-rgb: 190, 18, 60;
     }
     .metric-card {
         background: white;
@@ -34,14 +34,13 @@
     .icon-box-dark { background: transparent; color: #334155; font-size: 1.4rem; }
 </style>
 
-<div class="mb-3 d-flex justify-content-between align-items-center">
+<div class="mt-4 mb-4 d-flex justify-content-between align-items-center">
     <div>
-        <h4 class="fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">Resumen Operativo</h4>
-        <p class="text-muted mb-0 small">Indicadores financieros y comerciales del sistema.</p>
+        <h2 class="fw-bold" style="font-family: 'Montserrat', sans-serif; color: #0F172A;">Resumen Operativo</h2>
+        <p class="text-muted mb-0">Indicadores financieros y comerciales del sistema.</p>
     </div>
 </div>
 
-<!-- Fila 1: Transacciones y Pagos -->
 <div class="row mb-3">
     <div class="col-12">
         <div class="metric-card p-0">
@@ -98,9 +97,7 @@
     </div>
 </div>
 
-<!-- Fila 2: Clientes y Deuda Promedio -->
 <div class="row g-3 mb-3">
-    <!-- Deuda Promedio -->
     <div class="col-md-5">
         <div class="metric-card h-100 d-flex flex-column justify-content-center shadow-sm">
             <div class="d-flex align-items-center mb-2">
@@ -113,7 +110,6 @@
         </div>
     </div>
 
-    <!-- Población de Clientes -->
     <div class="col-md-7">
         <div class="metric-card h-100 d-flex flex-column justify-content-center">
             <h6 class="text-dark fw-bold mb-3" style="font-family: 'Montserrat', sans-serif;">Población de Clientes</h6>
@@ -148,37 +144,36 @@
     </div>
 </div>
 
-<!-- Fila 3: Productos Financieros -->
 <div class="row mt-1 mb-3">
     <div class="col-12">
-        <div class="metric-card border-0 p-3 shadow-sm" style="background-color: #0F172A; color: white;">
+        <div class="metric-card border p-3 shadow-sm rounded-4 bg-white">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold mb-0" style="font-family: 'Montserrat', sans-serif;">Inventario de Productos Activos</h6>
-                <div class="badge bg-white text-dark rounded-pill px-3 py-2 fw-bold shadow-sm" style="font-size: 0.8rem;">
+                <h6 class="fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Inventario de Productos Activos</h6>
+                <div class="badge bg-light text-secondary border rounded-pill px-3 py-2 fw-bold shadow-sm" style="font-size: 0.8rem;">
                     Total general: @Model.TotalFinancialProducts.ToString("N0")
                 </div>
             </div>
             
             <div class="row g-3">
                 <div class="col-md-4">
-                    <div class="bg-white bg-opacity-10 rounded-2 p-3 h-100 text-center border border-white border-opacity-10" style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.15)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">
+                    <div class="bg-light rounded-3 p-3 h-100 text-center border" style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#e9ecef'" onmouseout="this.style.backgroundColor=''">
                         <i class="bi bi-cash-coin fs-2 text-success mb-2 d-block"></i>
-                        <h3 class="fw-bolder mb-1 text-white">@Model.OutstandingLoans.ToString("N0")</h3>
-                        <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Préstamos Vigentes</span>
+                        <h3 class="fw-bolder mb-1 text-dark">@Model.OutstandingLoans.ToString("N0")</h3>
+                        <span class="text-secondary text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Préstamos Vigentes</span>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="bg-white bg-opacity-10 rounded-2 p-3 h-100 text-center border border-white border-opacity-10" style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.15)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">
+                    <div class="bg-light rounded-3 p-3 h-100 text-center border" style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#e9ecef'" onmouseout="this.style.backgroundColor=''">
                         <i class="bi bi-credit-card fs-2 text-success mb-2 d-block"></i>
-                        <h3 class="fw-bolder mb-1 text-white">@Model.CreditCardActive.ToString("N0")</h3>
-                        <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Tarjetas de Crédito</span>
+                        <h3 class="fw-bolder mb-1 text-dark">@Model.CreditCardActive.ToString("N0")</h3>
+                        <span class="text-secondary text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Tarjetas de Crédito</span>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="bg-white bg-opacity-10 rounded-2 p-3 h-100 text-center border border-white border-opacity-10" style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.15)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">
+                    <div class="bg-light rounded-3 p-3 h-100 text-center border" style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#e9ecef'" onmouseout="this.style.backgroundColor=''">
                         <i class="bi bi-piggy-bank fs-2 text-success mb-2 d-block"></i>
-                        <h3 class="fw-bolder mb-1 text-white">@Model.SavingAccountActive.ToString("N0")</h3>
-                        <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Cuentas de Ahorro</span>
+                        <h3 class="fw-bolder mb-1 text-dark">@Model.SavingAccountActive.ToString("N0")</h3>
+                        <span class="text-secondary text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Cuentas de Ahorro</span>
                     </div>
                 </div>
             </div>

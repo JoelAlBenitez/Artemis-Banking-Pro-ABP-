@@ -1,69 +1,66 @@
-@using Artemis_Banking_Pro.Core.Application.ViewModels.Transactions
 @using Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts
+@using Artemis_Banking_Pro.Core.Application.ViewModels.Transactions
 @model ExpressTransactionViewModel
 @{
-    ViewData["Title"] = "Transacción Express";
+    ViewData["Title"] = "Transferencia Exprés";
     var savingsAccounts = ViewBag.SavingsAccounts as List<SavingsAccountDto> ?? new List<SavingsAccountDto>();
 }
 
-<div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
+<div class="container-fluid py-5" style="font-family: 'Montserrat', sans-serif;">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="card-header bg-primary text-white p-4 border-0">
-                    <h3 class="fw-bold mb-1"><i class="bi bi-send-fill me-2"></i> Transacción Express</h3>
-                    <p class="mb-0 opacity-75 small">Transfiere fondos rápidamente a cualquier cuenta de ahorro.</p>
-                </div>
-                
+        <div class="col-md-8 col-lg-6 col-xl-5">
+            
+            <div class="mb-4 text-center">
+                <h2 class="fw-bold mb-2" style="color: #0F172A;">
+                    <i class="bi bi-lightning-charge text-warning me-2"></i> Transferencia Exprés
+                </h2>
+                <p class="text-muted mb-0">Transfiere fondos entre tus propias cuentas de ahorro o a cuentas de terceros en nuestro banco.</p>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4 p-md-5">
                     @if (!ViewData.ModelState.IsValid)
                     {
-                        <div class="alert alert-danger shadow-sm border-0 rounded-4 mb-4">
+                        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4">
                             <i class="bi bi-exclamation-circle-fill me-2"></i>
                             <strong>¡Atención!</strong>
                             <div asp-validation-summary="All" class="mt-2 mb-0 small"></div>
                         </div>
                     }
 
-                    <form id="expressForm" asp-controller="Transactions" asp-action="Express" method="post">
+                    <form asp-action="Express" method="post">
                         
                         <div class="mb-4">
                             <label asp-for="SourceAccountNumber" class="form-label fw-bold text-secondary">Cuenta de Origen <span class="text-danger">*</span></label>
-                            <select asp-for="SourceAccountNumber" class="form-select form-select-lg border-0 bg-light shadow-sm rounded-4 font-monospace">
-                                <option value="">Seleccione una cuenta origen</option>
+                            <select asp-for="SourceAccountNumber" class="form-select">
+                                <option value="">-- Seleccione una cuenta origen --</option>
                                 @foreach(var account in savingsAccounts)
                                 {
-                                    <option value="@account.AccountNumber">@account.AccountNumber - (RD$ @account.Balance.ToString("N2"))</option>
+                                    <option value="@account.AccountNumber">@account.AccountNumber - RD$ @account.Balance.ToString("N2")</option>
                                 }
                             </select>
-                            <span asp-validation-for="SourceAccountNumber" class="text-danger small mt-2 d-block fw-bold"></span>
+                            <span asp-validation-for="SourceAccountNumber" class="text-danger small mt-1 d-block"></span>
                         </div>
 
                         <div class="mb-4">
-                            <label asp-for="DestinationAccountNumber" class="form-label fw-bold text-secondary">Cuenta Destino <span class="text-danger">*</span></label>
-                            <div class="input-group input-group-lg shadow-sm rounded-4 overflow-hidden">
-                                <span class="input-group-text bg-light border-0"><i class="bi bi-person-badge text-secondary"></i></span>
-                                <input asp-for="DestinationAccountNumber" class="form-control border-0 bg-light font-monospace" placeholder="Ej: 123456789" maxlength="9" autocomplete="off" />
-                            </div>
-                            <span asp-validation-for="DestinationAccountNumber" class="text-danger small mt-2 d-block fw-bold"></span>
+                            <label asp-for="DestinationAccountNumber" class="form-label fw-bold text-secondary">Cuenta de Destino <span class="text-danger">*</span></label>
+                            <input asp-for="DestinationAccountNumber" type="text" class="form-control font-monospace" placeholder="Ej: 123456789" autocomplete="off" />
+                            <span asp-validation-for="DestinationAccountNumber" class="text-danger small mt-1 d-block"></span>
+                            <div class="form-text small text-muted">Ingrese los 9 dígitos de la cuenta destino.</div>
                         </div>
 
                         <div class="mb-5">
-                            <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto a transferir <span class="text-danger">*</span></label>
-                            <div class="input-group input-group-lg shadow-sm rounded-4 overflow-hidden">
-                                <span class="input-group-text bg-light border-0 text-primary fw-bold">RD$</span>
-                                <input asp-for="Amount" type="number" step="0.01" class="form-control border-0 bg-light font-monospace text-dark fw-bold" placeholder="0.00" autocomplete="off" />
+                            <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto a Transferir <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light fw-bold text-secondary border-end-0">RD$</span>
+                                <input asp-for="Amount" type="number" step="0.01" min="0.01" class="form-control border-start-0 fw-bold" placeholder="0.00" />
                             </div>
-                            <span asp-validation-for="Amount" class="text-danger small mt-2 d-block fw-bold"></span>
+                            <span asp-validation-for="Amount" class="text-danger small mt-1 d-block"></span>
                         </div>
 
-                        <div class="d-flex gap-3 justify-content-end border-top border-secondary border-opacity-25 pt-4">
-                            <a asp-controller="Customer" asp-action="Index" class="btn btn-light rounded-pill fw-bold px-4 shadow-sm text-secondary">
-                                Cancelar
-                            </a>
-                            <button type="button" class="btn btn-primary rounded-pill fw-bold px-5 shadow-sm" onclick="showConfirmationModal()">
-                                Siguiente <i class="bi bi-arrow-right ms-2"></i>
-                            </button>
+                        <div class="d-flex gap-3 justify-content-end pt-4 mt-2 border-top">
+                            <a asp-controller="Customer" asp-action="Index" class="btn btn-light px-4">Cancelar</a>
+                            <button type="submit" class="btn btn-dark px-5">Realizar Transferencia</button>
                         </div>
                     </form>
                 </div>
@@ -72,57 +69,6 @@
     </div>
 </div>
 
-<!-- Confirmation Modal -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true" style="font-family: 'Montserrat', sans-serif;">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content rounded-4 border-0 shadow-lg">
-      <div class="modal-header bg-primary text-white border-0 rounded-top-4 p-4">
-        <h5 class="modal-title fw-bold" id="confirmationModalLabel"><i class="bi bi-shield-check me-2"></i> Confirmar Transacción</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body p-4 text-center">
-        <i class="bi bi-arrow-left-right text-primary opacity-50 mb-3" style="font-size: 3rem;"></i>
-        <h4 class="fw-bold mb-3">¿Está seguro de que desea realizar esta transacción?</h4>
-        <div class="bg-light rounded-3 p-3 text-start mb-3">
-            <p class="mb-1 text-secondary small fw-bold">Cuenta Destino:</p>
-            <p class="mb-2 font-monospace fs-5 fw-bold text-dark" id="confirmDestAccount"></p>
-            
-            <p class="mb-1 text-secondary small fw-bold">Monto a Transferir:</p>
-            <p class="mb-0 font-monospace fs-5 fw-bold text-primary" id="confirmAmount"></p>
-        </div>
-        <p class="text-secondary small">Esta acción no se puede deshacer.</p>
-      </div>
-      <div class="modal-footer border-0 p-4 pt-0 justify-content-center gap-3">
-        <button type="button" class="btn btn-light rounded-pill fw-bold px-4" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary rounded-pill fw-bold px-5 shadow-sm" onclick="submitForm()">Confirmar y Enviar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        function showConfirmationModal() {
-            var src = document.getElementById('SourceAccountNumber').value;
-            var dest = document.getElementById('DestinationAccountNumber').value;
-            var amount = document.getElementById('Amount').value;
-
-            if(!src || !dest || !amount) {
-                // Let standard HTML5 validation or unobtrusive validation handle the missing fields
-                document.getElementById('expressForm').reportValidity();
-                return;
-            }
-
-            document.getElementById('confirmDestAccount').innerText = dest;
-            document.getElementById('confirmAmount').innerText = 'RD$ ' + parseFloat(amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            
-            var modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-            modal.show();
-        }
-
-        function submitForm() {
-            document.getElementById('expressForm').submit();
-        }
-    </script>
 }

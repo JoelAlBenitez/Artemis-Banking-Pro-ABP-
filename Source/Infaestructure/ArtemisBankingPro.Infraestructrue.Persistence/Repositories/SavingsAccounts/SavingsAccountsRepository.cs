@@ -22,13 +22,22 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.SavingsAcco
         //largo exigido. El PadLeft solo protege el formato de texto del contrato.
         public async Task<string> GetNextAccountNumberAsync()
         {
-            var nextValue = await _context.Database
-                .SqlQueryRaw<int>($"SELECT NEXT VALUE FOR [{AccountNumberSequence}] AS [Value]")
-                .FirstAsync();
+            await _context.Database.OpenConnectionAsync();
+            try
+            {
+                using var command = _context.Database.GetDbConnection().CreateCommand();
+                command.CommandText = $"SELECT NEXT VALUE FOR [{AccountNumberSequence}]";
+                var result = await command.ExecuteScalarAsync();
+                var nextValue = Convert.ToInt32(result);
 
-            return nextValue
-                .ToString(CultureInfo.InvariantCulture)
-                .PadLeft(DomainConstants.AccountNumberLength, '0');
+                return nextValue
+                    .ToString(CultureInfo.InvariantCulture)
+                    .PadLeft(DomainConstants.AccountNumberLength, '0');
+            }
+            finally
+            {
+                await _context.Database.CloseConnectionAsync();
+            }
         }
 
         public async Task<PagedResult<SavingsAccount>> GetPagedSavingsAccountsAsync(

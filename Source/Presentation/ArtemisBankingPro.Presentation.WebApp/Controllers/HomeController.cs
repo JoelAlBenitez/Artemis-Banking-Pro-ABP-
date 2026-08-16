@@ -23,7 +23,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
                 return RedirectToAction("Index", "Admin");
             
             if (User.IsInRole("Cajero"))
-                return RedirectToAction("Index", "CashierHome");
+                return RedirectToAction("Index", "Atm");
             
             if (User.IsInRole("Cliente"))
                 return RedirectToAction("Index", "Customer");

@@ -6,7 +6,16 @@
 }
 
 <div class="container mt-4 mb-5">
-    <!-- Header -->
+    <style>
+        .custom-radio-toggle {
+            border-radius: 50% !important;
+            cursor: pointer;
+        }
+        .custom-radio-toggle:checked {
+            background-color: #10b981 !important;
+            border-color: #10b981 !important;
+        }
+    </style>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold" style="font-family: 'Montserrat', sans-serif; color: #0F172A;">
@@ -19,7 +28,6 @@
         </div>
     </div>
 
-    <!-- Promedio de Deuda -->
     <div class="alert shadow-sm border-0 d-flex align-items-center" style="background-color: #E2E8F0; color: #0F172A;">
         <i class="bi bi-info-circle-fill fs-4 me-3 text-primary"></i>
         <div>
@@ -28,7 +36,6 @@
         </div>
     </div>
 
-    <!-- Búsqueda -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body bg-light">
             <form asp-action="Assign" method="get" class="row gx-3 gy-2 align-items-center">
@@ -54,7 +61,6 @@
         <div asp-validation-summary="All" class="alert alert-warning shadow-sm mb-4"></div>
     }
 
-    <!-- Listado de Clientes y Formulario de Selección -->
     <form asp-action="SelectCustomer" method="post" id="selectCustomerForm">
         <input type="hidden" name="fullNameCustomer" id="hiddenFullName" value="" />
         
@@ -84,9 +90,9 @@
                             {
                                 foreach (var client in Model.Clients)
                                 {
-                                    <tr onclick="document.getElementById('radio_@client.Id').click();" style="cursor: pointer;">
+                                    <tr onclick="if(event.target.tagName !== 'INPUT') { document.getElementById('radio_@client.Id').click(); }" style="cursor: pointer;">
                                         <td class="ps-4 text-center">
-                                            <input class="form-check-input fs-5" type="radio" name="customerId" id="radio_@client.Id" value="@client.Id" onchange="updateHiddenName('@client.FullName')" />
+                                            <input class="form-check-input fs-5 custom-radio-toggle" type="checkbox" name="customerId" id="radio_@client.Id" value="@client.Id" onchange="handleSelection(this, '@client.FullName')" />
                                         </td>
                                         <td class="fw-bold">@client.IdCard</td>
                                         <td>@client.FullName</td>
@@ -112,8 +118,17 @@
 
 @section Scripts {
     <script>
-        function updateHiddenName(fullName) {
-            document.getElementById('hiddenFullName').value = fullName;
+        function handleSelection(checkbox, fullName) {
+            if (checkbox.checked) {
+                var checkboxes = document.querySelectorAll('.custom-radio-toggle');
+                checkboxes.forEach(function(cb) {
+                    if (cb !== checkbox) cb.checked = false;
+                });
+            }
+            var hiddenName = document.getElementById('hiddenFullName');
+            if (hiddenName) {
+                hiddenName.value = checkbox.checked ? fullName : '';
+            }
         }
 
         document.getElementById('selectCustomerForm').addEventListener('submit', function(e) {

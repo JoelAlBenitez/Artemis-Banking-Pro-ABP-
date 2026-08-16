@@ -1,120 +1,92 @@
 @using Artemis_Banking_Pro.Core.Application.DTOs.Loans
-@using ArtemisBankingPro.Core.Domain.Common.Enum
 @model DetailLoansDto
 @{
-    ViewData["Title"] = "Detalles del Préstamo";
+    ViewData["Title"] = "Amortización de Préstamo";
 }
 
 <div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
-    <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary border-opacity-25 pb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">Tabla de Amortización</h2>
-            <p class="text-secondary mb-0">Detalle de cuotas del préstamo #<span class="font-monospace">@Model.NumberLoand</span></p>
+            <h2 class="fw-bold mb-1" style="color: #0F172A;">Detalles del Préstamo</h2>
+            <p class="text-muted mb-0">Préstamo @Model?.NumberLoand - Tasa @Model?.AnnualInterestRate%</p>
         </div>
-        <a asp-controller="Customer" asp-action="Index" class="btn btn-outline-secondary rounded-pill fw-bold px-4">
-            <i class="bi bi-arrow-left me-2"></i> Volver atrás
-        </a>
+        <div>
+            <a asp-action="Index" class="btn btn-light shadow-sm rounded-pill px-4 fw-bold"><i class="bi bi-arrow-left me-2"></i> Volver</a>
+        </div>
     </div>
 
-    <!-- Loan Summary Card -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-light">
-        <div class="card-body p-4">
-            <div class="row g-4 text-center">
-                <div class="col-6 col-md-3 border-end border-secondary border-opacity-25">
-                    <p class="text-secondary small mb-1">Monto Aprobado</p>
-                    <h5 class="fw-bold text-dark mb-0">RD$ @Model.ApprovedAmount.ToString("N2")</h5>
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-light">
+                <div class="card-body p-4 text-center">
+                    <p class="text-muted mb-1">Monto Aprobado</p>
+                    <h3 class="fw-bold text-dark mb-0">RD$ @Model?.ApprovedAmount.ToString("N2")</h3>
                 </div>
-                <div class="col-6 col-md-3 border-end-md border-secondary border-opacity-25">
-                    <p class="text-secondary small mb-1">Tasa Anual</p>
-                    <h5 class="fw-bold text-dark mb-0">@Model.AnnualInterestRate.ToString("N2")%</h5>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-light">
+                <div class="card-body p-4 text-center">
+                    <p class="text-muted mb-1">Plazo</p>
+                    <h3 class="fw-bold text-dark mb-0">@Model?.Term meses</h3>
                 </div>
-                <div class="col-6 col-md-3 border-end border-secondary border-opacity-25">
-                    <p class="text-secondary small mb-1">Plazo</p>
-                    <h5 class="fw-bold text-dark mb-0">@Model.Term Meses</h5>
-                </div>
-                <div class="col-6 col-md-3">
-                    <p class="text-secondary small mb-1">Estado</p>
-                    @if (Model.StateLoans == LoanStatus.Al_Dia)
-                    {
-                        <span class="badge bg-success rounded-pill px-3 py-2 fw-bold">AL DÍA</span>
-                    }
-                    else if (Model.StateLoans == LoanStatus.En_Mora)
-                    {
-                        <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold">EN MORA</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-primary rounded-pill px-3 py-2 fw-bold">@Model.StateLoans.ToString().ToUpper()</span>
-                    }
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-light">
+                <div class="card-body p-4 text-center">
+                    <p class="text-muted mb-1">Estado</p>
+                    <h3 class="fw-bold text-success mb-0">@Model?.StateLoans</h3>
                 </div>
             </div>
         </div>
     </div>
 
-    @if (Model.loansInstallmentDtos == null || !Model.loansInstallmentDtos.Any())
-    {
-        <div class="alert alert-info shadow-sm border-0 rounded-4 d-flex align-items-center p-4">
-            <i class="bi bi-info-circle-fill fs-3 text-info me-3"></i>
-            <div>
-                <h5 class="fw-bold mb-1">Sin cuotas</h5>
-                <p class="mb-0 text-secondary">Este préstamo no tiene cuotas generadas.</p>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-borderless align-middle mb-0">
-                    <thead class="bg-light text-secondary">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th class="py-3 px-4 fw-bold"># CUOTA</th>
-                            <th class="py-3 px-4 fw-bold">FECHA DE PAGO</th>
-                            <th class="py-3 px-4 fw-bold">ESTADO</th>
-                            <th class="py-3 px-4 fw-bold">ATRASO</th>
-                            <th class="py-3 px-4 fw-bold text-end">VALOR CUOTA</th>
+                            <th class="ps-4 py-3 text-secondary fw-bold">Cuota</th>
+                            <th class="py-3 text-secondary fw-bold">Monto</th>
+                            <th class="py-3 text-secondary fw-bold">Capital</th>
+                            <th class="py-3 text-secondary fw-bold">Interés</th>
+                            <th class="pe-4 py-3 text-secondary fw-bold text-end">Estado</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var installment in Model.loansInstallmentDtos.OrderBy(i => i.DueDate))
+                        @if (Model?.loansInstallmentDtos == null || !Model.loansInstallmentDtos.Any())
                         {
-                            <tr class="border-bottom border-secondary border-opacity-10">
-                                <td class="py-3 px-4 fw-bold text-secondary">@installment.NumberLoanInstallment</td>
-                                <td class="py-3 px-4">
-                                    <div class="fw-bold text-dark">@installment.DueDate.ToString("dd MMM yyyy")</div>
-                                </td>
-                                <td class="py-3 px-4">
-                                    @switch (installment.StateInstallment)
-                                    {
-                                        case PaymentStatus.Pagada:
-                                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-bold">PAGADA</span>
-                                            break;
-                                        case PaymentStatus.Parcial:
-                                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 fw-bold">PARCIAL</span>
-                                            break;
-                                        default:
-                                            <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2 fw-bold">PENDIENTE</span>
-                                            break;
-                                    }
-                                </td>
-                                <td class="py-3 px-4">
-                                    @if (installment.IsOverdue)
-                                    {
-                                        <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold"><i class="bi bi-exclamation-circle me-1"></i> ATRASADA</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-secondary small">-</span>
-                                    }
-                                </td>
-                                <td class="py-3 px-4 text-end fw-bold text-dark">
-                                    RD$ @installment.InstallmentValue.ToString("N2")
-                                </td>
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">No hay información de cuotas disponible.</td>
                             </tr>
+                        }
+                        else
+                        {
+                            foreach (var quota in Model.loansInstallmentDtos.OrderBy(x => x.NumberLoanInstallment))
+                            {
+                                <tr>
+                                    <td class="ps-4 py-3 fw-bold">#@quota.NumberLoanInstallment</td>
+                                    <td class="py-3">RD$ @quota.InstallmentValue.ToString("N2")</td>
+                                    <td class="py-3 text-success">RD$ @quota.CapitalAmount.ToString("N2")</td>
+                                    <td class="py-3 text-danger">RD$ @quota.InterestAmount.ToString("N2")</td>
+                                    <td class="pe-4 py-3 text-end">
+                                        @if (quota.StateInstallment.ToString() == "Pagada" || quota.StateInstallment.ToString() == "Paid")
+                                        {
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2">Pagada</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-2 text-dark">Pendiente</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
             </div>
         </div>
-    }
+    </div>
 </div>

@@ -5,74 +5,100 @@
 }
 
 <div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
-    <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary border-opacity-25 pb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">Mis Beneficiarios</h2>
-            <p class="text-secondary mb-0">Gestiona tus contactos frecuentes para transferencias.</p>
+            <h2 class="fw-bold mb-1" style="color: #0F172A;">Mis Beneficiarios</h2>
+            <p class="text-muted mb-0">Administra las cuentas de terceros a las que transfieres frecuentemente.</p>
         </div>
-        <a asp-controller="Beneficiaries" asp-action="Add" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm">
-            <i class="bi bi-person-plus-fill me-2"></i> Agregar beneficiario
-        </a>
+        <div>
+            <a asp-action="Add" class="btn btn-dark shadow-sm rounded-pill px-4 fw-bold">
+                <i class="bi bi-plus-lg me-2"></i> Añadir Beneficiario
+            </a>
+        </div>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 rounded-4 mb-4" role="alert">
+        <div class="alert alert-success shadow-sm border-0 rounded-3 mb-4">
             <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-    
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 rounded-4 mb-4" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    @if (!Model.Any())
+    @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-info shadow-sm border-0 rounded-4 d-flex align-items-center p-4">
-            <i class="bi bi-people-fill fs-3 text-info me-3"></i>
-            <div>
-                <h5 class="fw-bold mb-1">Sin beneficiarios</h5>
-                <p class="mb-0 text-secondary">Aún no tienes beneficiarios registrados. Agrega uno para facilitar tus transferencias.</p>
-            </div>
+        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4">
+            <i class="bi bi-exclamation-circle-fill me-2"></i> @TempData["ErrorMessage"]
         </div>
     }
-    else
-    {
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-borderless align-middle mb-0">
-                    <thead class="bg-light text-secondary">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th class="py-3 px-4 fw-bold">NOMBRE</th>
-                            <th class="py-3 px-4 fw-bold">APELLIDO</th>
-                            <th class="py-3 px-4 fw-bold">NÚMERO DE CUENTA</th>
-                            <th class="py-3 px-4 fw-bold text-end">ACCIONES</th>
+                            <th class="ps-4 py-3 text-secondary fw-bold">Beneficiario</th>
+                            <th class="py-3 text-secondary fw-bold">Número de Cuenta</th>
+                            <th class="pe-4 py-3 text-secondary fw-bold text-end">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var beneficiary in Model)
+                        @if (Model == null || !Model.Any())
                         {
-                            <tr class="border-bottom border-secondary border-opacity-10">
-                                <td class="py-3 px-4 fw-bold text-dark">@beneficiary.Name</td>
-                                <td class="py-3 px-4 text-secondary">@beneficiary.LastName</td>
-                                <td class="py-3 px-4 font-monospace text-primary fw-bold">@beneficiary.AccountNumber</td>
-                                <td class="py-3 px-4 text-end">
-                                    <form asp-controller="Beneficiaries" asp-action="Delete" asp-route-id="@beneficiary.Id" method="post" onsubmit="return confirm('¿Está seguro que desea eliminar este beneficiario?');" class="d-inline">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill fw-bold px-3">
-                                            <i class="bi bi-trash-fill me-1"></i> Eliminar
-                                        </button>
-                                    </form>
+                            <tr>
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <i class="bi bi-people mb-3 d-block" style="font-size: 3rem; color: #dee2e6;"></i>
+                                    No tienes beneficiarios registrados aún.
                                 </td>
                             </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-person-fill fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold text-dark">@item.Name @item.LastName</h6>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 font-monospace fs-6">@item.AccountNumber</td>
+                                    <td class="pe-4 py-3 text-end">
+                                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill fw-bold px-3" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.Id">
+                                            <i class="bi bi-trash3 me-1"></i> Eliminar
+                                        </button>
+
+                                        <div class="modal fade" id="deleteModal-@item.Id" tabindex="-1" aria-labelledby="deleteModalLabel-@item.Id" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                                                    <div class="modal-header border-0 pb-0">
+                                                        <h5 class="modal-title fw-bold" id="deleteModalLabel-@item.Id">Confirmar Eliminación</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body py-4">
+                                                        <p class="mb-0 text-muted">¿Estás seguro que deseas eliminar a <strong>@item.Name @item.LastName</strong> de tu lista de beneficiarios? No podrás realizarle transferencias rápidas.</p>
+                                                    </div>
+                                                    <div class="modal-footer border-0 pt-0">
+                                                        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                                                        <form asp-action="Delete" asp-route-id="@item.Id" method="post">
+                                                            <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Eliminar Beneficiario</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
             </div>
         </div>
-    }
+    </div>
 </div>
