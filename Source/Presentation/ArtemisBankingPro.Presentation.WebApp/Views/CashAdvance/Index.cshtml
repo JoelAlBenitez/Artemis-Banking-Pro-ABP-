@@ -49,7 +49,7 @@
                                     <option value="">Seleccione una tarjeta</option>
                                     @foreach(var card in Model.AvailableCards)
                                     {
-                                        <option value="@card.Id" data-credit="@(card.LimitAmount - card.OwedAmount)">**** @card.LastFourDigits (Disponible: RD$ @((card.LimitAmount - card.OwedAmount).ToString("N2")))</option>
+                                        <option value="@card.Id" data-credit="@(card.CreditLimit - card.OwedAmount)">**** @card.LastFourDigits (Disponible: RD$ @((card.CreditLimit - card.OwedAmount).ToString("N2")))</option>
                                     }
                                 </select>
                                 <span asp-validation-for="CreditCardId" class="text-danger small mt-2 d-block fw-bold"></span>

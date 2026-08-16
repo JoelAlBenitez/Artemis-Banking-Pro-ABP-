@@ -50,7 +50,7 @@
                                 <option value="">-- Seleccione una tarjeta --</option>
                                 @foreach(var card in creditCards)
                                 {
-                                    <option value="@card.Id">Tarjeta terminada en @(card.CardNumber?.Length > 4 ? card.CardNumber.Substring(card.CardNumber.Length - 4) : card.CardNumber) - Deuda: RD$ @card.Debt.ToString("N2")</option>
+                                    <option value="@card.Id">Tarjeta terminada en @card.LastFourDigits - Deuda: RD$ @card.OwedAmount.ToString("N2")</option>
                                 }
                             </select>
                             <span asp-validation-for="CreditCardId" class="text-danger small mt-1 d-block"></span>

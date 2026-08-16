@@ -50,7 +50,7 @@
                                 <option value="">-- Seleccione un préstamo --</option>
                                 @foreach(var loan in loans)
                                 {
-                                    <option value="@loan.Id">Préstamo #@loan.Id - Deuda: RD$ @loan.Debt.ToString("N2")</option>
+                                    <option value="@loan.Id">Préstamo #@loan.Id - Deuda: RD$ @loan.PendientAmount.ToString("N2")</option>
                                 }
                             </select>
                             <span asp-validation-for="LoanId" class="text-danger small mt-1 d-block"></span>
