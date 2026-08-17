@@ -33,7 +33,7 @@ namespace Artemis_Banking_Pro.Core.Application.ViewModels.Users
         public string? ConfirmNewPassword { get; set; }
 
         //Solo aplica al rol Cliente: se acredita a su cuenta de ahorro principal
-        [Range(typeof(decimal), "0", "999999999999.99", ErrorMessage = "El monto adicional no puede ser negativo.")]
+        [Range(0, 999999999999.99, ErrorMessage = "El monto adicional no puede ser negativo.")]
         public decimal? AdditionalAmount { get; set; }
 
         //Decide si la pantalla muestra el campo de monto adicional. No viaja en el formulario:

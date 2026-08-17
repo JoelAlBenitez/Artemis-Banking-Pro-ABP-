@@ -60,13 +60,13 @@
                         <tr>
                             <th class="ps-4">NÚMERO</th>
                             <th>CLIENTE</th>
-                            <th>CAPITAL</th>
-                            <th>CUOTAS (PAG/TOT)</th>
-                            <th>PENDIENTE</th>
-                            <th>TASA</th>
-                            <th>PLAZO</th>
-                            <th>ESTADO PRÉSTAMO</th>
-                            <th>ESTADO CLIENTE</th>
+                            <th class="text-center">CAPITAL</th>
+                            <th class="text-center">CUOTAS (PAG/TOT)</th>
+                            <th class="text-center">PENDIENTE</th>
+                            <th class="text-center">TASA</th>
+                            <th class="text-center">PLAZO</th>
+                            <th class="text-center">ESTADO PRÉSTAMO</th>
+                            <th class="text-center">ESTADO CLIENTE</th>
                             <th class="text-end pe-4">ACCIONES</th>
                         </tr>
                     </thead>
@@ -86,39 +86,51 @@
                                 <tr>
                                     <td class="ps-4 fw-bold">@loan.LoanNumber</td>
                                     <td>@loan.FullNameCustomer</td>
-                                    <td class="fw-bold text-success">RD$ @loan.AprovechedCapital.ToString("N2")</td>
-                                    <td>
+                                    <td class="text-center fw-bold text-success">RD$ @loan.AprovechedCapital.ToString("N2")</td>
+                                    <td class="text-center">
                                         <span class="badge bg-secondary">@loan.InstallmentPay / @loan.QuantityInstallment</span>
                                     </td>
-                                    <td class="fw-bold text-danger">RD$ @loan.PendientAmount.ToString("N2")</td>
-                                    <td>@loan.AnnualInterestRate.ToString("N2")%</td>
-                                    <td>@loan.Term Meses</td>
-                                    <td>
+                                    <td class="text-center fw-bold text-danger">RD$ @loan.PendientAmount.ToString("N2")</td>
+                                    <td class="text-center">@loan.AnnualInterestRate.ToString("N2")%</td>
+                                    <td class="text-center">@loan.Term Meses</td>
+                                    <td class="text-center">
                                         @if (loan.StateLoans == "Completado")
                                         {
-                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">@loan.StateLoans</span>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <span class="status-dot bg-primary me-2"></span>
+                                                <span class="text-dark fw-medium" style="font-size: 0.9rem;">@loan.StateLoans</span>
+                                            </div>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">@loan.StateLoans</span>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <span class="status-dot bg-success me-2"></span>
+                                                <span class="text-dark fw-medium" style="font-size: 0.9rem;">@loan.StateLoans</span>
+                                            </div>
                                         }
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         @if (loan.StateCustomer == "Al día")
                                         {
-                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25"><i class="bi bi-check-circle me-1"></i> @loan.StateCustomer</span>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <span class="status-dot bg-success me-2"></span>
+                                                <span class="text-dark fw-medium" style="font-size: 0.9rem;">@loan.StateCustomer</span>
+                                            </div>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25"><i class="bi bi-exclamation-triangle me-1"></i> @loan.StateCustomer</span>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <span class="status-dot bg-danger me-2"></span>
+                                                <span class="text-dark fw-medium" style="font-size: 0.9rem;">@loan.StateCustomer</span>
+                                            </div>
                                         }
                                     </td>
                                     <td class="text-end pe-4">
-                                        <a asp-action="Details" asp-route-id="@loan.Id" class="btn btn-sm btn-outline-info fw-bold me-2" title="Ver detalles y tabla de amortización">
-                                            Detalles
+                                        <a asp-action="Details" asp-route-id="@loan.Id" class="btn btn-light btn-action text-info shadow-sm border me-1" title="Ver detalles y tabla de amortización">
+                                            <i class="bi bi-eye"></i>
                                         </a>
-                                        <a asp-action="Edit" asp-route-id="@loan.Id" class="btn btn-sm btn-outline-primary fw-bold">
-                                            Editar Tasa
+                                        <a asp-action="Edit" asp-route-id="@loan.Id" class="btn btn-light btn-action text-primary shadow-sm border" title="Editar Tasa">
+                                            <i class="bi bi-pencil-square"></i>
                                         </a>
                                     </td>
                                 </tr>

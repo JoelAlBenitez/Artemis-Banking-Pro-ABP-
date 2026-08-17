@@ -60,10 +60,10 @@
                         <tr>
                             <th class="ps-4">NÚMERO DE TARJETA</th>
                             <th>CLIENTE</th>
-                            <th>LÍMITE DE CRÉDITO</th>
-                            <th>EXPIRACIÓN</th>
-                            <th>MONTO ADEUDADO</th>
-                            <th>ESTADO</th>
+                            <th class="text-center">LÍMITE DE CRÉDITO</th>
+                            <th class="text-center">EXPIRACIÓN</th>
+                            <th class="text-center">MONTO ADEUDADO</th>
+                            <th class="text-center">ESTADO</th>
                             <th class="text-end pe-4">ACCIONES</th>
                         </tr>
                     </thead>
@@ -83,30 +83,36 @@
                                 <tr>
                                     <td class="ps-4 fw-bold font-monospace">@card.MaskedCardNumber</td>
                                     <td>@card.FullNameCustomer</td>
-                                    <td class="fw-bold text-success">RD$ @card.CreditLimit.ToString("N2")</td>
-                                    <td class="text-muted">@card.ExpirationDate</td>
-                                    <td class="fw-bold text-danger">RD$ @card.OwedAmount.ToString("N2")</td>
-                                    <td>
+                                    <td class="text-center fw-bold text-success">RD$ @card.CreditLimit.ToString("N2")</td>
+                                    <td class="text-center text-muted">@card.ExpirationDate</td>
+                                    <td class="text-center fw-bold text-danger">RD$ @card.OwedAmount.ToString("N2")</td>
+                                    <td class="text-center">
                                         @if (card.StateCreditCard == "Cancelada")
                                         {
-                                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">@card.StateCreditCard</span>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <span class="status-dot bg-secondary me-2"></span>
+                                                <span class="text-dark fw-medium" style="font-size: 0.9rem;">@card.StateCreditCard</span>
+                                            </div>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">@card.StateCreditCard</span>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <span class="status-dot bg-success me-2"></span>
+                                                <span class="text-dark fw-medium" style="font-size: 0.9rem;">@card.StateCreditCard</span>
+                                            </div>
                                         }
                                     </td>
                                     <td class="text-end pe-4">
-                                        <a asp-action="Details" asp-route-id="@card.Id" class="btn btn-sm btn-outline-info fw-bold me-2" title="Ver consumos de la tarjeta">
-                                            Detalles
+                                        <a asp-action="Details" asp-route-id="@card.Id" class="btn btn-light btn-action text-info shadow-sm border me-1" title="Ver consumos de la tarjeta">
+                                            <i class="bi bi-eye"></i>
                                         </a>
                                         @if (card.StateCreditCard != "Cancelada")
                                         {
-                                            <a asp-action="Edit" asp-route-id="@card.Id" class="btn btn-sm btn-outline-primary fw-bold me-2">
-                                                Editar
+                                            <a asp-action="Edit" asp-route-id="@card.Id" class="btn btn-light btn-action text-primary shadow-sm border me-1" title="Editar">
+                                                <i class="bi bi-pencil-square"></i>
                                             </a>
-                                            <a asp-action="Cancel" asp-route-id="@card.Id" class="btn btn-sm btn-outline-danger fw-bold">
-                                                Cancelar
+                                            <a asp-action="Cancel" asp-route-id="@card.Id" class="btn btn-light btn-action text-danger shadow-sm border" title="Cancelar">
+                                                <i class="bi bi-x-circle"></i>
                                             </a>
                                         }
                                     </td>

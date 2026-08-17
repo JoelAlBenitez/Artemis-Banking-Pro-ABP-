@@ -65,9 +65,9 @@
                         <tr>
                             <th class="ps-4">NÚMERO DE CUENTA</th>
                             <th>CLIENTE</th>
-                            <th>BALANCE DISPONIBLE</th>
-                            <th>TIPO</th>
-                            <th>ESTADO</th>
+                            <th class="text-center">BALANCE DISPONIBLE</th>
+                            <th class="text-center">TIPO</th>
+                            <th class="text-center">ESTADO</th>
                             <th class="text-end pe-4">ACCIONES</th>
                         </tr>
                     </thead>
@@ -87,35 +87,47 @@
                                 <tr>
                                     <td class="ps-4 fw-bold font-monospace">@account.AccountNumber</td>
                                     <td>@account.FullNameCustomer</td>
-                                    <td class="fw-bold text-success">RD$ @account.Balance.ToString("N2")</td>
-                                    <td>
-                                        @if (account.TypeSavingsAccount == "Principal")
+                                    <td class="text-center fw-bold text-success">RD$ @account.Balance.ToString("N2")</td>
+                                    <td class="text-center">
+                                        @if (account.TypeSavingsAccount.ToString() == "Principal")
                                         {
-                                            <span class="badge bg-warning text-dark"><i class="bi bi-star-fill me-1"></i> @account.TypeSavingsAccount</span>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <span class="status-dot bg-primary me-2"></span>
+                                                <span class="text-dark fw-medium" style="font-size: 0.9rem;">@account.TypeSavingsAccount</span>
+                                            </div>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-light text-dark border"><i class="bi bi-diagram-2 me-1"></i> @account.TypeSavingsAccount</span>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <span class="status-dot bg-secondary me-2"></span>
+                                                <span class="text-dark fw-medium" style="font-size: 0.9rem;">@account.TypeSavingsAccount</span>
+                                            </div>
                                         }
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         @if (account.StateSavingsAccount == "Cancelada")
                                         {
-                                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">@account.StateSavingsAccount</span>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <span class="status-dot bg-secondary me-2"></span>
+                                                <span class="text-dark fw-medium" style="font-size: 0.9rem;">@account.StateSavingsAccount</span>
+                                            </div>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">@account.StateSavingsAccount</span>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <span class="status-dot bg-success me-2"></span>
+                                                <span class="text-dark fw-medium" style="font-size: 0.9rem;">@account.StateSavingsAccount</span>
+                                            </div>
                                         }
                                     </td>
                                     <td class="text-end pe-4">
-                                        <a asp-action="Details" asp-route-id="@account.Id" class="btn btn-sm btn-outline-info fw-bold me-2" title="Ver transacciones">
-                                            Detalles
+                                        <a asp-action="Details" asp-route-id="@account.Id" class="btn btn-light btn-action text-info shadow-sm border me-1" title="Ver transacciones">
+                                            <i class="bi bi-eye"></i>
                                         </a>
                                         @if (account.CanBeCancelled)
                                         {
-                                            <a asp-action="Cancel" asp-route-id="@account.Id" class="btn btn-sm btn-outline-danger fw-bold">
-                                                Cancelar
+                                            <a asp-action="Cancel" asp-route-id="@account.Id" class="btn btn-light btn-action text-danger shadow-sm border" title="Cancelar">
+                                                <i class="bi bi-x-circle"></i>
                                             </a>
                                         }
                                     </td>
