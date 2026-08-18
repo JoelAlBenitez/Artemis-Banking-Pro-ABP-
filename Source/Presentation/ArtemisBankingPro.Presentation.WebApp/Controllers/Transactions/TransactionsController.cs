@@ -3,7 +3,8 @@ using Artemis_Banking_Pro.Core.Application.Contracts.Dashboard;
 using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
 using Artemis_Banking_Pro.Core.Application.ViewModels.Transactions;
-using ArtemisBankingPro.Core.Domain.Interfaces.Beneficiaries;
+using Artemis_Banking_Pro.Core.Application.Contracts.Beneficiaries;
+using Artemis_Banking_Pro.Core.Application.ViewModels.Beneficiaries;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,21 +17,27 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
         private readonly ITransactionService _transactionService;
         private readonly IPaymentService _paymentService;
         private readonly IDashboardService _dashboardService;
-        private readonly IBeneficiaryRepository _beneficiaryRepository;
+        private readonly IBeneficiaryServices _beneficiaryServices;
         private readonly IMapper _mapper;
 
         public TransactionsController(
             ITransactionService transactionService,
             IPaymentService paymentService,
             IDashboardService dashboardService,
-            IBeneficiaryRepository beneficiaryRepository,
+            IBeneficiaryServices beneficiaryServices,
             IMapper mapper)
         {
             _transactionService = transactionService;
             _paymentService = paymentService;
             _dashboardService = dashboardService;
-            _beneficiaryRepository = beneficiaryRepository;
+            _beneficiaryServices = beneficiaryServices;
             _mapper = mapper;
+        }
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            return View();
         }
 
         [HttpGet]
@@ -239,8 +246,15 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
 
         private async Task PopulateBeneficiariesAsync(string clientId)
         {
-            var beneficiaries = await _beneficiaryRepository.GetAllFindAsync(b => b.OwnerClientId == clientId && b.IsActive);
-            ViewBag.Beneficiaries = beneficiaries;
+            var result = await _beneficiaryServices.GetClientBeneficiariesAsync(clientId);
+            if (result.IsValid && result.Value != null)
+            {
+                ViewBag.Beneficiaries = _mapper.Map<List<BeneficiaryListViewModel>>(result.Value);
+            }
+            else
+            {
+                ViewBag.Beneficiaries = new List<BeneficiaryListViewModel>();
+            }
         }
 
         private async Task PopulateCreditCardsAsync(string clientId)
