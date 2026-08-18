@@ -21,7 +21,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             decimal annualInterestRate,
             int totalInstallments)
         {
-            _logger.LogInformation("Realizando calculo de la cutoas seg�n la tarifa determinada.");
+            _logger.LogInformation("Realizando calculo de las cuotas según la tarifa determinada.");
             if (totalInstallments <= 0) return 0m;
             var monthlyRate = MonthlyRate(annualInterestRate);
             if (monthlyRate == 0m) return Money(capital / totalInstallments);
@@ -41,7 +41,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
             if (totalInstallments <= 0) return installments;
 
             #region  calculando la tarifa mensual de as cuotas
-            _logger.LogInformation("Realizaci�n del calculo de la tarifa mensual" +
+            _logger.LogInformation("Realización del calculo de la tarifa mensual" +
                 " y las mensualidades de las cuotas del prestamo con ID {ID} ", loanId);
             var monthlyRate = MonthlyRate(annualInterestRate);
             var monthlyInstallment = CalculateMonthlyInstallment(capital, annualInterestRate, totalInstallments);
@@ -65,7 +65,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Loans
 
                 pendingCapital = Money(pendingCapital - capitalAmount);
 
-                _logger.LogInformation("Creando cuota determinada n�mero {N} al prestamo con ID {ID}", number, loanId);
+                _logger.LogInformation("Creando cuota determinada número {N} al prestamo con ID {ID}", number, loanId);
                 installments.Add(new LoanInstallment
                 {
                     LoanId = loanId,

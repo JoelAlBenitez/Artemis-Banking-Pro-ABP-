@@ -34,9 +34,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
             if (User.Identity != null && User.Identity.IsAuthenticated)
                 return RedirectToRoleHome();
 
-            if (Request.Query.ContainsKey("denied"))
-                ModelState.AddModelError(string.Empty, "No tiene permiso para acceder a esta sección.");
-            else if (Request.Query.ContainsKey("expired"))
+            if (Request.Query.ContainsKey("expired"))
                 ModelState.AddModelError(string.Empty, "Su sesión ha expirado. Inicie sesión nuevamente.");
 
             return View(new AuthenticationRequest { UserName = "", Password = "" });
@@ -146,12 +144,12 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
 
             if (User.IsInRole(nameof(Roles.Administrador)))
             {
-                homeController = "AdminHome";
+                homeController = "Admin";
                 homeAction = "Index";
             }
             else if (User.IsInRole(nameof(Roles.Cajero)))
             {
-                homeController = "CashierHome";
+                homeController = "Atm";
                 homeAction = "Index";
             }
             else if (User.IsInRole(nameof(Roles.Cliente)))
@@ -183,7 +181,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
 
             //Pendiente: el módulo Cajero todavía no tiene su controlador en la WebApp
             if (userRoles.Contains(nameof(Roles.Cajero)))
-                return RedirectToAction("Index", "CashierHome");
+                return RedirectToAction("Index", "Atm");
 
             if (userRoles.Contains(nameof(Roles.Cliente)))
                 return RedirectToAction("Index", "Customer");

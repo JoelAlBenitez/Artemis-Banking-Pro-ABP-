@@ -1,5 +1,5 @@
 using ArtemisBankingPro.IOC;
-using ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguration;
+
 using ArtemisBankingPro.Presentation.WebApp.Extensions;
 using ArtemisBankingPro.Presentation.WebApp.Middlewares;
 using Serilog;
@@ -19,7 +19,7 @@ try
     builder.Services.AddApplicationDependecies();
     builder.Services.AddInfraestructurePersistence(builder.Configuration);
     builder.Services.AddInfraestructureDependencies(builder.Configuration);
-    builder.Services.AddWebAppIdentity(builder.Configuration);
+    builder.Services.AddWebAppIdentityDependencies(builder.Configuration);
 
     // Add services to the container.
     builder.Services.AddControllersWithViews();
@@ -53,7 +53,7 @@ try
 
     app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
+        pattern: "{controller=Account}/{action=Login}/{id?}")
         .WithStaticAssets();
 
     app.Run();

@@ -1,0 +1,74 @@
+﻿@model ArtemisBankingPro.Core.Application.ViewModels.Atm.ConfirmCreditCardPaymentViewModel
+@{
+    ViewData["Title"] = "Confirmar Pago a Tarjeta";
+}
+
+<div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-10 col-xl-9">
+            <div class="card border-0 shadow-lg rounded-2 overflow-hidden">
+                <div class="card-header bg-white text-dark p-4 border-bottom">
+                    <h3 class="fw-bold mb-1">Confirmar Pago a Tarjeta</h3>
+                    <p class="mb-0 opacity-75 small fw-bold">Verifique la información antes de aplicar la transacción.</p>
+                </div>
+                
+                <div class="card-body p-4 bg-white text-center">
+                    <h4 class="fw-bold mb-4 fs-5">¿Está seguro que desea realizar este pago?</h4>
+                    
+                    <div class="bg-light rounded-2 p-4 text-start mb-4 shadow-sm border border-secondary border-opacity-10">
+                        <div class="row g-4">
+                            <div class="col-sm-6">
+                                <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Titular de la cuenta</p>
+                                <p class="mb-0 fs-5 fw-bold text-dark">@Model.AccountOwnerName</p>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Cuenta Origen</p>
+                                <p class="mb-0 font-monospace fs-5 fw-bold text-primary">@Model.SourceAccountNumber</p>
+                            </div>
+
+                            <div class="col-sm-6 border-top pt-3">
+                                <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Titular Tarjeta</p>
+                                <p class="mb-0 fs-5 fw-bold text-dark">@Model.CreditCardOwnerName</p>
+                            </div>
+
+                            <div class="col-sm-6 border-top pt-3">
+                                <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Tarjeta Destino</p>
+                                <p class="mb-0 font-monospace fs-5 fw-bold text-primary">**** @Model.CardLastFourDigits</p>
+                            </div>
+
+                            <div class="col-sm-6 border-top pt-3 mt-3">
+                                <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Monto Ingresado</p>
+                                <p class="mb-0 font-monospace fs-5 fw-bold text-muted">RD$ @Model.EnteredAmount</p>
+                            </div>
+
+                            <div class="col-sm-6 border-top pt-3 mt-3">
+                                <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Monto Efectivo a Pagar</p>
+                                <p class="mb-0 font-monospace fs-4 fw-bold text-success">RD$ @Model.EffectiveAmount</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form asp-action="ExecuteCreditCardPayment" method="post">
+                        <input type="hidden" asp-for="SourceAccountNumber" />
+                        <input type="hidden" asp-for="AccountOwnerName" />
+                        <input type="hidden" asp-for="CreditCardNumber" />
+                        <input type="hidden" asp-for="CreditCardOwnerName" />
+                        <input type="hidden" asp-for="CardLastFourDigits" />
+                        <input type="hidden" asp-for="EnteredAmount" />
+                        <input type="hidden" asp-for="EffectiveAmount" />
+                        
+                        <div class="d-flex gap-3 justify-content-center">
+                            <a asp-controller="Atm" asp-action="Index" class="btn btn-light rounded-2 fw-bold px-5 shadow-sm text-secondary">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success rounded-2 fw-bold px-5 shadow-sm text-white">
+                                Confirmar Pago 
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

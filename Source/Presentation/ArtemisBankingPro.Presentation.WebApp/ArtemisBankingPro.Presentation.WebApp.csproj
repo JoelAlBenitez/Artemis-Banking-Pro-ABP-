@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>1fb55103-e76c-408b-9a59-4d9d9ccd4dc0</UserSecretsId>
+    <UserSecretsId>63fdd67e-ccaf-4b30-b4f6-caaa12731a8b</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,11 +19,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\ArtemisBankingPro.IOC\ArtemisBankingPro.IOC.csproj" />
-    <ProjectReference Include="..\..\Core\Artemis Banking Pro.Core.Application\ArtemisBankingPro.Core.Application.csproj" />
   </ItemGroup>
 
 </Project>
