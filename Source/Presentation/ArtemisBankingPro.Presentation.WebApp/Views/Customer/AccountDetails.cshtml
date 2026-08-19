@@ -23,6 +23,7 @@
                         <tr>
                             <th class="ps-4 py-3 text-secondary fw-bold">Fecha</th>
                             <th class="py-3 text-secondary fw-bold">Tipo</th>
+                            <th class="py-3 text-secondary fw-bold">Concepto</th>
                             <th class="py-3 text-secondary fw-bold">Monto</th>
                             <th class="pe-4 py-3 text-secondary fw-bold text-end">Estado</th>
                         </tr>
@@ -31,7 +32,7 @@
                         @if (Model == null || !Model.Any())
                         {
                             <tr>
-                                <td colspan="4" class="text-center py-5 text-muted">No hay movimientos registrados.</td>
+                                <td colspan="5" class="text-center py-5 text-muted">No hay movimientos registrados.</td>
                             </tr>
                         }
                         else
@@ -41,8 +42,18 @@
                                 <tr>
                                     <td class="ps-4 py-3">@txn.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")</td>
                                     <td class="py-3 fw-bold">@txn.TransactionType</td>
-                                    <td class="py-3 fw-bold @(txn.TransactionType.ToString() == "Deposito" ? "text-success" : "text-dark")">
-                                        @(txn.TransactionType.ToString() == "Deposito" ? "+" : "-") RD$ @txn.EffectiveAmount.ToString("N2")
+                                    <td class="py-3 text-muted">
+                                        @if (txn.TransactionType.ToString() == "Debito")
+                                        {
+                                            <span>Hacia: @(string.IsNullOrEmpty(txn.Beneficiary) ? "N/A" : txn.Beneficiary)</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Desde: @(string.IsNullOrEmpty(txn.Origin) ? "N/A" : txn.Origin)</span>
+                                        }
+                                    </td>
+                                    <td class="py-3 fw-bold @(txn.TransactionType.ToString() == "Deposito" || txn.TransactionType.ToString() == "Credito" ? "text-success" : "text-dark")">
+                                        @(txn.TransactionType.ToString() == "Deposito" || txn.TransactionType.ToString() == "Credito" ? "+" : "-") RD$ @txn.EffectiveAmount.ToString("N2")
                                     </td>
                                     <td class="pe-4 py-3 text-end">
                                         @if (txn.Status.ToString() == "Aprobada")

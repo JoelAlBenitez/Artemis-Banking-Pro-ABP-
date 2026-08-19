@@ -9,5 +9,7 @@ namespace Artemis_Banking_Pro.Core.Application.DTOs.Transactions
         public TransactionStatus Status { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public string? WarningMessage { get; set; }
+        public string? Origin { get; set; }
+        public string? Beneficiary { get; set; }
     }
 }

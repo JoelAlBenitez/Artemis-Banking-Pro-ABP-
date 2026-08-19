@@ -91,7 +91,7 @@
                                     </div>
                                     <div>
                                         <h6 class="text-secondary fw-bold mb-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">DEUDA ACTUAL</h6>
-                                        <h3 class="fw-bold text-danger mb-1">RD$ @card.OwedAmount.ToString("N2")</h3>
+                                        <h3 class="fw-bold text-dark mb-1">RD$ @card.OwedAmount.ToString("N2")</h3>
                                     </div>
                                     <p class="small text-muted mb-3">Disponible: RD$ @card.AvailableCredit.ToString("N2")</p>
                                     <a asp-action="CardDetails" asp-route-id="@card.Id" class="btn btn-outline-success btn-sm rounded-pill w-100 fw-bold">Ver Consumos</a>
@@ -126,7 +126,7 @@
                                     </div>
                                     <div>
                                         <h6 class="text-secondary fw-bold mb-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">MONTO PENDIENTE</h6>
-                                        <h3 class="fw-bold text-warning mb-1">RD$ @loan.PendientAmount.ToString("N2")</h3>
+                                        <h3 class="fw-bold text-dark mb-1">RD$ @loan.PendientAmount.ToString("N2")</h3>
                                     </div>
                                     <p class="small text-muted mb-3">Cuota: RD$ @loan.InstallmentPay.ToString("N2")</p>
                                     <a asp-action="LoanDetails" asp-route-id="@loan.Id" class="btn btn-outline-warning btn-sm rounded-pill w-100 fw-bold text-dark">Ver Amortización</a>
