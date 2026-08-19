@@ -52,17 +52,23 @@
                                             <span>Desde: @(string.IsNullOrEmpty(txn.Origin) ? "N/A" : txn.Origin)</span>
                                         }
                                     </td>
-                                    <td class="py-3 fw-bold @(txn.TransactionType.ToString() == "Deposito" || txn.TransactionType.ToString() == "Credito" ? "text-success" : "text-dark")">
+                                    <td class="py-3 fw-bold text-dark">
                                         @(txn.TransactionType.ToString() == "Deposito" || txn.TransactionType.ToString() == "Credito" ? "+" : "-") RD$ @txn.EffectiveAmount.ToString("N2")
                                     </td>
                                     <td class="pe-4 py-3 text-end">
                                         @if (txn.Status.ToString() == "Aprobada")
                                         {
-                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2">Completado</span>
+                                            <div class="d-flex justify-content-end align-items-center">
+                                                <span class="status-dot bg-success me-2" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+                                                <span class="text-dark fw-medium">Completado</span>
+                                            </div>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2">Fallido</span>
+                                            <div class="d-flex justify-content-end align-items-center">
+                                                <span class="status-dot bg-danger me-2" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+                                                <span class="text-dark fw-medium">Fallido</span>
+                                            </div>
                                         }
                                     </td>
                                 </tr>
