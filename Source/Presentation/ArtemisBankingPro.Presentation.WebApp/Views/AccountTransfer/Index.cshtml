@@ -7,7 +7,7 @@
 <div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card border-0 shadow-lg rounded-2 overflow-hidden">
                 <div class="card-header bg-primary text-white p-4 border-0">
                     <h3 class="fw-bold mb-1"><i class="bi bi-arrow-repeat me-2"></i> Transferencia entre cuentas</h3>
                     <p class="mb-0 opacity-75 small">Mueve fondos libremente entre tus cuentas de ahorro activas.</p>
@@ -16,7 +16,7 @@
                 <div class="card-body p-4 p-md-5">
                     @if (!ViewData.ModelState.IsValid)
                     {
-                        <div class="alert alert-danger shadow-sm border-0 rounded-4 mb-4">
+                        <div class="alert alert-danger shadow-sm border-0 rounded-2 mb-4">
                             <i class="bi bi-exclamation-circle-fill me-2"></i>
                             <strong>¡Atención!</strong>
                             <div asp-validation-summary="All" class="mt-2 mb-0 small"></div>
@@ -25,7 +25,7 @@
 
                     @if (Model.AvailableAccounts == null || Model.AvailableAccounts.Count < 2)
                     {
-                        <div class="alert alert-warning border-0 rounded-4 shadow-sm p-4 text-center">
+                        <div class="alert alert-warning border-0 rounded-2 shadow-sm p-4 text-center">
                             <i class="bi bi-exclamation-triangle-fill fs-1 text-warning mb-3 d-block"></i>
                             <h5 class="fw-bold">Cuentas insuficientes</h5>
                             <p class="mb-0">Debe tener al menos dos cuentas de ahorro activas para realizar una transferencia entre cuentas propias.</p>
@@ -37,7 +37,7 @@
                             
                             <div class="mb-4">
                                 <label asp-for="SourceAccountId" class="form-label fw-bold text-secondary">Cuenta de Origen <span class="text-danger">*</span></label>
-                                <select asp-for="SourceAccountId" class="form-select form-select-lg border-0 bg-light shadow-sm rounded-4 font-monospace" id="sourceSelect">
+                                <select asp-for="SourceAccountId" class="form-select form-select-lg border-0 bg-light shadow-sm rounded-2 " id="sourceSelect">
                                     <option value="">Seleccione cuenta a debitar</option>
                                     @foreach(var account in Model.AvailableAccounts)
                                     {
@@ -49,7 +49,7 @@
 
                             <div class="mb-4">
                                 <label asp-for="DestinationAccountId" class="form-label fw-bold text-secondary">Cuenta de Destino <span class="text-danger">*</span></label>
-                                <select asp-for="DestinationAccountId" class="form-select form-select-lg border-0 bg-light shadow-sm rounded-4 font-monospace" id="destSelect">
+                                <select asp-for="DestinationAccountId" class="form-select form-select-lg border-0 bg-light shadow-sm rounded-2 " id="destSelect">
                                     <option value="">Seleccione cuenta a acreditar</option>
                                     @foreach(var account in Model.AvailableAccounts)
                                     {
@@ -61,9 +61,9 @@
 
                             <div class="mb-5">
                                 <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto a Transferir <span class="text-danger">*</span></label>
-                                <div class="input-group input-group-lg shadow-sm rounded-4 overflow-hidden">
+                                <div class="input-group input-group-lg shadow-sm rounded-2 overflow-hidden">
                                     <span class="input-group-text bg-light border-0 text-primary fw-bold">RD$</span>
-                                    <input asp-for="Amount" type="number" step="0.01" class="form-control border-0 bg-light font-monospace text-dark fw-bold" placeholder="0.00" autocomplete="off" id="amountInput" />
+                                    <input asp-for="Amount" type="number" step="0.01" class="form-control border-0 bg-light  text-dark fw-bold" placeholder="0.00" autocomplete="off" id="amountInput" />
                                 </div>
                                 <span asp-validation-for="Amount" class="text-danger small mt-2 d-block fw-bold"></span>
                             </div>
@@ -87,7 +87,7 @@
 <!-- Confirmation Modal -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true" style="font-family: 'Montserrat', sans-serif;">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content rounded-4 border-0 shadow-lg">
+    <div class="modal-content rounded-2 border-0 shadow-lg">
       <div class="modal-header bg-primary text-white border-0 rounded-top-4 p-4">
         <h5 class="modal-title fw-bold" id="confirmationModalLabel"><i class="bi bi-shield-check me-2"></i> Confirmar Transferencia</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -97,13 +97,13 @@
         <h4 class="fw-bold mb-3">¿Está seguro que desea realizar esta transferencia?</h4>
         <div class="bg-light rounded-3 p-3 text-start mb-3">
             <p class="mb-1 text-secondary small fw-bold">Cuenta de Origen:</p>
-            <p class="mb-2 font-monospace fs-5 fw-bold text-danger" id="confirmSrcAccount"></p>
+            <p class="mb-2  fs-5 fw-bold text-danger" id="confirmSrcAccount"></p>
 
             <p class="mb-1 text-secondary small fw-bold">Cuenta de Destino:</p>
-            <p class="mb-2 font-monospace fs-5 fw-bold text-success" id="confirmDestAccount"></p>
+            <p class="mb-2  fs-5 fw-bold text-success" id="confirmDestAccount"></p>
             
             <p class="mb-1 text-secondary small fw-bold">Monto a Transferir:</p>
-            <p class="mb-0 font-monospace fs-5 fw-bold text-primary" id="confirmAmount"></p>
+            <p class="mb-0  fs-5 fw-bold text-primary" id="confirmAmount"></p>
         </div>
         <p class="text-secondary small">Esta acción descontará los fondos inmediatamente.</p>
       </div>
