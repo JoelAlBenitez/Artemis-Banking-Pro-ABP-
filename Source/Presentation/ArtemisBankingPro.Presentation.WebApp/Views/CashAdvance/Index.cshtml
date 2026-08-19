@@ -45,7 +45,7 @@
                             
                             <div class="mb-4">
                                 <label asp-for="CreditCardId" class="form-label fw-bold text-secondary">Tarjeta de crédito origen <span class="text-danger">*</span></label>
-                                <select asp-for="CreditCardId" class="form-select form-select-lg border-0 bg-light shadow-sm rounded-2 font-monospace" id="cardSelect" onchange="updateAvailableCredit()">
+                                <select asp-for="CreditCardId" class="form-select form-select-lg border-0 bg-light shadow-sm rounded-2" id="cardSelect" onchange="updateAvailableCredit()">
                                     <option value="">Seleccione una tarjeta</option>
                                     @foreach(var card in Model.AvailableCards)
                                     {
@@ -57,7 +57,7 @@
 
                             <div class="mb-4">
                                 <label asp-for="SavingsAccountId" class="form-label fw-bold text-secondary">Cuenta de ahorro destino <span class="text-danger">*</span></label>
-                                <select asp-for="SavingsAccountId" class="form-select form-select-lg border-0 bg-light shadow-sm rounded-2 font-monospace">
+                                <select asp-for="SavingsAccountId" class="form-select form-select-lg border-0 bg-light shadow-sm rounded-2">
                                     <option value="">Seleccione cuenta a depositar</option>
                                     @foreach(var account in Model.AvailableAccounts)
                                     {
@@ -71,17 +71,17 @@
                                 <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto del avance de efectivo <span class="text-danger">*</span></label>
                                 <div class="input-group input-group-lg shadow-sm rounded-2 overflow-hidden">
                                     <span class="input-group-text bg-light border-0 text-success fw-bold">RD$</span>
-                                    <input asp-for="Amount" type="number" step="0.01" class="form-control border-0 bg-light font-monospace text-dark fw-bold" placeholder="0.00" autocomplete="off" oninput="calculateInterest()" />
+                                    <input asp-for="Amount" type="number" step="0.01" class="form-control border-0 bg-light text-dark fw-bold" placeholder="0.00" autocomplete="off" oninput="calculateInterest()" />
                                 </div>
                                 <span asp-validation-for="Amount" class="text-danger small mt-2 d-block fw-bold"></span>
                                 
                                 <div class="alert alert-secondary mt-3 mb-0 rounded-3 border-0 d-flex justify-content-between align-items-center">
                                     <span class="small fw-bold text-secondary"><i class="bi bi-info-circle me-1"></i> Interés (6.25%):</span>
-                                    <span class="small fw-bold text-dark font-monospace" id="interestDisplay">RD$ 0.00</span>
+                                    <span class="small fw-bold text-dark" id="interestDisplay">RD$ 0.00</span>
                                 </div>
                                 <div class="alert alert-info mt-2 mb-0 rounded-3 border-0 d-flex justify-content-between align-items-center">
                                     <span class="small fw-bold text-info"><i class="bi bi-calculator me-1"></i> Total a cargar:</span>
-                                    <span class="small fw-bold text-dark font-monospace" id="totalDisplay">RD$ 0.00</span>
+                                    <span class="small fw-bold text-dark" id="totalDisplay">RD$ 0.00</span>
                                 </div>
                             </div>
 
