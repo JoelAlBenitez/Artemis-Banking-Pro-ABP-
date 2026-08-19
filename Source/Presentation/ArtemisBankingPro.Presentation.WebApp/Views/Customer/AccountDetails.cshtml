@@ -40,9 +40,9 @@
                             foreach (var txn in Model.OrderByDescending(x => x.CreatedAt))
                             {
                                 <tr>
-                                    <td class="ps-4 py-3">@txn.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")</td>
+                                    <td class="ps-4 py-3 fw-bold text-dark">@txn.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")</td>
                                     <td class="py-3 fw-bold">@txn.TransactionType</td>
-                                    <td class="py-3 text-muted">
+                                    <td class="py-3 fw-bold text-dark">
                                         @if (txn.TransactionType.ToString() == "Debito")
                                         {
                                             <span>Hacia: @(string.IsNullOrEmpty(txn.Beneficiary) ? "N/A" : txn.Beneficiary)</span>
@@ -60,14 +60,14 @@
                                         {
                                             <div class="d-flex justify-content-end align-items-center">
                                                 <span class="status-dot bg-success me-2" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
-                                                <span class="text-dark fw-medium">Completado</span>
+                                                <span class="text-dark fw-bold">Completado</span>
                                             </div>
                                         }
                                         else
                                         {
                                             <div class="d-flex justify-content-end align-items-center">
                                                 <span class="status-dot bg-danger me-2" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
-                                                <span class="text-dark fw-medium">Fallido</span>
+                                                <span class="text-dark fw-bold">Fallido</span>
                                             </div>
                                         }
                                     </td>
