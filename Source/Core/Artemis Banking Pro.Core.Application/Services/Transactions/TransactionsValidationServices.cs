@@ -244,7 +244,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 if (installments.Count == 0)
                 {
                     _logger.LogWarning("Validación fallida: el préstamo {LoanId} no posee cuotas pendientes", dto.LoanId);
-                    return ValidationResult<(SavingsAccount, Loan, List<LoanInstallment>, decimal)>.Failure(TransactionError.LoanOverpayment);
+                    return ValidationResult<(SavingsAccount, Loan, List<LoanInstallment>, decimal)>.Failure(TransactionError.NoPendingInstallments);
                 }
 
                 var totalPending = installments.Sum(i => i.PendingBalance);

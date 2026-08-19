@@ -54,6 +54,11 @@ namespace ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros
             "El préstamo seleccionado no existe o no pertenece al cliente."
         );
 
+        public static readonly Error NoPendingInstallments = new(
+            "Transaction.NoPendingInstallments", 
+            "El pr�stamo seleccionado no posee cuotas pendientes por pagar."
+        );
+
         public static readonly Error LoanOverpayment = new(
             "Transaction.LoanOverpayment", 
             "El monto de pago no puede exceder el balance pendiente del préstamo."
