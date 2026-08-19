@@ -6,14 +6,14 @@
 
 <div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+        <div class="col-md-8 col-lg-5">
             <div class="card border-0 shadow-lg rounded-2 overflow-hidden">
                 <div class="card-header bg-dark text-white p-4 border-0">
                     <h3 class="fw-bold mb-1"><i class="bi bi-cash-stack me-2 text-success"></i> Avance de Efectivo</h3>
                     <p class="mb-0 opacity-75 small">Transfiere fondos desde tu tarjeta de crédito a tu cuenta de ahorro.</p>
                 </div>
                 
-                <div class="card-body p-4 p-md-5">
+                <div class="card-body p-4 p-4">
                     @if (!ViewData.ModelState.IsValid)
                     {
                         <div class="alert alert-danger shadow-sm border-0 rounded-2 mb-4">
@@ -45,7 +45,7 @@
                             
                             <div class="mb-4">
                                 <label asp-for="CreditCardId" class="form-label fw-bold text-secondary">Tarjeta de crédito origen <span class="text-danger">*</span></label>
-                                <select asp-for="CreditCardId" class="form-select form-select-lg border-0 bg-light shadow-sm rounded-2" id="cardSelect" onchange="updateAvailableCredit()">
+                                <select asp-for="CreditCardId" class="form-select form-select border-0 bg-light shadow-sm rounded-2" id="cardSelect" onchange="updateAvailableCredit()">
                                     <option value="">Seleccione una tarjeta</option>
                                     @foreach(var card in Model.AvailableCards)
                                     {
@@ -57,7 +57,7 @@
 
                             <div class="mb-4">
                                 <label asp-for="SavingsAccountId" class="form-label fw-bold text-secondary">Cuenta de ahorro destino <span class="text-danger">*</span></label>
-                                <select asp-for="SavingsAccountId" class="form-select form-select-lg border-0 bg-light shadow-sm rounded-2">
+                                <select asp-for="SavingsAccountId" class="form-select form-select border-0 bg-light shadow-sm rounded-2">
                                     <option value="">Seleccione cuenta a depositar</option>
                                     @foreach(var account in Model.AvailableAccounts)
                                     {
@@ -69,7 +69,7 @@
 
                             <div class="mb-5">
                                 <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto del avance de efectivo <span class="text-danger">*</span></label>
-                                <div class="input-group input-group-lg shadow-sm rounded-2 overflow-hidden">
+                                <div class="input-group input-group shadow-sm rounded-2 overflow-hidden">
                                     <span class="input-group-text bg-light border-0 text-success fw-bold">RD$</span>
                                     <input asp-for="Amount" type="number" step="0.01" class="form-control border-0 bg-light text-dark fw-bold" placeholder="0.00" autocomplete="off" oninput="calculateInterest()" />
                                 </div>
