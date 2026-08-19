@@ -11,7 +11,7 @@
             <p class="text-muted mb-0">Administra las cuentas de terceros a las que transfieres frecuentemente.</p>
         </div>
         <div>
-            <a asp-action="Add" class="btn btn-dark shadow-sm rounded-pill px-4 fw-bold">
+            <a asp-action="Add" class="btn btn-dark shadow-sm rounded-2 px-4 fw-bold">
                 <i class="bi bi-plus-lg me-2"></i> Añadir Beneficiario
             </a>
         </div>
@@ -84,9 +84,9 @@
                                                         <p class="mb-0 text-muted">¿Estás seguro que deseas eliminar a <strong>@item.Name @item.LastName</strong> de tu lista de beneficiarios? No podrás realizarle transferencias rápidas.</p>
                                                     </div>
                                                     <div class="modal-footer border-0 pt-0">
-                                                        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="button" class="btn btn-light rounded-2 px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
                                                         <form asp-action="Delete" asp-route-id="@item.Id" method="post">
-                                                            <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Eliminar Beneficiario</button>
+                                                            <button type="submit" class="btn btn-danger rounded-2 px-4 fw-bold">Eliminar Beneficiario</button>
                                                         </form>
                                                     </div>
                                                 </div>
