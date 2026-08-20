@@ -1,0 +1,61 @@
+﻿@using Artemis_Banking_Pro.Core.Application.ViewModels.Transactions
+@model ConfirmBeneficiaryViewModel
+@{
+    ViewData["Title"] = "Confirmar Transferencia a Beneficiario";
+}
+
+<div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-10 col-xl-9">
+            <div class="card border-0 shadow-sm rounded-2 overflow-hidden">
+                <div class="card-header bg-white text-dark p-4 border-bottom">
+                    <h3 class="fw-bold mb-1">Confirmar Transferencia</h3>
+                    <p class="mb-0 text-muted small fw-bold">Verifique la información del beneficiario antes de procesar.</p>
+                </div>
+                
+                <div class="card-body p-4 bg-white text-center">
+                    <h4 class="fw-bold mb-4 fs-5">¿Está seguro que desea realizar esta transferencia?</h4>
+                    
+                    <div class="bg-light rounded-2 p-4 text-start mb-4 shadow-sm border border-secondary border-opacity-10">
+                        <div class="row g-4">
+                            <div class="col-sm-6">
+                                <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Cuenta Origen</p>
+                                <p class="mb-0 fs-5 fw-bold text-dark">@Model.OriginOwnerName</p>
+                                <p class="mb-0 font-monospace text-muted small">@Model.SourceAccountNumber</p>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Beneficiario Destino</p>
+                                <p class="mb-0 fs-5 fw-bold text-dark">@Model.DestinationOwnerName</p>
+                                <p class="mb-0 font-monospace text-muted small">@Model.DestinationAccountNumber</p>
+                            </div>
+
+                            <div class="col-12 border-top pt-3 mt-3">
+                                <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Monto a Transferir</p>
+                                <p class="mb-0 font-monospace fs-4 fw-bold text-success">RD$ @Model.Amount.ToString("N2")</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form asp-controller="Transactions" asp-action="ExecuteBeneficiary" method="post">
+                        <input type="hidden" asp-for="BeneficiaryId" />
+                        <input type="hidden" asp-for="SourceAccountNumber" />
+                        <input type="hidden" asp-for="OriginOwnerName" />
+                        <input type="hidden" asp-for="DestinationAccountNumber" />
+                        <input type="hidden" asp-for="DestinationOwnerName" />
+                        <input type="hidden" asp-for="Amount" />
+
+                        <div class="d-flex gap-3 justify-content-center">
+                            <a asp-controller="Transactions" asp-action="Beneficiary" class="btn btn-light rounded-2 fw-bold px-5 shadow-sm text-secondary">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-dark rounded-2 fw-bold px-5 shadow-sm text-white">
+                                Confirmar Transferencia
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

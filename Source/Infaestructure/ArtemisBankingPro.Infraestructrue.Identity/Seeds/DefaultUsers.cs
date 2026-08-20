@@ -79,6 +79,48 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Seeds
                     await userManager.AddToRoleAsync(defaultUser, Roles.Cliente.ToString());
                 }
             }
+
+            var prueba1 = new ApplicationUser
+            {
+                UserName = "prueba1",
+                Email = "prueba1@artemisbank.com",
+                FirstName = "Prueba",
+                LastName = "Uno",
+                IDCARD = "00300000010",
+                IsActive = true,
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true
+            };
+            if (userManager.Users.All(u => u.Email != prueba1.Email))
+            {
+                var user = await userManager.FindByEmailAsync(prueba1.Email);
+                if (user == null)
+                {
+                    await userManager.CreateAsync(prueba1, "Prueba123*");
+                    await userManager.AddToRoleAsync(prueba1, Roles.Cliente.ToString());
+                }
+            }
+
+            var prueba2 = new ApplicationUser
+            {
+                UserName = "prueba2",
+                Email = "prueba2@artemisbank.com",
+                FirstName = "Prueba",
+                LastName = "Dos",
+                IDCARD = "00300000011",
+                IsActive = true,
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true
+            };
+            if (userManager.Users.All(u => u.Email != prueba2.Email))
+            {
+                var user = await userManager.FindByEmailAsync(prueba2.Email);
+                if (user == null)
+                {
+                    await userManager.CreateAsync(prueba2, "Prueba123*");
+                    await userManager.AddToRoleAsync(prueba2, Roles.Cliente.ToString());
+                }
+            }
         }
 
         public static async Task SeedAdminApiAsync(UserManager<ApplicationUser> userManager)

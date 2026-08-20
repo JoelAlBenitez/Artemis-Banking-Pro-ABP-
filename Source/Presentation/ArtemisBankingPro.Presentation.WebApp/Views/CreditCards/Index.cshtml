@@ -60,10 +60,10 @@
                         <tr>
                             <th class="ps-4">NÚMERO DE TARJETA</th>
                             <th>CLIENTE</th>
-                            <th>LÍMITE DE CRÉDITO</th>
-                            <th>EXPIRACIÓN</th>
-                            <th>MONTO ADEUDADO</th>
-                            <th>ESTADO</th>
+                            <th class="text-center">LÍMITE DE CRÉDITO</th>
+                            <th class="text-center">EXPIRACIÓN</th>
+                            <th class="text-center">MONTO ADEUDADO</th>
+                            <th class="text-center">ESTADO</th>
                             <th class="text-end pe-4">ACCIONES</th>
                         </tr>
                     </thead>
@@ -83,10 +83,10 @@
                                 <tr>
                                     <td class="ps-4 fw-bold font-monospace">@card.MaskedCardNumber</td>
                                     <td>@card.FullNameCustomer</td>
-                                    <td class="fw-bold text-success">RD$ @card.CreditLimit.ToString("N2")</td>
-                                    <td class="text-muted">@card.ExpirationDate</td>
-                                    <td class="fw-bold text-danger">RD$ @card.OwedAmount.ToString("N2")</td>
-                                    <td>
+                                    <td class="text-center fw-bold text-success">RD$ @card.CreditLimit.ToString("N2")</td>
+                                    <td class="text-center text-muted">@card.ExpirationDate</td>
+                                    <td class="text-center fw-bold text-danger">RD$ @card.OwedAmount.ToString("N2")</td>
+                                    <td class="text-center">
                                         @if (card.StateCreditCard == "Cancelada")
                                         {
                                             <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-danger me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @card.StateCreditCard</span>

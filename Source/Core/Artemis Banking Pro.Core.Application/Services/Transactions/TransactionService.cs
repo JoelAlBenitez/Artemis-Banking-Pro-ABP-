@@ -753,6 +753,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                     CreatedAt = DateTimeOffset.UtcNow
                 };
                 await _transactionRepository.AddAsync(transaction);
+                await _transactionRepository.SaveChangesAsync();
 
                 // Send email notification
                 try
@@ -811,6 +812,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                         RejectionReason = "Fondos insuficientes"
                     };
                     await _transactionRepository.AddAsync(rejected);
+                    await _transactionRepository.SaveChangesAsync();
                     return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.InsufficientFunds", "Fondos insuficientes."));
                 }
 
@@ -832,6 +834,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                     CreatedAt = DateTimeOffset.UtcNow
                 };
                 await _transactionRepository.AddAsync(transaction);
+                await _transactionRepository.SaveChangesAsync();
 
                 // Send email notification
                 try
@@ -1220,11 +1223,13 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
 
         public async Task<ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmIndicatorsDto>> GetAtmCashierDailyIndicatorsAsync(string cashierId)
         {
-            var today = DateTimeOffset.UtcNow.Date;
+            var startOfDay = new DateTimeOffset(DateTimeOffset.UtcNow.Date, TimeSpan.Zero);
+            var endOfDay = startOfDay.AddDays(1);
             
             var todayTransactions = await _transactionRepository.GetAllFindAsync(t => 
                 t.PerformedByUserId == cashierId && 
-                t.CreatedAt.Date == today &&
+                t.CreatedAt >= startOfDay &&
+                t.CreatedAt < endOfDay &&
                 t.Status == ArtemisBankingPro.Core.Domain.Common.Enum.TransactionStatus.Aprobada);
 
             var deposits = todayTransactions.Count(t => t.OperationType == ArtemisBankingPro.Core.Domain.Common.Enum.OperationType.Deposito);
@@ -1253,12 +1258,16 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             if (account == null)
                 return ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmAccountDetailsDto>.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.AccountNotFound", "El número de cuenta ingresado no corresponde a una cuenta válida."));
 
+            var user = await _userManagementService.GetUserByIdAsync(account.CustomerId);
+            var ownerName = user != null ? $"{user.Name} {user.LastName}" : $"Cliente {account.CustomerId}";
+            var ownerEmail = user?.Email ?? $"{account.CustomerId}@artemis.com";
+
             var dto = new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmAccountDetailsDto
             {
                 AccountNumber = account.AccountNumber,
                 IsActive = account.IsActive,
-                OwnerName = $"Cliente {account.CustomerId}", // Mock until real Identity connection
-                OwnerEmail = $"{account.CustomerId}@artemis.com", // Mock until real Identity connection
+                OwnerName = ownerName,
+                OwnerEmail = ownerEmail,
                 Balance = account.Balance
             };
 
@@ -1271,12 +1280,16 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             if (card == null)
                 return ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardDetailsDto>.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.CreditCardNotFound", "El número de tarjeta ingresado no corresponde a una tarjeta válida."));
 
+            var user = await _userManagementService.GetUserByIdAsync(card.CustomerId);
+            var ownerName = user != null ? $"{user.Name} {user.LastName}" : $"Cliente {card.CustomerId}";
+            var ownerEmail = user?.Email ?? $"{card.CustomerId}@artemis.com";
+
             var dto = new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmCreditCardDetailsDto
             {
                 CreditCardNumber = card.CardNumber,
                 CustomerId = card.CustomerId,
-                OwnerName = $"Cliente {card.CustomerId}", // Mock until real Identity connection
-                OwnerEmail = $"{card.CustomerId}@artemis.com", // Mock until real Identity connection
+                OwnerName = ownerName,
+                OwnerEmail = ownerEmail,
                 IsActive = card.Status == ArtemisBankingPro.Core.Domain.Common.Enum.CreditCardStatus.Activa,
                 Debt = card.OwedAmount
             };
@@ -1290,15 +1303,19 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             if (loan == null)
                 return ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanDetailsDto>.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.LoanNotFound", "El número de préstamo ingresado no corresponde a un préstamo válido."));
 
+            var user = await _userManagementService.GetUserByIdAsync(loan.CustomerId);
+            var ownerName = user != null ? $"{user.Name} {user.LastName}" : $"Cliente {loan.CustomerId}";
+            var ownerEmail = user?.Email ?? $"{loan.CustomerId}@artemis.com";
+
             var dto = new Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanDetailsDto
             {
                 LoanNumber = loan.LoanNumber,
                 CustomerId = loan.CustomerId,
-                OwnerName = $"Cliente {loan.CustomerId}", // Mock until real Identity connection
-                OwnerEmail = $"{loan.CustomerId}@artemis.com", // Mock until real Identity connection
+                OwnerName = ownerName,
+                OwnerEmail = ownerEmail,
                 IsActive = loan.Status == ArtemisBankingPro.Core.Domain.Common.Enum.LoanStatus.Activo,
                 PendingAmount = loan.PendingAmount,
-                HasPendingInstallments = loan.loanInstallments.Any(i => i.paymentStatus != ArtemisBankingPro.Core.Domain.Common.Enum.PaymentStatus.Pagada)
+                HasPendingInstallments = loan.loanInstallments == null || !loan.loanInstallments.Any() || loan.loanInstallments.Any(i => i.paymentStatus != ArtemisBankingPro.Core.Domain.Common.Enum.PaymentStatus.Pagada)
             };
 
             return ValidationResult<Artemis_Banking_Pro.Core.Application.DTOs.Transactions.Atm.AtmLoanDetailsDto>.Success(dto);

@@ -32,42 +32,44 @@
 
                     <form asp-action="PayCard" method="post">
                         
-                        <div class="mb-4">
-                            <label asp-for="SourceAccountNumber" class="form-label fw-bold text-secondary">Cuenta de Origen <span class="text-danger">*</span></label>
-                            <select asp-for="SourceAccountNumber" class="form-select">
-                                <option value="">-- Seleccione una cuenta origen --</option>
-                                @foreach(var account in savingsAccounts)
-                                {
-                                    <option value="@account.AccountNumber">@account.AccountNumber - RD$ @account.Balance.ToString("N2")</option>
-                                }
-                            </select>
-                            <span asp-validation-for="SourceAccountNumber" class="text-danger small mt-1 d-block"></span>
-                        </div>
-
-                        <div class="mb-4">
-                            <label asp-for="CreditCardId" class="form-label fw-bold text-secondary">Tarjeta a Pagar <span class="text-danger">*</span></label>
-                            <select asp-for="CreditCardId" class="form-select">
-                                <option value="">-- Seleccione una tarjeta --</option>
-                                @foreach(var card in creditCards)
-                                {
-                                    <option value="@card.Id">Tarjeta terminada en @card.LastFourDigits - Deuda: RD$ @card.OwedAmount.ToString("N2")</option>
-                                }
-                            </select>
-                            <span asp-validation-for="CreditCardId" class="text-danger small mt-1 d-block"></span>
-                        </div>
-
-                        <div class="mb-5">
-                            <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto a Pagar <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light fw-bold text-secondary border-end-0">RD$</span>
-                                <input asp-for="Amount" type="number" step="0.01" min="0.01" class="form-control border-start-0 fw-bold" placeholder="0.00" />
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-6">
+                                <label asp-for="SourceAccountNumber" class="form-label fw-bold text-secondary">Cuenta de Origen <span class="text-danger">*</span></label>
+                                <select asp-for="SourceAccountNumber" class="form-select">
+                                    <option value="">-- Seleccione una cuenta origen --</option>
+                                    @foreach(var account in savingsAccounts)
+                                    {
+                                        <option value="@account.AccountNumber">@account.AccountNumber - RD$ @account.Balance.ToString("N2")</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="SourceAccountNumber" class="text-danger small mt-1 d-block"></span>
                             </div>
-                            <span asp-validation-for="Amount" class="text-danger small mt-1 d-block"></span>
+
+                            <div class="col-md-6">
+                                <label asp-for="CreditCardId" class="form-label fw-bold text-secondary">Tarjeta a Pagar <span class="text-danger">*</span></label>
+                                <select asp-for="CreditCardId" class="form-select">
+                                    <option value="">-- Seleccione una tarjeta --</option>
+                                    @foreach(var card in creditCards)
+                                    {
+                                        <option value="@card.Id">Tarjeta terminada en @card.LastFourDigits - Deuda: RD$ @card.OwedAmount.ToString("N2")</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="CreditCardId" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto a Pagar <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light fw-bold text-secondary border-end-0">RD$</span>
+                                    <input asp-for="Amount" type="number" step="0.01" min="0.01" class="form-control border-start-0 fw-bold" placeholder="0.00" />
+                                </div>
+                                <span asp-validation-for="Amount" class="text-danger small mt-1 d-block"></span>
+                            </div>
                         </div>
 
                         <div class="d-flex gap-3 justify-content-end pt-4 mt-2 border-top">
                             <a asp-controller="Customer" asp-action="Index" class="btn btn-light px-4">Cancelar</a>
-                            <button type="submit" class="btn btn-dark px-5">Pagar Tarjeta</button>
+                            <button type="submit" class="btn btn-dark px-5">Continuar</button>
                         </div>
                     </form>
                 </div>

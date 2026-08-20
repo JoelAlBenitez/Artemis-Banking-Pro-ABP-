@@ -1,4 +1,4 @@
-@using ArtemisBankingPro.Core.Application.ViewModels.Atm
+﻿@using ArtemisBankingPro.Core.Application.ViewModels.Atm
 @model LoanPaymentConfirmationViewModel
 @{
     ViewData["Title"] = "Cajero - Confirmar Pago a Préstamo";
@@ -9,7 +9,7 @@
         <div class="col-md-8 col-lg-5 col-xl-5">
             <div class="card border-0 shadow-lg rounded-2 overflow-hidden">
                 <div class="card-header bg-white text-dark p-4 border-bottom">
-                    <h3 class="fw-bold mb-1"><i class="bi bi-shield-check me-2"></i> Confirmar Pago a Préstamo</h3>
+                    <h3 class="fw-bold mb-1">Confirmar Pago a Préstamo</h3>
                     <p class="mb-0 opacity-75 small fw-bold">Verifique la información antes de aplicar la transacción.</p>
                 </div>
                 
@@ -32,20 +32,19 @@
                             </div>
                             <div class="col-6 text-end">
                                 <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Titular Cuenta</p>
-                                <p class="mb-0 fs-6 fw-bold text-dark text-truncate"><i class="bi bi-person text-muted me-1"></i>@Model.OriginAccountHolderName</p>
+                                <p class="mb-0 fs-5 fw-bold text-dark text-truncate">@Model.OriginAccountHolderName</p>
                             </div>
-                        </div>
 
                         <div class="row g-3 mb-3 border-bottom pb-3">
                             <div class="col-6">
                                 <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Préstamo Destino</p>
                                 <p class="mb-0  fs-6 fw-bold text-primary"><i class="bi bi-hash text-muted me-1"></i>@Model.LoanNumber</p>
                             </div>
-                            <div class="col-6 text-end">
+
+                            <div class="col-sm-6 border-top pt-3">
                                 <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Titular Préstamo</p>
-                                <p class="mb-0 fs-6 fw-bold text-dark text-truncate"><i class="bi bi-person text-muted me-1"></i>@Model.LoanHolderName</p>
+                                <p class="mb-0 fs-5 fw-bold text-dark text-truncate">@Model.LoanHolderName</p>
                             </div>
-                        </div>
 
                         <div>
                             <p class="mb-1 text-secondary small fw-bold text-uppercase" style="letter-spacing: 1px;">Monto Efectivo a Pagar</p>
@@ -62,11 +61,11 @@
                         <input type="hidden" asp-for="EffectiveAmount" />
 
                         <div class="d-flex gap-3 justify-content-center">
-                            <a asp-controller="Atm" asp-action="Index" class="btn btn-light rounded-pill fw-bold px-5 shadow-sm text-secondary">
+                            <a asp-controller="Atm" asp-action="Index" class="btn btn-light rounded-2 fw-bold px-5 shadow-sm text-secondary">
                                 Cancelar
                             </a>
-                            <button type="submit" class="btn btn-success rounded-pill fw-bold px-5 shadow-sm text-white">
-                                Confirmar Pago <i class="bi bi-check2-circle ms-2"></i>
+                            <button type="submit" class="btn btn-success rounded-2 fw-bold px-5 shadow-sm text-white">
+                                Confirmar Pago 
                             </button>
                         </div>
                     </form>

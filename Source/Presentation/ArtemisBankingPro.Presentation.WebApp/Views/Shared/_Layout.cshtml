@@ -21,7 +21,7 @@
         <aside class="sidebar text-white d-flex flex-column shadow-lg" style="width: 240px; min-height: 100vh; background-color: #0F172A; z-index: 1000;">
             <div class="p-4 border-bottom border-secondary border-opacity-25 text-center">
                 <a class="navbar-brand fw-bold text-white fs-4 text-decoration-none" style="font-family: 'Montserrat', sans-serif; letter-spacing: 2px;" asp-area="" asp-controller="Home" asp-action="Index">
-                    ARTEMIS<span style="color: #4472C4;">.</span>
+                    ARTEMIS<span style="color: #0EA5E9;">.</span>
                 </a>
             </div>
             
@@ -64,7 +64,7 @@
                         else if (User.IsInRole("Cajero"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @GetActiveStyle(currentController, "Atm")" style="font-size: 0.9rem;" asp-area="" asp-controller="Atm" asp-action="Index">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @(currentController == "Atm" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "bg-white bg-opacity-10 text-white" : "text-white opacity-75 sidebar-link")" style="font-size: 0.9rem;" asp-area="" asp-controller="Atm" asp-action="Index">
                                     <i class="bi bi-grid-1x2 me-3 fs-5"></i> Home
                                 </a>
                             </li>
@@ -107,8 +107,8 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @GetActiveStyle(currentController, "Transactions")" style="font-size: 0.9rem;" asp-area="" asp-controller="Transactions" asp-action="Index">
-                                    <i class="bi bi-arrow-left-right me-3 fs-5"></i> Transferencias y Pagos
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @(currentController == "Transactions" && ViewContext.RouteData.Values["Action"]?.ToString() == "Express" ? "bg-white bg-opacity-10 text-white" : "text-white opacity-75 sidebar-link")" style="font-size: 0.9rem;" asp-area="" asp-controller="Transactions" asp-action="Express">
+                                    <i class="bi bi-arrow-left-right me-3 fs-5"></i> Transferencia Exprés
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -121,7 +121,7 @@
                     else
                     {
                         <li class="nav-item">
-                            <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @GetActiveStyle(currentController, "Home")" style="font-size: 0.9rem;" asp-area="" asp-controller="Home" asp-action="Index">
+                            <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @(currentController == "Home" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "bg-white bg-opacity-10 text-white" : "text-white opacity-75 sidebar-link")" style="font-size: 0.9rem;" asp-area="" asp-controller="Home" asp-action="Index">
                                 <i class="bi bi-house-door me-3 fs-5"></i> Inicio
                             </a>
                         </li>

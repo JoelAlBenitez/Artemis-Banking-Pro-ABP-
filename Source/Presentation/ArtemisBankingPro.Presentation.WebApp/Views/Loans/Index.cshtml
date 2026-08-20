@@ -60,13 +60,13 @@
                         <tr>
                             <th class="ps-4">NÚMERO</th>
                             <th>CLIENTE</th>
-                            <th>CAPITAL</th>
-                            <th>CUOTAS (PAG/TOT)</th>
-                            <th>PENDIENTE</th>
-                            <th>TASA</th>
-                            <th>PLAZO</th>
-                            <th>ESTADO PRÉSTAMO</th>
-                            <th>ESTADO CLIENTE</th>
+                            <th class="text-center">CAPITAL</th>
+                            <th class="text-center">CUOTAS (PAG/TOT)</th>
+                            <th class="text-center">PENDIENTE</th>
+                            <th class="text-center">TASA</th>
+                            <th class="text-center">PLAZO</th>
+                            <th class="text-center">ESTADO PRÉSTAMO</th>
+                            <th class="text-center">ESTADO CLIENTE</th>
                             <th class="text-end pe-4">ACCIONES</th>
                         </tr>
                     </thead>
@@ -86,14 +86,14 @@
                                 <tr>
                                     <td class="ps-4 fw-bold">@loan.LoanNumber</td>
                                     <td>@loan.FullNameCustomer</td>
-                                    <td class="fw-bold text-success">RD$ @loan.AprovechedCapital.ToString("N2")</td>
-                                    <td>
+                                    <td class="text-center fw-bold text-success">RD$ @loan.AprovechedCapital.ToString("N2")</td>
+                                    <td class="text-center">
                                         <span class="badge bg-secondary">@loan.InstallmentPay / @loan.QuantityInstallment</span>
                                     </td>
-                                    <td class="fw-bold text-danger">RD$ @loan.PendientAmount.ToString("N2")</td>
-                                    <td>@loan.AnnualInterestRate.ToString("N2")%</td>
-                                    <td>@loan.Term Meses</td>
-                                    <td>
+                                    <td class="text-center fw-bold text-danger">RD$ @loan.PendientAmount.ToString("N2")</td>
+                                    <td class="text-center">@loan.AnnualInterestRate.ToString("N2")%</td>
+                                    <td class="text-center">@loan.Term Meses</td>
+                                    <td class="text-center">
                                         @if (loan.StateLoans == "Completado")
                                         {
                                             <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-secondary me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @loan.StateLoans</span>
@@ -103,7 +103,7 @@
                                             <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @loan.StateLoans</span>
                                         }
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         @if (loan.StateCustomer == "Al día")
                                         {
                                             <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @loan.StateCustomer</span>

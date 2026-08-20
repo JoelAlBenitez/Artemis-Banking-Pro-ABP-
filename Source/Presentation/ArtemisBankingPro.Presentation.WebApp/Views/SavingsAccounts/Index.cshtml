@@ -65,9 +65,9 @@
                         <tr>
                             <th class="ps-4">NÚMERO DE CUENTA</th>
                             <th>CLIENTE</th>
-                            <th>BALANCE DISPONIBLE</th>
-                            <th>TIPO</th>
-                            <th>ESTADO</th>
+                            <th class="text-center">BALANCE DISPONIBLE</th>
+                            <th class="text-center">TIPO</th>
+                            <th class="text-center">ESTADO</th>
                             <th class="text-end pe-4">ACCIONES</th>
                         </tr>
                     </thead>
@@ -87,9 +87,9 @@
                                 <tr>
                                     <td class="ps-4 fw-bold font-monospace">@account.AccountNumber</td>
                                     <td>@account.FullNameCustomer</td>
-                                    <td class="fw-bold text-success">RD$ @account.Balance.ToString("N2")</td>
-                                    <td>
-                                        @if (account.TypeSavingsAccount == "Principal")
+                                    <td class="text-center fw-bold text-success">RD$ @account.Balance.ToString("N2")</td>
+                                    <td class="text-center">
+                                        @if (account.TypeSavingsAccount.ToString() == "Principal")
                                         {
                                             <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-primary me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @account.TypeSavingsAccount</span>
                                         }
@@ -98,7 +98,7 @@
                                             <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-secondary me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @account.TypeSavingsAccount</span>
                                         }
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         @if (account.StateSavingsAccount == "Cancelada")
                                         {
                                             <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-danger me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @account.StateSavingsAccount</span>

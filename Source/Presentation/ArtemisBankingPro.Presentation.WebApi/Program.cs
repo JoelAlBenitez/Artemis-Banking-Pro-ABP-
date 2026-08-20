@@ -1,5 +1,5 @@
 using ArtemisBankingPro.IOC;
-using ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguration;
+
 using ArtemisBankingPro.Presentation.WebApi.Extensions;
 using ArtemisBankingPro.Presentation.WebApi.Middlewares;
 using Serilog;
@@ -20,7 +20,7 @@ try
     builder.Services.AddApiCqrsDependencies();
     builder.Services.AddInfraestructurePersistence(builder.Configuration);
     builder.Services.AddInfraestructureDependencies(builder.Configuration);
-    builder.Services.AddWebApiIdentity(builder.Configuration);
+    builder.Services.AddWebApiIdentityDependencies(builder.Configuration);
 
 
     builder.Services.AddControllers();

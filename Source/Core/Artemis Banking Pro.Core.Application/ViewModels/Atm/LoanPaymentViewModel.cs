@@ -8,7 +8,6 @@ namespace ArtemisBankingPro.Core.Application.ViewModels.Atm
         public string OriginAccountNumber { get; set; }
 
         [Required(ErrorMessage = "The loan number is required.")]
-        [StringLength(9, MinimumLength = 9, ErrorMessage = "The loan number must contain exactly 9 digits.")]
         public string LoanNumber { get; set; }
 
         [Required(ErrorMessage = "The amount to pay is required.")]
