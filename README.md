@@ -63,14 +63,12 @@ Una **Azure Function** con disparador por temporizador ejecuta el control de cuo
 ---
 
 ## Equipo
-
-| Matrícula | Integrante | Sección | Responsabilidad |
-|---|---|:--:|---|
-| 2025-1049 | Joel Alberto Benitez Varela | 10 | Módulo de Administrador y Web API completa |
-| 2025-1150 | Adrian Francisco Brito Nelkitts | 10 | ASP.NET Identity, gestión de usuarios, autenticación y roles |
-| 2025-1172 | Sebastian de Jesus Peguero Herrera | 10 | Módulo de Cliente |
-| 2024-2174 | Robert Plaza Brito | 3 | Módulo de Cajero e interfaz completa de caja |
-
+<ul>
+<li>Joel Alberto Benitez Varela | Módulo de Administrador y Web API completa </li>
+<li>Adrian Francisco Brito Nelkitts || AP.NET Identity, gestión de usuarios, autenticación y roles </li>
+<li>Sebastian de Jesus Peguero Herrera | Módulo de Cliente </li>
+<li>Robert Plaza Brito | Módulo de Cajero e interfaz completa de caja </li>
+</ul>
 ---
 
 ## Arquitectura
