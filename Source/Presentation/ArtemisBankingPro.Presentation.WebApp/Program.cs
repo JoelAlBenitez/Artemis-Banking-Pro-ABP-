@@ -1,8 +1,8 @@
 using ArtemisBankingPro.IOC;
-
 using ArtemisBankingPro.Presentation.WebApp.Extensions;
 using ArtemisBankingPro.Presentation.WebApp.Middlewares;
 using Serilog;
+using Microsoft.EntityFrameworkCore;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()

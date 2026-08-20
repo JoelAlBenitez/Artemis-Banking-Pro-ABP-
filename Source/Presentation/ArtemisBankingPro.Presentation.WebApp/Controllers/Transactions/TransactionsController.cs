@@ -8,6 +8,7 @@ using Artemis_Banking_Pro.Core.Application.ViewModels.Beneficiaries;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ArtemisBankingPro.Core.Domain.Interfaces.Beneficiaries;
 
 namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
 {
@@ -18,6 +19,8 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
         private readonly IPaymentService _paymentService;
         private readonly IDashboardService _dashboardService;
         private readonly IBeneficiaryServices _beneficiaryServices;
+        private readonly IAtmTransactionService _atmTransactionService;
+        private readonly IBeneficiaryRepository _beneficiaryRepository;
         private readonly IMapper _mapper;
 
         public TransactionsController(
@@ -25,12 +28,16 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
             IPaymentService paymentService,
             IDashboardService dashboardService,
             IBeneficiaryServices beneficiaryServices,
+            IAtmTransactionService atmTransactionService,
+            IBeneficiaryRepository beneficiaryRepository,
             IMapper mapper)
         {
             _transactionService = transactionService;
             _paymentService = paymentService;
             _dashboardService = dashboardService;
             _beneficiaryServices = beneficiaryServices;
+            _atmTransactionService = atmTransactionService;
+            _beneficiaryRepository = beneficiaryRepository;
             _mapper = mapper;
         }
 
