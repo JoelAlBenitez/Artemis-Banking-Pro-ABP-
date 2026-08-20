@@ -276,14 +276,5 @@ dotnet test "Artemis Banking Pro.sln"
 - **475 unitarias** — Commands y Queries de los siete módulos, validadores de FluentValidation, el Behavior de validación, y los servicios de negocio: cuentas y balances, transferencias, beneficiarios, amortización, avances de efectivo, pagos, operaciones de caja, comercios y Hermes Pay.
 - **141 de integración** — repositorios y persistencia sobre base de datos en memoria, sin depender de un servidor real.
 
----
 
-## Documentación
 
-| Documento | Contenido |
-|---|---|
-| `docs/Landing-Evaluacion-ABP.html` | Evaluación del proyecto criterio por criterio contra la rúbrica oficial, con la justificación de cada puntuación |
-| `docs/PDFS/` | Documento funcional, rúbrica de evaluación, entidades y contratos base, y requerimientos externos |
-| Swagger | `https://localhost:7046` — documentación viva de los 31 endpoints con sus parámetros, cuerpos y respuestas |
-
-> La carpeta `docs/` está excluida del control de versiones por `.gitignore`, de modo que su contenido no viaja con el repositorio.
