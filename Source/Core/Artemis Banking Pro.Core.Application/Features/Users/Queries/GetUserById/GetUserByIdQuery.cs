@@ -1,3 +1,5 @@
+using Artemis_Banking_Pro.Core.Application.Common;
+using FluentValidation;
 using Artemis_Banking_Pro.Core.Application.Exceptions;
 using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Application.DTOs.Users;
@@ -11,6 +13,14 @@ namespace Artemis_Banking_Pro.Core.Application.Features.Users.Queries.GetUserByI
     public class GetUserByIdQuery : IRequest<UserApiDetailDto>
     {
         public required string Id { get; set; }
+    }
+
+    public class GetUserByIdQueryValidator : AbstractValidator<GetUserByIdQuery>
+    {
+        public GetUserByIdQueryValidator()
+        {
+            RuleFor(query => query.Id).ValidIdentifier();
+        }
     }
 
     public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserApiDetailDto>

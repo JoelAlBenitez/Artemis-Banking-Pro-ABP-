@@ -1,3 +1,5 @@
+using Artemis_Banking_Pro.Core.Application.Common;
+using FluentValidation;
 using Artemis_Banking_Pro.Core.Application.DTOs.Commerces;
 using Artemis_Banking_Pro.Core.Application.Exceptions;
 using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
@@ -11,6 +13,14 @@ namespace Artemis_Banking_Pro.Core.Application.Features.Commerces.Queries.GetCom
     public class GetCommerceByIdQuery : IRequest<CommerceDetailDto>
     {
         public required int Id { get; set; }
+    }
+
+    public class GetCommerceByIdQueryValidator : AbstractValidator<GetCommerceByIdQuery>
+    {
+        public GetCommerceByIdQueryValidator()
+        {
+            RuleFor(query => query.Id).ValidIdentifier();
+        }
     }
 
     public class GetCommerceByIdQueryHandler : IRequestHandler<GetCommerceByIdQuery, CommerceDetailDto>

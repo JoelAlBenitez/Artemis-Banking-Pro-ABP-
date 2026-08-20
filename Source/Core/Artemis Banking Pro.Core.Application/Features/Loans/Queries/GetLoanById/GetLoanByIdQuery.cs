@@ -1,3 +1,4 @@
+using FluentValidation;
 using Artemis_Banking_Pro.Core.Application.Common;
 using Artemis_Banking_Pro.Core.Application.Contracts.Loans;
 using Artemis_Banking_Pro.Core.Application.DTOs.Loans;
@@ -11,6 +12,14 @@ namespace Artemis_Banking_Pro.Core.Application.Features.Loans.Queries.GetLoanByI
     public class GetLoanByIdQuery : IRequest<LoanDetailApiDto>
     {
         public required int Id { get; set; }
+    }
+
+    public class GetLoanByIdQueryValidator : AbstractValidator<GetLoanByIdQuery>
+    {
+        public GetLoanByIdQueryValidator()
+        {
+            RuleFor(query => query.Id).ValidIdentifier();
+        }
     }
 
     public class GetLoanByIdQueryHandler : IRequestHandler<GetLoanByIdQuery, LoanDetailApiDto>

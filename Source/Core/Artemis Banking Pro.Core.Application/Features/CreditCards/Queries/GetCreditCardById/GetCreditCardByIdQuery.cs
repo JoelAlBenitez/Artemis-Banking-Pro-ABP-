@@ -1,3 +1,4 @@
+using FluentValidation;
 using Artemis_Banking_Pro.Core.Application.Common;
 using Artemis_Banking_Pro.Core.Application.Contracts.CreditCards;
 using Artemis_Banking_Pro.Core.Application.DTOs.CreditCards;
@@ -14,6 +15,15 @@ namespace Artemis_Banking_Pro.Core.Application.Features.CreditCards.Queries.GetC
         public required int Id { get; set; }
 
         public int Page { get; set; } = 1;
+    }
+
+    public class GetCreditCardByIdQueryValidator : AbstractValidator<GetCreditCardByIdQuery>
+    {
+        public GetCreditCardByIdQueryValidator()
+        {
+            RuleFor(query => query.Id).ValidIdentifier();
+            RuleFor(query => query.Page).ValidPage();
+        }
     }
 
     public class GetCreditCardByIdQueryHandler
