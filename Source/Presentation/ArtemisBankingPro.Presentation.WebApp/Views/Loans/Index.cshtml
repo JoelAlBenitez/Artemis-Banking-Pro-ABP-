@@ -1,4 +1,4 @@
-﻿@using Artemis_Banking_Pro.Core.Application.ViewModels.Loans
+@using Artemis_Banking_Pro.Core.Application.ViewModels.Loans
 @using ArtemisBankingPro.Core.Domain.Common.Enum
 @model LoansListViewModel
 
@@ -48,6 +48,14 @@
     {
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            @TempData["ErrorMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
