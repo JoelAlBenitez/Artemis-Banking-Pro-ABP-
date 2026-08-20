@@ -11,3 +11,6 @@ Logs/
 *.user
 *.suo
 .idea/
+
+# Archivos Seed de Base de Datos locales
+seed*.sql

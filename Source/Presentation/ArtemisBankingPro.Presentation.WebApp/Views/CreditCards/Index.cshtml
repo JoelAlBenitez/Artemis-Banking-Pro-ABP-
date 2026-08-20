@@ -1,4 +1,4 @@
-@using Artemis_Banking_Pro.Core.Application.ViewModels.CreditCards
+﻿@using Artemis_Banking_Pro.Core.Application.ViewModels.CreditCards
 @using ArtemisBankingPro.Core.Domain.Common.Enum
 @model CreditCardsListViewModel
 
@@ -81,30 +81,24 @@
                                     <td class="text-center">
                                         @if (card.StateCreditCard == "Cancelada")
                                         {
-                                            <div class="d-flex align-items-center justify-content-center">
-                                                <span class="status-dot bg-secondary me-2"></span>
-                                                <span class="text-dark fw-medium" style="font-size: 0.9rem;">@card.StateCreditCard</span>
-                                            </div>
+                                            <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-danger me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @card.StateCreditCard</span>
                                         }
                                         else
                                         {
-                                            <div class="d-flex align-items-center justify-content-center">
-                                                <span class="status-dot bg-success me-2"></span>
-                                                <span class="text-dark fw-medium" style="font-size: 0.9rem;">@card.StateCreditCard</span>
-                                            </div>
+                                            <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @card.StateCreditCard</span>
                                         }
                                     </td>
                                     <td class="text-end pe-4">
-                                        <a asp-action="Details" asp-route-id="@card.Id" class="btn btn-light btn-action text-info shadow-sm border me-1" title="Ver consumos de la tarjeta">
+                                        <a asp-action="Details" asp-route-id="@card.Id" class="btn btn-sm btn-outline-info me-2" title="Ver consumos de la tarjeta">
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         @if (card.StateCreditCard != "Cancelada")
                                         {
-                                            <a asp-action="Edit" asp-route-id="@card.Id" class="btn btn-light btn-action text-primary shadow-sm border me-1" title="Editar">
-                                                <i class="bi bi-pencil-square"></i>
+                                            <a asp-action="Edit" asp-route-id="@card.Id" class="btn btn-sm btn-outline-primary me-2">
+                                                <i class="bi bi-pencil"></i>
                                             </a>
-                                            <a asp-action="Cancel" asp-route-id="@card.Id" class="btn btn-light btn-action text-danger shadow-sm border" title="Cancelar">
-                                                <i class="bi bi-x-circle"></i>
+                                            <a asp-action="Cancel" asp-route-id="@card.Id" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
                                             </a>
                                         }
                                     </td>

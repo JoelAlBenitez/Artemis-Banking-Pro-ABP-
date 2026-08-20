@@ -72,16 +72,21 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
                 return View(vm);
             }
 
-            var confirmVm = new ConfirmAccountTransferViewModel
+            var result = await _transactionService.ProcessAccountTransferAsync(dto, clientId);
+            
+            if (!result.IsValid)
             {
-                SourceAccountId = vm.SourceAccountId,
-                SourceAccountNumber = validation.Value.Origin.AccountNumber,
-                DestinationAccountId = vm.DestinationAccountId,
-                DestinationAccountNumber = validation.Value.Destination.AccountNumber,
-                Amount = vm.Amount
-            };
+                TempData["ErrorMessage"] = string.Join(" ", result.Errors.Select(e => e.Description));
+                return RedirectToAction(nameof(Index));
+            }
 
-            return View("Confirm", confirmVm);
+            if (!string.IsNullOrEmpty(result.Value?.WarningMessage))
+            {
+                TempData["WarningMessage"] = result.Value.WarningMessage;
+            }
+
+            TempData["SuccessMessage"] = "La transferencia entre cuentas propias ha sido realizada exitosamente.";
+            return RedirectToAction("Index", "Customer");
         }
 
         [HttpPost]

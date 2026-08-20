@@ -1,0 +1,132 @@
+@{
+    ViewData["Title"] = "Transferencias y Pagos";
+}
+
+<div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: #0F172A;">Transferencias y Pagos</h2>
+            <p class="text-muted mb-0">Seleccione el tipo de transacción que desea realizar.</p>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4">
+            <i class="bi bi-exclamation-circle-fill me-2"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="row g-4 align-items-start mb-5">
+        
+        <!-- Transferencias Section -->
+        <div class="col-xl-6 col-lg-5 col-md-12">
+            <h4 class="fw-bold mb-3 text-secondary"><i class="bi bi-arrow-left-right me-2"></i> Transferencias</h4>
+            <div class="row g-3">
+                <div class="col-12">
+                    <a asp-controller="AccountTransfer" asp-action="Index" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 hover-elevate transition-all">
+                            <div class="card-body p-4 d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex justify-content-center align-items-center me-4" style="width: 56px; height: 56px; flex-shrink: 0;">
+                                    <i class="bi bi-arrow-repeat fs-3"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-1 text-dark">Entre Mis Cuentas</h5>
+                                    <p class="text-muted small mb-0">Transfiere fondos entre tus propias cuentas de ahorro de forma instantánea.</p>
+                                </div>
+                                <i class="bi bi-chevron-right ms-auto fs-4 text-muted"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="col-12">
+                    <a asp-controller="Transactions" asp-action="Beneficiary" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 hover-elevate transition-all">
+                            <div class="card-body p-4 d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex justify-content-center align-items-center me-4" style="width: 56px; height: 56px; flex-shrink: 0;">
+                                    <i class="bi bi-person-check fs-3"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-1 text-dark">A Beneficiario</h5>
+                                    <p class="text-muted small mb-0">Transfiere a cuentas de otras personas que tienes guardadas como beneficiarios.</p>
+                                </div>
+                                <i class="bi bi-chevron-right ms-auto fs-4 text-muted"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-12">
+                    <a asp-controller="Transactions" asp-action="Express" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 hover-elevate transition-all">
+                            <div class="card-body p-4 d-flex align-items-center">
+                                <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex justify-content-center align-items-center me-4" style="width: 56px; height: 56px; flex-shrink: 0;">
+                                    <i class="bi bi-lightning-charge fs-3"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-1 text-dark">Transferencia Exprés</h5>
+                                    <p class="text-muted small mb-0">Transfiere rápidamente a cualquier cuenta sin necesidad de agregarla como beneficiario.</p>
+                                </div>
+                                <i class="bi bi-chevron-right ms-auto fs-4 text-muted"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagos Section -->
+        <div class="col-xl-6 col-lg-5 col-md-12">
+            <h4 class="fw-bold mb-3 text-secondary"><i class="bi bi-wallet2 me-2"></i> Pagos</h4>
+            <div class="row g-3">
+                <div class="col-12">
+                    <a asp-controller="Transactions" asp-action="PayCard" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 hover-elevate transition-all">
+                            <div class="card-body p-4 d-flex align-items-center">
+                                <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex justify-content-center align-items-center me-4" style="width: 56px; height: 56px; flex-shrink: 0;">
+                                    <i class="bi bi-credit-card-fill fs-3"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-1 text-dark">Pago de Tarjeta</h5>
+                                    <p class="text-muted small mb-0">Paga las cuotas o el balance total de tus tarjetas de crédito.</p>
+                                </div>
+                                <i class="bi bi-chevron-right ms-auto fs-4 text-muted"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-12">
+                    <a asp-controller="Transactions" asp-action="PayLoan" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 hover-elevate transition-all">
+                            <div class="card-body p-4 d-flex align-items-center">
+                                <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex justify-content-center align-items-center me-4" style="width: 56px; height: 56px; flex-shrink: 0;">
+                                    <i class="bi bi-cash-stack fs-3"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-1 text-dark">Pago de Préstamo</h5>
+                                    <p class="text-muted small mb-0">Realiza el pago de las cuotas de tus préstamos activos.</p>
+                                </div>
+                                <i class="bi bi-chevron-right ms-auto fs-4 text-muted"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-elevate:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.10)!important;
+    }
+    .transition-all {
+        transition: all .3s ease;
+    }
+    .text-decoration-none:hover .text-dark {
+        color: #0d6efd !important;
+    }
+</style>

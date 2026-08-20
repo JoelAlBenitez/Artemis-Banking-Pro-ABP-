@@ -5,7 +5,6 @@ using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
 using Artemis_Banking_Pro.Core.Application.ViewModels.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.ViewModels.Transactions;
-using ArtemisBankingPro.Core.Domain.Interfaces.Beneficiaries;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +17,6 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
         private readonly ITransactionService _transactionService;
         private readonly IPaymentService _paymentService;
         private readonly IDashboardService _dashboardService;
-        private readonly IBeneficiaryRepository _beneficiaryRepository;
         private readonly IBeneficiaryServices _beneficiaryServices;
         private readonly IAtmTransactionService _atmTransactionService;
         private readonly IMapper _mapper;
@@ -27,7 +25,6 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
             ITransactionService transactionService,
             IPaymentService paymentService,
             IDashboardService dashboardService,
-            IBeneficiaryRepository beneficiaryRepository,
             IBeneficiaryServices beneficiaryServices,
             IAtmTransactionService atmTransactionService,
             IMapper mapper)
@@ -35,10 +32,15 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
             _transactionService = transactionService;
             _paymentService = paymentService;
             _dashboardService = dashboardService;
-            _beneficiaryRepository = beneficiaryRepository;
             _beneficiaryServices = beneficiaryServices;
             _atmTransactionService = atmTransactionService;
             _mapper = mapper;
+        }
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            return View();
         }
 
         [HttpGet]
@@ -138,22 +140,24 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
                 await PopulateSavingsAccountsAsync(clientId); await PopulateBeneficiariesAsync(clientId); return View(vm);
             }
 
-            var beneficiaries = await _beneficiaryRepository.GetAllFindAsync(b => b.OwnerClientId == clientId && b.IsActive);
-            var beneficiary = beneficiaries.FirstOrDefault(b => b.Id == vm.BeneficiaryId);
+            var beneficiariesResult = await _beneficiaryServices.GetClientBeneficiariesAsync(clientId);
+            var beneficiary = beneficiariesResult.IsValid
+                ? beneficiariesResult.Value!.FirstOrDefault(b => b.Id == vm.BeneficiaryId)
+                : null;
             if (beneficiary == null)
             {
                 ModelState.AddModelError(string.Empty, "El beneficiario seleccionado no es válido.");
                 await PopulateSavingsAccountsAsync(clientId); await PopulateBeneficiariesAsync(clientId); return View(vm);
             }
 
-            var destResult = await _atmTransactionService.GetAtmAccountDetailsAsync(beneficiary.BeneficiaryAccountNumber);
+            var destResult = await _atmTransactionService.GetAtmAccountDetailsAsync(beneficiary.AccountNumber);
             
             var confirmModel = new ConfirmBeneficiaryViewModel
             {
                 BeneficiaryId = vm.BeneficiaryId,
                 SourceAccountNumber = vm.SourceAccountNumber,
                 OriginOwnerName = sourceResult.Value!.OwnerName,
-                DestinationAccountNumber = beneficiary.BeneficiaryAccountNumber,
+                DestinationAccountNumber = beneficiary.AccountNumber,
                 DestinationOwnerName = destResult.IsValid ? destResult.Value!.OwnerName : "Beneficiario",
                 Amount = vm.Amount
             };
@@ -340,6 +344,15 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
         private async Task PopulateBeneficiariesAsync(string clientId)
         {
             var result = await _beneficiaryServices.GetClientBeneficiariesAsync(clientId);
+            if (result.IsValid && result.Value != null)
+            {
+                ViewBag.Beneficiaries = _mapper.Map<List<BeneficiaryListViewModel>>(result.Value);
+            }
+            else
+            {
+                ViewBag.Beneficiaries = new List<BeneficiaryListViewModel>();
+            }
+
 
             ViewBag.Beneficiaries = result.IsValid
                 ? _mapper.Map<List<BeneficiaryListViewModel>>(result.Value)
