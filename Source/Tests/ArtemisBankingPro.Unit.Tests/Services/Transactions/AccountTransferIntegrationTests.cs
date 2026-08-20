@@ -162,7 +162,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
 
                 debitTx.Amount.Should().Be(300m);
                 debitTx.SavingsAccountId.Should().Be(sourceId);
-                debitTx.RelatedTransactionId.Should().Be(creditTx.Id);
+                debitTx.RelatedTransactionId.Should().BeNull();
                 debitTx.Status.Should().Be(TransactionStatus.Aprobada);
 
                 creditTx.Amount.Should().Be(300m);

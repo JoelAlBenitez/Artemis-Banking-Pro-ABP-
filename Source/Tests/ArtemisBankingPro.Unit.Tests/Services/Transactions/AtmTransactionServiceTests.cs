@@ -568,8 +568,10 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
 
             debito.SavingsAccountId.Should().Be(origen.Id);
             credito.SavingsAccountId.Should().Be(destino.Id);
-            debito.RelatedTransaction.Should().BeSameAs(credito);
+            //El enlace va solo del crédito al débito: el recíproco formaría un ciclo entre dos filas
+            //nuevas de la misma tabla y EF abortaría el SaveChangesAsync completo.
             credito.RelatedTransaction.Should().BeSameAs(debito);
+            debito.RelatedTransaction.Should().BeNull();
 
             //Balances y ambos asientos se confirman juntos: nunca queda medio movimiento.
             _transactionRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Once);
