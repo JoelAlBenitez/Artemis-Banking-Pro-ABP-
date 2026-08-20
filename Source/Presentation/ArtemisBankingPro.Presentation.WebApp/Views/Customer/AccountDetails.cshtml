@@ -1,4 +1,5 @@
 @using Artemis_Banking_Pro.Core.Application.DTOs.Transactions
+@using ArtemisBankingPro.Core.Domain.Common.Enum
 @model IReadOnlyCollection<TransactionResultDto>
 @{
     ViewData["Title"] = "Detalles de Cuenta";
@@ -41,11 +42,11 @@
                                 <tr>
                                     <td class="ps-4 py-3">@txn.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")</td>
                                     <td class="py-3 fw-bold">@txn.TransactionType</td>
-                                    <td class="py-3 fw-bold @(txn.TransactionType.ToString() == "Deposito" ? "text-success" : "text-dark")">
-                                        @(txn.TransactionType.ToString() == "Deposito" ? "+" : "-") RD$ @txn.EffectiveAmount.ToString("N2")
+                                    <td class="py-3 fw-bold @(txn.TransactionType == TransactionType.Credito ? "text-success" : "text-dark")">
+                                        @(txn.TransactionType == TransactionType.Credito ? "+" : "-") RD$ @txn.EffectiveAmount.ToString("N2")
                                     </td>
                                     <td class="pe-4 py-3 text-end">
-                                        @if (txn.Status.ToString() == "Success")
+                                        @if (txn.Status == TransactionStatus.Aprobada)
                                         {
                                             <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2">Completado</span>
                                         }

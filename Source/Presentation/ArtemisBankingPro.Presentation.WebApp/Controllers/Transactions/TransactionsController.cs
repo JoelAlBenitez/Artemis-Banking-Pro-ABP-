@@ -1,7 +1,9 @@
 using System.Security.Claims;
+using Artemis_Banking_Pro.Core.Application.Contracts.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.Contracts.Dashboard;
 using Artemis_Banking_Pro.Core.Application.Contracts.Transactions;
 using Artemis_Banking_Pro.Core.Application.DTOs.Transactions;
+using Artemis_Banking_Pro.Core.Application.ViewModels.Beneficiaries;
 using Artemis_Banking_Pro.Core.Application.ViewModels.Transactions;
 using ArtemisBankingPro.Core.Domain.Interfaces.Beneficiaries;
 using AutoMapper;
@@ -17,6 +19,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
         private readonly IPaymentService _paymentService;
         private readonly IDashboardService _dashboardService;
         private readonly IBeneficiaryRepository _beneficiaryRepository;
+        private readonly IBeneficiaryServices _beneficiaryServices;
         private readonly IAtmTransactionService _atmTransactionService;
         private readonly IMapper _mapper;
 
@@ -25,6 +28,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
             IPaymentService paymentService,
             IDashboardService dashboardService,
             IBeneficiaryRepository beneficiaryRepository,
+            IBeneficiaryServices beneficiaryServices,
             IAtmTransactionService atmTransactionService,
             IMapper mapper)
         {
@@ -32,6 +36,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
             _paymentService = paymentService;
             _dashboardService = dashboardService;
             _beneficiaryRepository = beneficiaryRepository;
+            _beneficiaryServices = beneficiaryServices;
             _atmTransactionService = atmTransactionService;
             _mapper = mapper;
         }
@@ -330,10 +335,15 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
                 ?? new List<Artemis_Banking_Pro.Core.Application.DTOs.SavingsAccounts.SavingsAccountDto>();
         }
 
+        //La vista lista los beneficiarios por nombre, así que necesita el view model del módulo
+        //de beneficiarios: la entidad solo guarda el número de cuenta y el id del titular.
         private async Task PopulateBeneficiariesAsync(string clientId)
         {
-            var beneficiaries = await _beneficiaryRepository.GetAllFindAsync(b => b.OwnerClientId == clientId && b.IsActive);
-            ViewBag.Beneficiaries = beneficiaries;
+            var result = await _beneficiaryServices.GetClientBeneficiariesAsync(clientId);
+
+            ViewBag.Beneficiaries = result.IsValid
+                ? _mapper.Map<List<BeneficiaryListViewModel>>(result.Value)
+                : new List<BeneficiaryListViewModel>();
         }
 
         private async Task PopulateCreditCardsAsync(string clientId)

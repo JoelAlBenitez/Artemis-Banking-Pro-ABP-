@@ -60,6 +60,11 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Account
         public async Task<IActionResult> Logout()
         {
             await _authService.LogoutAsync();
+
+            //Un aviso pendiente pertenece a la sesión que termina: sin esto lo vería el
+            //próximo usuario que inicie sesión en el mismo navegador.
+            TempData.Clear();
+
             return RedirectToAction(nameof(Login));
         }
 

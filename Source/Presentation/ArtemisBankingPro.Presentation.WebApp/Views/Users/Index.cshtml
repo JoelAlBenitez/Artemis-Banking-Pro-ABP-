@@ -119,24 +119,6 @@
     </div>
 </div>
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 bg-success bg-opacity-10 text-success rounded-3 d-flex align-items-center mb-4" role="alert">
-        <i class="bi bi-check-circle-fill me-3 fs-5"></i>
-        <div class="fw-medium">@TempData["SuccessMessage"]</div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 bg-danger bg-opacity-10 text-danger rounded-3 d-flex align-items-center mb-4" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i>
-        <div class="fw-medium">@TempData["ErrorMessage"]</div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
 <div class="table-container mb-4">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">

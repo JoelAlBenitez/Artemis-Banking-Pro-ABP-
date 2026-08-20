@@ -351,10 +351,10 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Management
                     Origin = "Ajuste administrativo",
                     Beneficiary = primaryAccount.AccountNumber,
                     Status = TransactionStatus.Aprobada,
-                    PerformedByUserId = DomainConstants.SystemUserId,
+                    PerformedByUserId = _currentUserService.UserId ?? DomainConstants.SystemUserId,
                     Channel = ChannelPayment.Administrador,
                     CreatedAt = DateTimeOffset.UtcNow,
-                    CreateByUserId = DomainConstants.SystemUserId
+                    CreateByUserId = _currentUserService.UserId ?? DomainConstants.SystemUserId
                 });
                 await _transactionRepository.SaveChangesAsync();
             }
