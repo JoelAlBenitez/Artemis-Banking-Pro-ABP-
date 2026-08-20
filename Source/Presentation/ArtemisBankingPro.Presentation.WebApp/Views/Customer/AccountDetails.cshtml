@@ -1,0 +1,83 @@
+@using Artemis_Banking_Pro.Core.Application.DTOs.Transactions
+@using ArtemisBankingPro.Core.Domain.Common.Enum
+@model IReadOnlyCollection<TransactionResultDto>
+@{
+    ViewData["Title"] = "Detalles de Cuenta";
+}
+
+<div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: #0F172A;">Movimientos de la Cuenta</h2>
+            <p class="text-muted mb-0">Historial de transacciones de tu cuenta de ahorro.</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-light shadow-sm rounded-3 px-4 fw-bold"><i class="bi bi-arrow-left me-2"></i> Volver</a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4 py-3 text-secondary fw-bold">Fecha</th>
+                            <th class="py-3 text-secondary fw-bold">Tipo</th>
+                            <th class="py-3 text-secondary fw-bold">Concepto</th>
+                            <th class="py-3 text-secondary fw-bold">Monto</th>
+                            <th class="pe-4 py-3 text-secondary fw-bold text-end">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model == null || !Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">No hay movimientos registrados.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var txn in Model.OrderByDescending(x => x.CreatedAt))
+                            {
+                                <tr>
+                                    <td class="ps-4 py-3 text-dark">@txn.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")</td>
+                                    <td class="py-3 fw-bold">@txn.TransactionType</td>
+                                    <td class="py-3 text-dark">
+                                        @if (txn.TransactionType == TransactionType.Debito)
+                                        {
+                                            <span>Hacia: @(string.IsNullOrEmpty(txn.Beneficiary) ? "N/A" : txn.Beneficiary)</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Desde: @(string.IsNullOrEmpty(txn.Origin) ? "N/A" : txn.Origin)</span>
+                                        }
+                                    </td>
+                                    <td class="py-3 fw-bold @(txn.TransactionType == TransactionType.Credito ? "text-success" : "text-dark")">
+                                        @(txn.TransactionType == TransactionType.Credito ? "+" : "-") RD$ @txn.EffectiveAmount.ToString("N2")
+                                    </td>
+                                    <td class="pe-4 py-3 text-end">
+                                        @if (txn.Status == TransactionStatus.Aprobada)
+                                        {
+                                            <div class="d-flex justify-content-end align-items-center">
+                                                <span class="status-dot bg-success me-2" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+                                                <span class="text-dark">Completado</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="d-flex justify-content-end align-items-center">
+                                                <span class="status-dot bg-danger me-2" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+                                                <span class="text-dark">Fallido</span>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

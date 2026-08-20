@@ -1,0 +1,70 @@
+using ArtemisBankingPro.IOC;
+
+using ArtemisBankingPro.Presentation.WebApi.Extensions;
+using ArtemisBankingPro.Presentation.WebApi.Middlewares;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.AddSerilogLogging();
+    builder.AddGlobalExceptionHandling();
+
+    // Add services to the container.
+    builder.Services.AddApplicationDependecies();
+    builder.Services.AddApiCqrsDependencies();
+    builder.Services.AddInfraestructurePersistence(builder.Configuration);
+    builder.Services.AddInfraestructureDependencies(builder.Configuration);
+    builder.Services.AddWebApiIdentityDependencies(builder.Configuration);
+
+
+    builder.Services.AddControllers();
+    builder.Services.AddSwaggerDocumentation();
+
+    var app = builder.Build();
+
+    // Run Identity Seeds (Roles and Default Users)
+    await app.Services.RunIdentitySeedsAsync();
+
+
+    // Configure the HTTP request pipeline.
+    app.UseLoggingAndExceptionHandling();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwaggerDocumentation();
+
+        //La raíz no es un endpoint de la API: sin esto la política de autorización por defecto
+        //la responde con 401 y parece que la API está caída.
+        app.MapGet("/", () => Results.Redirect("/swagger"))
+           .AllowAnonymous()
+           .ExcludeFromDescription();
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthentication();
+
+    // Entre autenticación y autorización: el usuario ya está resuelto y el rechazo por rol
+    // también queda registrado con su nombre y su rol.
+    app.UseRequestLoggingWithUserContext();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "La Web API finalizó de forma inesperada durante el arranque.");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

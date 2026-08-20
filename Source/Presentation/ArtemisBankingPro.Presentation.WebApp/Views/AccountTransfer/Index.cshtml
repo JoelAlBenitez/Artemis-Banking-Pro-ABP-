@@ -1,0 +1,151 @@
+@using Artemis_Banking_Pro.Core.Application.ViewModels.Transactions
+@model AccountTransferViewModel
+@{
+    ViewData["Title"] = "Transferencia entre Cuentas";
+}
+
+<div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-5">
+            <div class="card border-0 shadow-lg rounded-2 overflow-hidden">
+                <div class="card-header bg-primary text-white p-4 border-0">
+                    <h3 class="fw-bold mb-1"><i class="bi bi-arrow-repeat me-2"></i> Transferencia entre cuentas</h3>
+                    <p class="mb-0 opacity-75 small">Mueve fondos libremente entre tus cuentas de ahorro activas.</p>
+                </div>
+                
+                <div class="card-body p-4 p-4">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger shadow-sm border-0 rounded-2 mb-4">
+                            <i class="bi bi-exclamation-circle-fill me-2"></i>
+                            <strong>¡Atención!</strong>
+                            <div asp-validation-summary="All" class="mt-2 mb-0 small"></div>
+                        </div>
+                    }
+
+                    @if (Model.AvailableAccounts == null || Model.AvailableAccounts.Count < 2)
+                    {
+                        <div class="alert alert-warning border-0 rounded-2 shadow-sm p-4 text-center">
+                            <i class="bi bi-exclamation-triangle-fill fs-1 text-warning mb-3 d-block"></i>
+                            <h5 class="fw-bold">Cuentas insuficientes</h5>
+                            <p class="mb-0">Debe tener al menos dos cuentas de ahorro activas para realizar una transferencia entre cuentas propias.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <form id="transferForm" asp-controller="AccountTransfer" asp-action="Index" method="post">
+                            
+                            <div class="mb-4">
+                                <label asp-for="SourceAccountId" class="form-label fw-bold text-secondary">Cuenta de Origen <span class="text-danger">*</span></label>
+                                <select asp-for="SourceAccountId" class="form-select form-select border-0 bg-light shadow-sm rounded-2 " id="sourceSelect">
+                                    <option value="">Seleccione cuenta a debitar</option>
+                                    @foreach(var account in Model.AvailableAccounts)
+                                    {
+                                        <option value="@account.Id" data-account="@account.AccountNumber">@account.AccountNumber</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="SourceAccountId" class="text-danger small mt-2 d-block fw-bold"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="DestinationAccountId" class="form-label fw-bold text-secondary">Cuenta de Destino <span class="text-danger">*</span></label>
+                                <select asp-for="DestinationAccountId" class="form-select form-select border-0 bg-light shadow-sm rounded-2 " id="destSelect">
+                                    <option value="">Seleccione cuenta a acreditar</option>
+                                    @foreach(var account in Model.AvailableAccounts)
+                                    {
+                                        <option value="@account.Id" data-account="@account.AccountNumber">@account.AccountNumber</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="DestinationAccountId" class="text-danger small mt-2 d-block fw-bold"></span>
+                            </div>
+
+                            <div class="mb-5">
+                                <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto a Transferir <span class="text-danger">*</span></label>
+                                <div class="input-group input-group shadow-sm rounded-2 overflow-hidden">
+                                    <span class="input-group-text bg-light border-0 text-primary fw-bold">RD$</span>
+                                    <input asp-for="Amount" type="number" step="0.01" class="form-control border-0 bg-light  text-dark fw-bold" placeholder="0.00" autocomplete="off" id="amountInput" />
+                                </div>
+                                <span asp-validation-for="Amount" class="text-danger small mt-2 d-block fw-bold"></span>
+                            </div>
+
+                            <div class="d-flex gap-3 justify-content-end border-top border-secondary border-opacity-25 pt-4">
+                                <a asp-controller="Customer" asp-action="Index" class="btn btn-light rounded-3 fw-bold px-4 shadow-sm text-secondary">
+                                    Cancelar
+                                </a>
+                                <button type="button" class="btn btn-primary rounded-3 fw-bold px-5 shadow-sm" onclick="showConfirmationModal()">
+                                    Siguiente <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true" style="font-family: 'Montserrat', sans-serif;">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-2 border-0 shadow-lg">
+      <div class="modal-header bg-primary text-white border-0 rounded-top p-4">
+        <h5 class="modal-title fw-bold" id="confirmationModalLabel">Confirmar Transferencia</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        
+        <h4 class="fw-bold mb-3">¿Está seguro que desea realizar esta transferencia?</h4>
+        <div class="bg-light rounded-3 p-3 text-start mb-3">
+            <p class="mb-1 text-secondary small fw-bold">Cuenta de Origen:</p>
+            <p class="mb-2  fs-5 fw-bold text-danger" id="confirmSrcAccount"></p>
+
+            <p class="mb-1 text-secondary small fw-bold">Cuenta de Destino:</p>
+            <p class="mb-2  fs-5 fw-bold text-success" id="confirmDestAccount"></p>
+            
+            <p class="mb-1 text-secondary small fw-bold">Monto a Transferir:</p>
+            <p class="mb-0  fs-5 fw-bold text-primary" id="confirmAmount"></p>
+        </div>
+        <p class="text-secondary small">Esta acción descontará los fondos inmediatamente.</p>
+      </div>
+      <div class="modal-footer border-0 p-4 pt-0 justify-content-center gap-3">
+        <button type="button" class="btn btn-light rounded-3 fw-bold px-4" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary rounded-3 fw-bold px-5 shadow-sm" onclick="submitForm()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function showConfirmationModal() {
+            var srcSelect = document.getElementById('sourceSelect');
+            var destSelect = document.getElementById('destSelect');
+            var amountInput = document.getElementById('amountInput').value;
+
+            if(!srcSelect.value || !destSelect.value || !amountInput) {
+                document.getElementById('transferForm').reportValidity();
+                return;
+            }
+
+            if(srcSelect.value === destSelect.value) {
+                alert("La cuenta de origen y la cuenta de destino no pueden ser la misma.");
+                return;
+            }
+
+            var srcAccount = srcSelect.options[srcSelect.selectedIndex].getAttribute('data-account');
+            var destAccount = destSelect.options[destSelect.selectedIndex].getAttribute('data-account');
+
+            document.getElementById('confirmSrcAccount').innerText = srcAccount;
+            document.getElementById('confirmDestAccount').innerText = destAccount;
+            document.getElementById('confirmAmount').innerText = 'RD$ ' + parseFloat(amountInput).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            var modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            modal.show();
+        }
+
+        function submitForm() {
+            document.getElementById('transferForm').submit();
+        }
+    </script>
+}

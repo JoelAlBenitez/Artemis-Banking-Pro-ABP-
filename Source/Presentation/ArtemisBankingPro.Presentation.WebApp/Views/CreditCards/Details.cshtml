@@ -1,0 +1,162 @@
+@using Artemis_Banking_Pro.Core.Application.ViewModels.CreditCards
+@model ConsumptionListViewModel
+
+@{
+    ViewData["Title"] = "Detalles de Tarjeta de Crédito";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold" style="font-family: 'Montserrat', sans-serif; color: #0F172A;">
+                <a asp-action="Index" class="text-decoration-none text-muted me-2" title="Volver al Listado">
+                    <i class="bi bi-arrow-left-circle"></i>
+                </a>
+                Detalles de Tarjeta
+            </h2>
+            <p class="text-muted mb-0">Información general y consumos registrados.</p>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Número de Tarjeta</h6>
+                    <h4 class="mb-0 fw-bold font-monospace text-dark">@Model.CreditCard.MaskedCardNumber</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Cliente</h6>
+                    <h5 class="mb-0 fw-bolder text-dark">@Model.CreditCard.FullNameCustomer</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Límite de Crédito</h6>
+                    <h4 class="mb-0 fw-bolder text-success">RD$ @Model.CreditCard.CreditLimit.ToString("N2")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Monto Adeudado</h6>
+                    <h5 class="mb-0 fw-bolder text-danger">RD$ @Model.CreditCard.OwedAmount.ToString("N2")</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Crédito Disponible</h6>
+                    <h5 class="mb-0 fw-bolder text-success">RD$ @Model.CreditCard.AvailableCredit.ToString("N2")</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.8rem;">Expiración</h6>
+                        <h5 class="mb-0 fw-bolder text-dark">@Model.CreditCard.ExpirationDate</h5>
+                    </div>
+                    <div>
+                        @if (Model.CreditCard.StateCreditCard == "Cancelada")
+                        {
+                            <span class="badge bg-secondary fs-6">@Model.CreditCard.StateCreditCard</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-primary fs-6">@Model.CreditCard.StateCreditCard</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold mb-3" style="color: #0F172A;">Historial de Consumos</h4>
+    
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-muted" style="font-size: 0.85rem;">
+                        <tr>
+                            <th class="ps-4">FECHA DEL CONSUMO</th>
+                            <th>COMERCIO / ORIGEN</th>
+                            <th>MONTO</th>
+                            <th class="text-end pe-4">ESTADO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Consumptions == null || !Model.Consumptions.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    No se han registrado consumos para esta tarjeta.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var consumo in Model.Consumptions)
+                            {
+                                <tr>
+                                    <td class="ps-4">@consumo.ConsumptionDate.ToString("dd/MM/yyyy hh:mm tt")</td>
+                                    <td class="fw-bold">@consumo.CommerceName</td>
+                                    <td class="fw-bold">RD$ @consumo.Amount.ToString("N2")</td>
+                                    <td class="text-end pe-4">
+                                        @if (consumo.StateConsumption == "APROBADO")
+                                        {
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25"><i class="bi bi-check-circle-fill me-1"></i> @consumo.StateConsumption</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25"><i class="bi bi-x-circle-fill me-1"></i> @consumo.StateConsumption</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="mt-4 d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Mostrando página @Model.Page de @Model.TotalPages (Total: @Model.TotalRecords consumos)</span>
+            <ul class="pagination pagination-sm mb-0 shadow-sm">
+                <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
+                    <a class="page-link" asp-action="Details" asp-route-id="@Model.CreditCard.Id" asp-route-page="@(Model.Page - 1)">
+                        Anterior
+                    </a>
+                </li>
+                
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link" asp-action="Details" asp-route-id="@Model.CreditCard.Id" asp-route-page="@i">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.HasNext ? "" : "disabled")">
+                    <a class="page-link" asp-action="Details" asp-route-id="@Model.CreditCard.Id" asp-route-page="@(Model.Page + 1)">
+                        Siguiente
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

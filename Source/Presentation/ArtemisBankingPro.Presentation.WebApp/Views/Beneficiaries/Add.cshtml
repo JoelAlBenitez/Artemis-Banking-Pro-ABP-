@@ -1,0 +1,51 @@
+@using Artemis_Banking_Pro.Core.Application.ViewModels.Beneficiaries
+@model SaveBeneficiaryViewModel
+@{
+    ViewData["Title"] = "Añadir Beneficiario";
+}
+
+<div class="container-fluid py-5" style="font-family: 'Montserrat', sans-serif;">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-7">
+            
+            <div class="mb-4 text-center">
+                <h2 class="fw-bold mb-2" style="color: #0F172A;">
+                    <i class="bi bi-person-plus text-primary me-2"></i> Añadir Beneficiario
+                </h2>
+                <p class="text-muted mb-0">Ingresa el número de cuenta de ahorro para registrarlo.</p>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-4 p-md-5">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4">
+                            <i class="bi bi-exclamation-circle-fill me-2"></i>
+                            <strong>¡Atención!</strong>
+                            <div asp-validation-summary="All" class="mt-2 mb-0 small"></div>
+                        </div>
+                    }
+
+                    <form asp-action="Add" method="post">
+                        
+                        <div class="mb-5">
+                            <label asp-for="AccountNumber" class="form-label fw-bold text-secondary">Número de Cuenta <span class="text-danger">*</span></label>
+                            <input asp-for="AccountNumber" type="text" class="form-control" placeholder="Ej: 123456789" autocomplete="off" />
+                            <span asp-validation-for="AccountNumber" class="text-danger small mt-1 d-block"></span>
+                            <div class="form-text small text-muted">Ingrese los 9 dígitos de la cuenta de ahorro.</div>
+                        </div>
+
+                        <div class="d-flex gap-3 justify-content-end pt-4 mt-2 border-top">
+                            <a asp-action="Index" class="btn btn-light px-4">Cancelar</a>
+                            <button type="submit" class="btn btn-dark px-5">Validar y Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

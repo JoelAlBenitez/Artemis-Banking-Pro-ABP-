@@ -1,0 +1,776 @@
+[2026-08-04 13:50:19.516] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] User profile is available. Using 'C:\Users\hxdes\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2026-08-04 13:50:20.163] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:50:20.174] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:50:20.176] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:50:20.178] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:50:20.331] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:50:20.377] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:50:20.447] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:50:20.451] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:50:20.513] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:50:20.515] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:50:20.574] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:50:20.576] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:50:20.630] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:50:20.633] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:50:21.235] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Now listening on: https://localhost:7124
+[2026-08-04 13:50:21.236] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Now listening on: http://localhost:5235
+[2026-08-04 13:50:21.296] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Application started. Press Ctrl+C to shut down.
+[2026-08-04 13:50:21.297] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Hosting environment: Development
+[2026-08-04 13:50:21.299] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Content root path: C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp
+[2026-08-04 13:50:22.027] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/ - null null
+[2026-08-04 13:50:22.234] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 160d3774fd0f421081f91e1cf0ae5b62] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 13:50:22.240] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 160d3774fd0f421081f91e1cf0ae5b62] AuthenticationScheme: Identity.Application was challenged.
+[2026-08-04 13:50:22.243] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 160d3774fd0f421081f91e1cf0ae5b62] HTTP GET / responded 302 in 79.6257 ms
+[2026-08-04 13:50:22.253] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/ - 302 0 null 235.7138ms
+[2026-08-04 13:50:22.260] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Login?denied=true - null null
+[2026-08-04 13:50:22.273] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89a5f360f22b45aebd61420dfa43e105] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:50:22.288] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89a5f360f22b45aebd61420dfa43e105] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Login() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 13:50:22.336] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89a5f360f22b45aebd61420dfa43e105] Executing ViewResult, running view Login.
+[2026-08-04 13:50:22.429] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89a5f360f22b45aebd61420dfa43e105] Executed ViewResult - view Login executed in 94.9836ms.
+[2026-08-04 13:50:22.434] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89a5f360f22b45aebd61420dfa43e105] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 143.4257ms
+[2026-08-04 13:50:22.437] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89a5f360f22b45aebd61420dfa43e105] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:50:22.440] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89a5f360f22b45aebd61420dfa43e105] HTTP GET /Account/Login responded 200 in 173.3983 ms
+[2026-08-04 13:50:22.446] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Login?denied=true - 200 null text/html; charset=utf-8 185.4091ms
+[2026-08-04 13:50:22.456] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 13:50:22.456] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 13:50:22.464] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 7.897ms
+[2026-08-04 13:50:22.510] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 53.1941ms
+[2026-08-04 13:51:13.743] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 POST https://localhost:7124/Account/Login - application/x-www-form-urlencoded 220
+[2026-08-04 13:51:13.759] [INF] [ArtemisBankingPro.WebApp] [Correlacion: aa744dd4241d46048392183dacd33ec3] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:13.770] [INF] [ArtemisBankingPro.WebApp] [Correlacion: aa744dd4241d46048392183dacd33ec3] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(ArtemisBankingPro.Core.Application.Dtos.Account.AuthenticationRequest) on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 13:51:13.935] [INF] [ArtemisBankingPro.WebApp] [Correlacion: aa744dd4241d46048392183dacd33ec3] AuthenticationScheme: Identity.Application signed in.
+[2026-08-04 13:51:13.940] [INF] [ArtemisBankingPro.WebApp] [Correlacion: aa744dd4241d46048392183dacd33ec3] Executing RedirectResult, redirecting to /AdminHome.
+[2026-08-04 13:51:13.943] [INF] [ArtemisBankingPro.WebApp] [Correlacion: aa744dd4241d46048392183dacd33ec3] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 171.1267ms
+[2026-08-04 13:51:13.944] [INF] [ArtemisBankingPro.WebApp] [Correlacion: aa744dd4241d46048392183dacd33ec3] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:13.946] [INF] [ArtemisBankingPro.WebApp] [Correlacion: aa744dd4241d46048392183dacd33ec3] HTTP POST /Account/Login responded 302 in 194.0950 ms
+[2026-08-04 13:51:13.948] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 POST https://localhost:7124/Account/Login - 302 0 null 204.3796ms
+[2026-08-04 13:51:13.953] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/AdminHome - null null
+[2026-08-04 13:51:13.967] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d4df76b9959742f2a1153edd685f15cb] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:13.970] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d4df76b9959742f2a1153edd685f15cb] Route matched with {action = "Index", controller = "AdminHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 13:51:13.973] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d4df76b9959742f2a1153edd685f15cb] Executing ViewResult, running view Index.
+[2026-08-04 13:51:13.981] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d4df76b9959742f2a1153edd685f15cb] Executed ViewResult - view Index executed in 9.0344ms.
+[2026-08-04 13:51:13.983] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d4df76b9959742f2a1153edd685f15cb] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 11.2291ms
+[2026-08-04 13:51:13.984] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d4df76b9959742f2a1153edd685f15cb] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:13.986] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d4df76b9959742f2a1153edd685f15cb] HTTP GET /AdminHome responded 200 in 28.7315 ms
+[2026-08-04 13:51:13.988] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/AdminHome - 200 null text/html; charset=utf-8 34.8601ms
+[2026-08-04 13:51:14.012] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 13:51:14.012] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 13:51:14.023] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 11.1057ms
+[2026-08-04 13:51:14.031] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 18.9132ms
+[2026-08-04 13:51:16.127] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Login?denied=true - null null
+[2026-08-04 13:51:16.132] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 16fca7f1115a4cba93d2f96e2a50e934] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:16.133] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 16fca7f1115a4cba93d2f96e2a50e934] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Login() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 13:51:16.138] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 16fca7f1115a4cba93d2f96e2a50e934] Executing RedirectResult, redirecting to /AdminHome.
+[2026-08-04 13:51:16.138] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 16fca7f1115a4cba93d2f96e2a50e934] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 4.7778ms
+[2026-08-04 13:51:16.139] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 16fca7f1115a4cba93d2f96e2a50e934] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:16.140] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 16fca7f1115a4cba93d2f96e2a50e934] HTTP GET /Account/Login responded 302 in 9.2614 ms
+[2026-08-04 13:51:16.141] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Login?denied=true - 302 0 null 14.1776ms
+[2026-08-04 13:51:16.165] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 13:51:16.168] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 2.3892ms
+[2026-08-04 13:51:26.759] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/AdminHome - null null
+[2026-08-04 13:51:26.776] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7bf1a7666ec446258ac86a18136ce9e7] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:26.778] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7bf1a7666ec446258ac86a18136ce9e7] Route matched with {action = "Index", controller = "AdminHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 13:51:26.781] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7bf1a7666ec446258ac86a18136ce9e7] Executing ViewResult, running view Index.
+[2026-08-04 13:51:26.783] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7bf1a7666ec446258ac86a18136ce9e7] Executed ViewResult - view Index executed in 2.8181ms.
+[2026-08-04 13:51:26.785] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7bf1a7666ec446258ac86a18136ce9e7] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 4.6171ms
+[2026-08-04 13:51:26.787] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7bf1a7666ec446258ac86a18136ce9e7] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:26.788] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7bf1a7666ec446258ac86a18136ce9e7] HTTP GET /AdminHome responded 200 in 23.6922 ms
+[2026-08-04 13:51:26.791] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/AdminHome - 200 null text/html; charset=utf-8 33.0509ms
+[2026-08-04 13:51:26.815] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 13:51:26.815] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 13:51:26.818] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 2.7628ms
+[2026-08-04 13:51:26.825] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 9.4039ms
+[2026-08-04 13:51:26.835] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 13:51:26.841] [INF] [ArtemisBankingPro.WebApp] [Correlacion: c75bee31bb1e4f86ba5764874e4d4f36] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:26.883] [INF] [ArtemisBankingPro.WebApp] [Correlacion: c75bee31bb1e4f86ba5764874e4d4f36] Sending file. Request path: 'favicon.ico'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\oxxof40yni-61n19gt1b8.gz'
+[2026-08-04 13:51:26.886] [INF] [ArtemisBankingPro.WebApp] [Correlacion: c75bee31bb1e4f86ba5764874e4d4f36] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:26.887] [INF] [ArtemisBankingPro.WebApp] [Correlacion: c75bee31bb1e4f86ba5764874e4d4f36] HTTP GET /favicon.ico responded 200 in 49.1098 ms
+[2026-08-04 13:51:26.889] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 200 5463 image/x-icon 53.4067ms
+[2026-08-04 13:51:27.131] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/AdminHome - null null
+[2026-08-04 13:51:27.134] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7ec1edaeacd041a397e91a30bc375cbd] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:27.136] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7ec1edaeacd041a397e91a30bc375cbd] Route matched with {action = "Index", controller = "AdminHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 13:51:27.137] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7ec1edaeacd041a397e91a30bc375cbd] Executing ViewResult, running view Index.
+[2026-08-04 13:51:27.153] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7ec1edaeacd041a397e91a30bc375cbd] Executed ViewResult - view Index executed in 16.1337ms.
+[2026-08-04 13:51:27.155] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7ec1edaeacd041a397e91a30bc375cbd] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 17.9703ms
+[2026-08-04 13:51:27.156] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7ec1edaeacd041a397e91a30bc375cbd] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:27.158] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7ec1edaeacd041a397e91a30bc375cbd] HTTP GET /AdminHome responded 200 in 24.5999 ms
+[2026-08-04 13:51:27.161] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/AdminHome - 200 null text/html; charset=utf-8 30.2398ms
+[2026-08-04 13:51:27.176] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 13:51:27.176] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 13:51:27.179] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 2.6359ms
+[2026-08-04 13:51:27.186] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 9.9693ms
+[2026-08-04 13:51:27.201] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 13:51:27.205] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4e478a73912d4cb8a6190d5db9ea2f95] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:27.209] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4e478a73912d4cb8a6190d5db9ea2f95] Sending file. Request path: 'favicon.ico'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\oxxof40yni-61n19gt1b8.gz'
+[2026-08-04 13:51:27.210] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4e478a73912d4cb8a6190d5db9ea2f95] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:27.212] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4e478a73912d4cb8a6190d5db9ea2f95] HTTP GET /favicon.ico responded 200 in 7.4595 ms
+[2026-08-04 13:51:27.214] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 200 5463 image/x-icon 13.7914ms
+[2026-08-04 13:51:36.023] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] User profile is available. Using 'C:\Users\hxdes\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2026-08-04 13:51:36.843] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:51:36.855] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:51:36.856] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:51:36.858] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:51:37.023] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:51:37.065] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:51:37.123] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:51:37.125] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:51:37.186] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:51:37.188] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:51:37.243] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:51:37.245] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:51:37.301] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 13:51:37.303] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 13:51:37.744] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Now listening on: https://localhost:7124
+[2026-08-04 13:51:37.746] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Now listening on: http://localhost:5235
+[2026-08-04 13:51:37.811] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Application started. Press Ctrl+C to shut down.
+[2026-08-04 13:51:37.813] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Hosting environment: Development
+[2026-08-04 13:51:37.814] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Content root path: C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp
+[2026-08-04 13:51:38.569] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/ - null null
+[2026-08-04 13:51:38.727] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f94b3198cc3b41d098893ae17bb57095] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.HomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:38.738] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f94b3198cc3b41d098893ae17bb57095] Route matched with {action = "Index", controller = "Home"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.HomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 13:51:38.748] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f94b3198cc3b41d098893ae17bb57095] Executing ViewResult, running view Index.
+[2026-08-04 13:51:38.851] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f94b3198cc3b41d098893ae17bb57095] Executed ViewResult - view Index executed in 104.5556ms.
+[2026-08-04 13:51:38.855] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f94b3198cc3b41d098893ae17bb57095] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.HomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 114.9776ms
+[2026-08-04 13:51:38.857] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f94b3198cc3b41d098893ae17bb57095] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.HomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:38.860] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f94b3198cc3b41d098893ae17bb57095] HTTP GET / responded 200 in 201.9781 ms
+[2026-08-04 13:51:38.866] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/ - 200 null text/html; charset=utf-8 304.2513ms
+[2026-08-04 13:51:38.874] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 13:51:38.874] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/css/site.css?v=j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg - null null
+[2026-08-04 13:51:38.874] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 13:51:38.874] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/lib/bootstrap/dist/css/bootstrap.min.css - null null
+[2026-08-04 13:51:38.874] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/ArtemisBankingPro.Presentation.WebApp.styles.css?v=0xIpyO_9X1NdueFegLxki6y3rVG60MXyUmB1VfKHPi4 - null null
+[2026-08-04 13:51:38.879] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/lib/jquery/dist/jquery.min.js - null null
+[2026-08-04 13:51:38.908] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/lib/bootstrap/dist/js/bootstrap.bundle.min.js - null null
+[2026-08-04 13:51:38.913] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/js/site.js?v=hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo - null null
+[2026-08-04 13:51:38.977] [INF] [ArtemisBankingPro.WebApp] [Correlacion: e51efdba1a5d46a7a807fbeaf72ddbf8] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:38.977] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b16ce2a0486f4c8ab40900f8f49283c3] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:38.981] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 107.4791ms
+[2026-08-04 13:51:38.989] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0ffb3aa8688b42aeb9ad5f44df2b9227] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:38.989] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ba8f2b184381479c96e531d9241a1778] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:38.989] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f2ea3811fb23445fad1f1fc7bd63463f] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:38.989] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ccb7b7e8ac044574bad90d2be1daa992] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:39.006] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b16ce2a0486f4c8ab40900f8f49283c3] Sending file. Request path: 'css/site.css'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\tckcx4rgi9-b9sayid5wm.gz'
+[2026-08-04 13:51:39.006] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 133.0251ms
+[2026-08-04 13:51:39.006] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0ffb3aa8688b42aeb9ad5f44df2b9227] Sending file. Request path: 'ArtemisBankingPro.Presentation.WebApp.styles.css'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\3qu73cn16i-30luxbwyuf.gz'
+[2026-08-04 13:51:39.006] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ccb7b7e8ac044574bad90d2be1daa992] Sending file. Request path: 'js/site.js'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\rebdeedfrb-xtxxf3hu2r.gz'
+[2026-08-04 13:51:39.008] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b16ce2a0486f4c8ab40900f8f49283c3] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:39.013] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0ffb3aa8688b42aeb9ad5f44df2b9227] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:39.014] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ccb7b7e8ac044574bad90d2be1daa992] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:39.015] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b16ce2a0486f4c8ab40900f8f49283c3] HTTP GET /css/site.css responded 200 in 96.8255 ms
+[2026-08-04 13:51:39.016] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0ffb3aa8688b42aeb9ad5f44df2b9227] HTTP GET /ArtemisBankingPro.Presentation.WebApp.styles.css responded 200 in 40.5455 ms
+[2026-08-04 13:51:39.017] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ccb7b7e8ac044574bad90d2be1daa992] HTTP GET /js/site.js responded 200 in 33.6277 ms
+[2026-08-04 13:51:39.020] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/css/site.css?v=j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg - 200 700 text/css 145.7045ms
+[2026-08-04 13:51:39.021] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/ArtemisBankingPro.Presentation.WebApp.styles.css?v=0xIpyO_9X1NdueFegLxki6y3rVG60MXyUmB1VfKHPi4 - 200 1188 text/css 147.5751ms
+[2026-08-04 13:51:39.021] [INF] [ArtemisBankingPro.WebApp] [Correlacion: e51efdba1a5d46a7a807fbeaf72ddbf8] Sending file. Request path: 'lib/bootstrap/dist/css/bootstrap.min.css'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\vuoq0qbi9k-43atpzeawx.gz'
+[2026-08-04 13:51:39.023] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/js/site.js?v=hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo - 200 264 text/javascript 110.1586ms
+[2026-08-04 13:51:39.030] [INF] [ArtemisBankingPro.WebApp] [Correlacion: e51efdba1a5d46a7a807fbeaf72ddbf8] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:39.033] [INF] [ArtemisBankingPro.WebApp] [Correlacion: e51efdba1a5d46a7a807fbeaf72ddbf8] HTTP GET /lib/bootstrap/dist/css/bootstrap.min.css responded 200 in 102.0525 ms
+[2026-08-04 13:51:39.035] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/lib/bootstrap/dist/css/bootstrap.min.css - 200 232876 text/css 161.7383ms
+[2026-08-04 13:51:39.059] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f2ea3811fb23445fad1f1fc7bd63463f] Sending file. Request path: 'lib/bootstrap/dist/js/bootstrap.bundle.min.js'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\xlaw83ks7b-hd3gran6i8.gz'
+[2026-08-04 13:51:39.061] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f2ea3811fb23445fad1f1fc7bd63463f] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:39.062] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f2ea3811fb23445fad1f1fc7bd63463f] HTTP GET /lib/bootstrap/dist/js/bootstrap.bundle.min.js responded 200 in 80.9694 ms
+[2026-08-04 13:51:39.064] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/lib/bootstrap/dist/js/bootstrap.bundle.min.js - 200 80770 text/javascript 155.8058ms
+[2026-08-04 13:51:39.074] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ba8f2b184381479c96e531d9241a1778] Sending file. Request path: 'lib/jquery/dist/jquery.min.js'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\zqq4uquvtr-m9qm4tazc0.gz'
+[2026-08-04 13:51:39.076] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ba8f2b184381479c96e531d9241a1778] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 13:51:39.077] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ba8f2b184381479c96e531d9241a1778] HTTP GET /lib/jquery/dist/jquery.min.js responded 200 in 99.1005 ms
+[2026-08-04 13:51:39.079] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/lib/jquery/dist/jquery.min.js - 200 87578 text/javascript 200.0267ms
+[2026-08-04 13:51:40.920] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Logout - null null
+[2026-08-04 13:51:40.928] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6045298ab3de413f9678ece9c7acbaf6] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Logout (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:40.933] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6045298ab3de413f9678ece9c7acbaf6] Route matched with {action = "Logout", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Logout() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 13:51:40.947] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6045298ab3de413f9678ece9c7acbaf6] AuthenticationScheme: Identity.Application signed out.
+[2026-08-04 13:51:40.949] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6045298ab3de413f9678ece9c7acbaf6] AuthenticationScheme: Identity.External signed out.
+[2026-08-04 13:51:40.951] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6045298ab3de413f9678ece9c7acbaf6] AuthenticationScheme: Identity.TwoFactorUserId signed out.
+[2026-08-04 13:51:40.952] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6045298ab3de413f9678ece9c7acbaf6] Executing RedirectResult, redirecting to /Account/Login.
+[2026-08-04 13:51:40.954] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6045298ab3de413f9678ece9c7acbaf6] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Logout (ArtemisBankingPro.Presentation.WebApp) in 19.4052ms
+[2026-08-04 13:51:40.955] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6045298ab3de413f9678ece9c7acbaf6] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Logout (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:40.956] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6045298ab3de413f9678ece9c7acbaf6] HTTP GET /Account/Logout responded 302 in 30.1607 ms
+[2026-08-04 13:51:40.959] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Logout - 302 0 null 39.3197ms
+[2026-08-04 13:51:40.964] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Login - null null
+[2026-08-04 13:51:40.968] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b2f1abe4857d4fca9556f6a9cf58b0d4] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:40.970] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b2f1abe4857d4fca9556f6a9cf58b0d4] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Login() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 13:51:40.974] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b2f1abe4857d4fca9556f6a9cf58b0d4] Executing ViewResult, running view Login.
+[2026-08-04 13:51:41.004] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b2f1abe4857d4fca9556f6a9cf58b0d4] Executed ViewResult - view Login executed in 31.1892ms.
+[2026-08-04 13:51:41.008] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b2f1abe4857d4fca9556f6a9cf58b0d4] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 36.9301ms
+[2026-08-04 13:51:41.011] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b2f1abe4857d4fca9556f6a9cf58b0d4] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 13:51:41.013] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b2f1abe4857d4fca9556f6a9cf58b0d4] HTTP GET /Account/Login responded 200 in 45.7913 ms
+[2026-08-04 13:51:41.014] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Login - 200 null text/html; charset=utf-8 50.3159ms
+[2026-08-04 13:51:41.029] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 13:51:41.029] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 13:51:41.033] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 4.218ms
+[2026-08-04 13:51:41.042] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 12.6614ms
+[2026-08-04 14:19:53.710] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] User profile is available. Using 'C:\Users\hxdes\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2026-08-04 14:19:54.293] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:19:54.303] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:19:54.305] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:19:54.306] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:19:54.441] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:19:54.480] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:19:54.542] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:19:54.545] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:19:54.613] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:19:54.615] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:19:54.674] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:19:54.676] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:19:54.751] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 14:19:54.757] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 14:19:55.222] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Now listening on: https://localhost:7124
+[2026-08-04 14:19:55.223] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Now listening on: http://localhost:5235
+[2026-08-04 14:19:55.301] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Application started. Press Ctrl+C to shut down.
+[2026-08-04 14:19:55.303] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Hosting environment: Development
+[2026-08-04 14:19:55.304] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Content root path: C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp
+[2026-08-04 14:19:56.211] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/ - null null
+[2026-08-04 14:19:56.378] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0613b480aa9b490a8ed4794ceee45ee4] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:19:56.384] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0613b480aa9b490a8ed4794ceee45ee4] AuthenticationScheme: Identity.Application was challenged.
+[2026-08-04 14:19:56.388] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0613b480aa9b490a8ed4794ceee45ee4] HTTP GET / responded 302 in 78.5764 ms
+[2026-08-04 14:19:56.397] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/ - 302 0 null 194.7132ms
+[2026-08-04 14:19:56.403] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Login?denied=true - null null
+[2026-08-04 14:19:56.415] [INF] [ArtemisBankingPro.WebApp] [Correlacion: e8e6acd5312a4cdab45ef77ec4cba02c] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:19:56.430] [INF] [ArtemisBankingPro.WebApp] [Correlacion: e8e6acd5312a4cdab45ef77ec4cba02c] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Login() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:19:56.466] [INF] [ArtemisBankingPro.WebApp] [Correlacion: e8e6acd5312a4cdab45ef77ec4cba02c] Executing ViewResult, running view Login.
+[2026-08-04 14:19:56.539] [INF] [ArtemisBankingPro.WebApp] [Correlacion: e8e6acd5312a4cdab45ef77ec4cba02c] Executed ViewResult - view Login executed in 75.208ms.
+[2026-08-04 14:19:56.544] [INF] [ArtemisBankingPro.WebApp] [Correlacion: e8e6acd5312a4cdab45ef77ec4cba02c] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 111.0203ms
+[2026-08-04 14:19:56.546] [INF] [ArtemisBankingPro.WebApp] [Correlacion: e8e6acd5312a4cdab45ef77ec4cba02c] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:19:56.548] [INF] [ArtemisBankingPro.WebApp] [Correlacion: e8e6acd5312a4cdab45ef77ec4cba02c] HTTP GET /Account/Login responded 200 in 138.5334 ms
+[2026-08-04 14:19:56.552] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Login?denied=true - 200 null text/html; charset=utf-8 149.3263ms
+[2026-08-04 14:19:56.559] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:19:56.559] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:19:56.566] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 6.7553ms
+[2026-08-04 14:19:56.590] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 30.3225ms
+[2026-08-04 14:21:17.130] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 POST https://localhost:7124/Account/Login - application/x-www-form-urlencoded 220
+[2026-08-04 14:21:17.145] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89f28793bce540ecbc439ebbf1885508] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:17.157] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89f28793bce540ecbc439ebbf1885508] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(ArtemisBankingPro.Core.Application.Dtos.Account.AuthenticationRequest) on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:17.331] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89f28793bce540ecbc439ebbf1885508] AuthenticationScheme: Identity.Application signed in.
+[2026-08-04 14:21:17.335] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89f28793bce540ecbc439ebbf1885508] Executing RedirectResult, redirecting to /AdminHome.
+[2026-08-04 14:21:17.336] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89f28793bce540ecbc439ebbf1885508] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 177.83ms
+[2026-08-04 14:21:17.337] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89f28793bce540ecbc439ebbf1885508] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:17.338] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 89f28793bce540ecbc439ebbf1885508] HTTP POST /Account/Login responded 302 in 199.8242 ms
+[2026-08-04 14:21:17.340] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 POST https://localhost:7124/Account/Login - 302 0 null 210.0396ms
+[2026-08-04 14:21:17.345] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/AdminHome - null null
+[2026-08-04 14:21:17.355] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 04cdd9ea4a864399a68dfe3dbc6cdf7f] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:17.357] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 04cdd9ea4a864399a68dfe3dbc6cdf7f] Route matched with {action = "Index", controller = "AdminHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:17.361] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 04cdd9ea4a864399a68dfe3dbc6cdf7f] Executing ViewResult, running view Index.
+[2026-08-04 14:21:17.370] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 04cdd9ea4a864399a68dfe3dbc6cdf7f] Executed ViewResult - view Index executed in 10.5098ms.
+[2026-08-04 14:21:17.372] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 04cdd9ea4a864399a68dfe3dbc6cdf7f] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 12.8056ms
+[2026-08-04 14:21:17.374] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 04cdd9ea4a864399a68dfe3dbc6cdf7f] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:17.374] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 04cdd9ea4a864399a68dfe3dbc6cdf7f] HTTP GET /AdminHome responded 200 in 25.8737 ms
+[2026-08-04 14:21:17.376] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/AdminHome - 200 null text/html; charset=utf-8 31.4656ms
+[2026-08-04 14:21:17.398] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:21:17.399] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:21:17.402] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 3.6145ms
+[2026-08-04 14:21:17.416] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 17.682ms
+[2026-08-04 14:21:50.012] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Login?denied=true - null null
+[2026-08-04 14:21:50.019] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 680d4bc8d3804cc598bdec4baf824eb2] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:50.020] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 680d4bc8d3804cc598bdec4baf824eb2] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Login() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:50.025] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 680d4bc8d3804cc598bdec4baf824eb2] Executing RedirectResult, redirecting to /AdminHome.
+[2026-08-04 14:21:50.026] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 680d4bc8d3804cc598bdec4baf824eb2] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 5.0264ms
+[2026-08-04 14:21:50.027] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 680d4bc8d3804cc598bdec4baf824eb2] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:50.027] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 680d4bc8d3804cc598bdec4baf824eb2] HTTP GET /Account/Login responded 302 in 9.7832 ms
+[2026-08-04 14:21:50.029] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Login?denied=true - 302 0 null 16.6864ms
+[2026-08-04 14:21:50.051] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:21:50.053] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 2.3073ms
+[2026-08-04 14:21:51.712] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:21:51.715] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 2.5938ms
+[2026-08-04 14:21:52.682] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/AdminHome - null null
+[2026-08-04 14:21:52.694] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b938f68a9a424928aa8f020412b6e8c9] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:52.696] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b938f68a9a424928aa8f020412b6e8c9] Route matched with {action = "Index", controller = "AdminHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:52.698] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b938f68a9a424928aa8f020412b6e8c9] Executing ViewResult, running view Index.
+[2026-08-04 14:21:52.700] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b938f68a9a424928aa8f020412b6e8c9] Executed ViewResult - view Index executed in 1.4844ms.
+[2026-08-04 14:21:52.701] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b938f68a9a424928aa8f020412b6e8c9] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 3.1059ms
+[2026-08-04 14:21:52.704] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b938f68a9a424928aa8f020412b6e8c9] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:52.707] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b938f68a9a424928aa8f020412b6e8c9] HTTP GET /AdminHome responded 200 in 22.5588 ms
+[2026-08-04 14:21:52.711] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/AdminHome - 200 null text/html; charset=utf-8 29.5838ms
+[2026-08-04 14:21:52.726] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:21:52.726] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:21:52.729] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 2.7051ms
+[2026-08-04 14:21:52.799] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 72.6739ms
+[2026-08-04 14:21:52.807] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 14:21:52.812] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9e7bd4e6da714384ad7045e3f2e0c6f1] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:52.838] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/AdminHome - null null
+[2026-08-04 14:21:52.840] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9e7bd4e6da714384ad7045e3f2e0c6f1] Sending file. Request path: 'favicon.ico'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\oxxof40yni-61n19gt1b8.gz'
+[2026-08-04 14:21:52.842] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 396d392bef5d484d90457d7ced00cf37] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:52.842] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9e7bd4e6da714384ad7045e3f2e0c6f1] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:52.843] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 396d392bef5d484d90457d7ced00cf37] Route matched with {action = "Index", controller = "AdminHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:52.843] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9e7bd4e6da714384ad7045e3f2e0c6f1] HTTP GET /favicon.ico responded 200 in 34.2186 ms
+[2026-08-04 14:21:52.844] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 396d392bef5d484d90457d7ced00cf37] Executing ViewResult, running view Index.
+[2026-08-04 14:21:52.846] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 200 5463 image/x-icon 38.343ms
+[2026-08-04 14:21:52.847] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 396d392bef5d484d90457d7ced00cf37] Executed ViewResult - view Index executed in 2.7272ms.
+[2026-08-04 14:21:52.850] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 396d392bef5d484d90457d7ced00cf37] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 5.5632ms
+[2026-08-04 14:21:52.851] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 396d392bef5d484d90457d7ced00cf37] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:52.853] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 396d392bef5d484d90457d7ced00cf37] HTTP GET /AdminHome responded 200 in 12.5257 ms
+[2026-08-04 14:21:52.855] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/AdminHome - 200 null text/html; charset=utf-8 17.325ms
+[2026-08-04 14:21:52.868] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:21:52.868] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:21:52.871] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 2.8417ms
+[2026-08-04 14:21:52.875] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 7.477ms
+[2026-08-04 14:21:52.978] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/AdminHome - null null
+[2026-08-04 14:21:52.981] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 323ea00d45684881950808fbe94d5c4e] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:52.982] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 323ea00d45684881950808fbe94d5c4e] Route matched with {action = "Index", controller = "AdminHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:52.983] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 323ea00d45684881950808fbe94d5c4e] Executing ViewResult, running view Index.
+[2026-08-04 14:21:52.984] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 323ea00d45684881950808fbe94d5c4e] Executed ViewResult - view Index executed in 0.8919ms.
+[2026-08-04 14:21:52.985] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 323ea00d45684881950808fbe94d5c4e] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 1.9949ms
+[2026-08-04 14:21:52.987] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 323ea00d45684881950808fbe94d5c4e] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:52.988] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 323ea00d45684881950808fbe94d5c4e] HTTP GET /AdminHome responded 200 in 6.8060 ms
+[2026-08-04 14:21:52.989] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/AdminHome - 200 null text/html; charset=utf-8 11.1212ms
+[2026-08-04 14:21:53.004] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:21:53.004] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:21:53.007] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 2.5046ms
+[2026-08-04 14:21:53.016] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 11.4696ms
+[2026-08-04 14:21:53.025] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 14:21:53.028] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ebde93aafe59462194fb7cb45c6e4d67] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:53.030] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ebde93aafe59462194fb7cb45c6e4d67] Sending file. Request path: 'favicon.ico'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\oxxof40yni-61n19gt1b8.gz'
+[2026-08-04 14:21:53.031] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ebde93aafe59462194fb7cb45c6e4d67] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:53.032] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ebde93aafe59462194fb7cb45c6e4d67] HTTP GET /favicon.ico responded 200 in 5.2458 ms
+[2026-08-04 14:21:53.034] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 200 5463 image/x-icon 9.0723ms
+[2026-08-04 14:21:53.246] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/AdminHome - null null
+[2026-08-04 14:21:53.249] [INF] [ArtemisBankingPro.WebApp] [Correlacion: be03ff537839451588f163b9c0cb799f] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:53.251] [INF] [ArtemisBankingPro.WebApp] [Correlacion: be03ff537839451588f163b9c0cb799f] Route matched with {action = "Index", controller = "AdminHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:53.252] [INF] [ArtemisBankingPro.WebApp] [Correlacion: be03ff537839451588f163b9c0cb799f] Executing ViewResult, running view Index.
+[2026-08-04 14:21:53.253] [INF] [ArtemisBankingPro.WebApp] [Correlacion: be03ff537839451588f163b9c0cb799f] Executed ViewResult - view Index executed in 0.9266ms.
+[2026-08-04 14:21:53.254] [INF] [ArtemisBankingPro.WebApp] [Correlacion: be03ff537839451588f163b9c0cb799f] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 2.1854ms
+[2026-08-04 14:21:53.255] [INF] [ArtemisBankingPro.WebApp] [Correlacion: be03ff537839451588f163b9c0cb799f] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:53.256] [INF] [ArtemisBankingPro.WebApp] [Correlacion: be03ff537839451588f163b9c0cb799f] HTTP GET /AdminHome responded 200 in 6.9064 ms
+[2026-08-04 14:21:53.258] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/AdminHome - 200 null text/html; charset=utf-8 11.5257ms
+[2026-08-04 14:21:53.273] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:21:53.273] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:21:53.276] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 3.129ms
+[2026-08-04 14:21:53.278] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 5.4467ms
+[2026-08-04 14:21:53.287] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 14:21:53.290] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 11b9a28bf2a44cf7b2887adfd38d5155] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:53.292] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 11b9a28bf2a44cf7b2887adfd38d5155] Sending file. Request path: 'favicon.ico'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\oxxof40yni-61n19gt1b8.gz'
+[2026-08-04 14:21:53.293] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 11b9a28bf2a44cf7b2887adfd38d5155] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:53.294] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 11b9a28bf2a44cf7b2887adfd38d5155] HTTP GET /favicon.ico responded 200 in 4.4665 ms
+[2026-08-04 14:21:53.295] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 200 5463 image/x-icon 7.4853ms
+[2026-08-04 14:21:53.378] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/AdminHome - null null
+[2026-08-04 14:21:53.382] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 405e3e501f3e4a79918faf4fedd63954] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:53.382] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 405e3e501f3e4a79918faf4fedd63954] Route matched with {action = "Index", controller = "AdminHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:53.384] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 405e3e501f3e4a79918faf4fedd63954] Executing ViewResult, running view Index.
+[2026-08-04 14:21:53.385] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 405e3e501f3e4a79918faf4fedd63954] Executed ViewResult - view Index executed in 0.9918ms.
+[2026-08-04 14:21:53.386] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 405e3e501f3e4a79918faf4fedd63954] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 2.1453ms
+[2026-08-04 14:21:53.387] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 405e3e501f3e4a79918faf4fedd63954] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:53.388] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 405e3e501f3e4a79918faf4fedd63954] HTTP GET /AdminHome responded 200 in 7.2741 ms
+[2026-08-04 14:21:53.390] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/AdminHome - 200 null text/html; charset=utf-8 11.9603ms
+[2026-08-04 14:21:53.406] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:21:53.406] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:21:53.408] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 1.9376ms
+[2026-08-04 14:21:53.413] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 7.1176ms
+[2026-08-04 14:21:53.420] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 14:21:53.423] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 66bc18d4c2684267a2c573e4c4dd799e] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:53.425] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 66bc18d4c2684267a2c573e4c4dd799e] Sending file. Request path: 'favicon.ico'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\oxxof40yni-61n19gt1b8.gz'
+[2026-08-04 14:21:53.426] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 66bc18d4c2684267a2c573e4c4dd799e] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:53.427] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 66bc18d4c2684267a2c573e4c4dd799e] HTTP GET /favicon.ico responded 200 in 4.6438 ms
+[2026-08-04 14:21:53.428] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 200 5463 image/x-icon 8.2627ms
+[2026-08-04 14:21:55.649] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/ - null null
+[2026-08-04 14:21:55.652] [INF] [ArtemisBankingPro.WebApp] [Correlacion: a22714094aaa4ccb9f0ce75501bd7c47] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.HomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:55.655] [INF] [ArtemisBankingPro.WebApp] [Correlacion: a22714094aaa4ccb9f0ce75501bd7c47] Route matched with {action = "Index", controller = "Home"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.HomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:55.659] [INF] [ArtemisBankingPro.WebApp] [Correlacion: a22714094aaa4ccb9f0ce75501bd7c47] Executing ViewResult, running view Index.
+[2026-08-04 14:21:55.681] [INF] [ArtemisBankingPro.WebApp] [Correlacion: a22714094aaa4ccb9f0ce75501bd7c47] Executed ViewResult - view Index executed in 23.1485ms.
+[2026-08-04 14:21:55.682] [INF] [ArtemisBankingPro.WebApp] [Correlacion: a22714094aaa4ccb9f0ce75501bd7c47] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.HomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 25.5095ms
+[2026-08-04 14:21:55.683] [INF] [ArtemisBankingPro.WebApp] [Correlacion: a22714094aaa4ccb9f0ce75501bd7c47] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.HomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:55.684] [INF] [ArtemisBankingPro.WebApp] [Correlacion: a22714094aaa4ccb9f0ce75501bd7c47] HTTP GET / responded 200 in 32.5067 ms
+[2026-08-04 14:21:55.686] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/ - 200 null text/html; charset=utf-8 37.639ms
+[2026-08-04 14:21:55.705] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/lib/bootstrap/dist/css/bootstrap.min.css - null null
+[2026-08-04 14:21:55.706] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/lib/bootstrap/dist/js/bootstrap.bundle.min.js - null null
+[2026-08-04 14:21:55.706] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/js/site.js?v=hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo - null null
+[2026-08-04 14:21:55.706] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/lib/jquery/dist/jquery.min.js - null null
+[2026-08-04 14:21:55.705] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/css/site.css?v=j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg - null null
+[2026-08-04 14:21:55.812] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 1da7eafee38e4c6e9d8632092ce50ec8] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:55.811] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 3b1ce6c007a9466dadc5b28931eea7aa] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:55.813] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 143f6fb636024583941dd1b843706d59] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:55.806] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 1d4c19171cec4002a615b33af0ed6034] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:55.705] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/ArtemisBankingPro.Presentation.WebApp.styles.css?v=0xIpyO_9X1NdueFegLxki6y3rVG60MXyUmB1VfKHPi4 - null null
+[2026-08-04 14:21:55.743] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:21:55.743] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:21:55.820] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 1da7eafee38e4c6e9d8632092ce50ec8] Sending file. Request path: 'lib/bootstrap/dist/js/bootstrap.bundle.min.js'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\xlaw83ks7b-hd3gran6i8.gz'
+[2026-08-04 14:21:55.819] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 3b1ce6c007a9466dadc5b28931eea7aa] Sending file. Request path: 'js/site.js'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\rebdeedfrb-xtxxf3hu2r.gz'
+[2026-08-04 14:21:55.817] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bfad4a6832934001a54a4c785e72bb19] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:55.823] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ec7a9bd212b54493b623d5db24014a68] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:55.822] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 143f6fb636024583941dd1b843706d59] Sending file. Request path: 'lib/jquery/dist/jquery.min.js'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\zqq4uquvtr-m9qm4tazc0.gz'
+[2026-08-04 14:21:55.827] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 1d4c19171cec4002a615b33af0ed6034] Sending file. Request path: 'lib/bootstrap/dist/css/bootstrap.min.css'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\vuoq0qbi9k-43atpzeawx.gz'
+[2026-08-04 14:21:55.827] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 83.425ms
+[2026-08-04 14:21:55.828] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 1da7eafee38e4c6e9d8632092ce50ec8] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:55.828] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 85.2592ms
+[2026-08-04 14:21:55.829] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 3b1ce6c007a9466dadc5b28931eea7aa] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:55.831] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bfad4a6832934001a54a4c785e72bb19] Sending file. Request path: 'css/site.css'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\tckcx4rgi9-b9sayid5wm.gz'
+[2026-08-04 14:21:55.832] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ec7a9bd212b54493b623d5db24014a68] Sending file. Request path: 'ArtemisBankingPro.Presentation.WebApp.styles.css'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\3qu73cn16i-30luxbwyuf.gz'
+[2026-08-04 14:21:55.832] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 143f6fb636024583941dd1b843706d59] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:55.833] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 1d4c19171cec4002a615b33af0ed6034] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:55.836] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 1da7eafee38e4c6e9d8632092ce50ec8] HTTP GET /lib/bootstrap/dist/js/bootstrap.bundle.min.js responded 200 in 26.2383 ms
+[2026-08-04 14:21:55.838] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 3b1ce6c007a9466dadc5b28931eea7aa] HTTP GET /js/site.js responded 200 in 27.2954 ms
+[2026-08-04 14:21:55.839] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bfad4a6832934001a54a4c785e72bb19] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:55.840] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ec7a9bd212b54493b623d5db24014a68] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:21:55.840] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 143f6fb636024583941dd1b843706d59] HTTP GET /lib/jquery/dist/jquery.min.js responded 200 in 27.7587 ms
+[2026-08-04 14:21:55.841] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 1d4c19171cec4002a615b33af0ed6034] HTTP GET /lib/bootstrap/dist/css/bootstrap.min.css responded 200 in 98.0776 ms
+[2026-08-04 14:21:55.842] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/lib/bootstrap/dist/js/bootstrap.bundle.min.js - 200 80770 text/javascript 136.0564ms
+[2026-08-04 14:21:55.843] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/js/site.js?v=hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo - 200 264 text/javascript 137.3394ms
+[2026-08-04 14:21:55.844] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bfad4a6832934001a54a4c785e72bb19] HTTP GET /css/site.css responded 200 in 27.2439 ms
+[2026-08-04 14:21:55.845] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ec7a9bd212b54493b623d5db24014a68] HTTP GET /ArtemisBankingPro.Presentation.WebApp.styles.css responded 200 in 21.9995 ms
+[2026-08-04 14:21:55.846] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/lib/jquery/dist/jquery.min.js - 200 87578 text/javascript 139.9725ms
+[2026-08-04 14:21:55.847] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/lib/bootstrap/dist/css/bootstrap.min.css - 200 232876 text/css 142.1376ms
+[2026-08-04 14:21:55.852] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/css/site.css?v=j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg - 200 700 text/css 147.2239ms
+[2026-08-04 14:21:55.853] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/ArtemisBankingPro.Presentation.WebApp.styles.css?v=0xIpyO_9X1NdueFegLxki6y3rVG60MXyUmB1VfKHPi4 - 200 1188 text/css 148.0733ms
+[2026-08-04 14:21:57.092] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Logout - null null
+[2026-08-04 14:21:57.095] [INF] [ArtemisBankingPro.WebApp] [Correlacion: eb382533981a4ac78ca8a38abbdd8aa5] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Logout (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:57.099] [INF] [ArtemisBankingPro.WebApp] [Correlacion: eb382533981a4ac78ca8a38abbdd8aa5] Route matched with {action = "Logout", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Logout() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:57.102] [INF] [ArtemisBankingPro.WebApp] [Correlacion: eb382533981a4ac78ca8a38abbdd8aa5] AuthenticationScheme: Identity.Application signed out.
+[2026-08-04 14:21:57.103] [INF] [ArtemisBankingPro.WebApp] [Correlacion: eb382533981a4ac78ca8a38abbdd8aa5] AuthenticationScheme: Identity.External signed out.
+[2026-08-04 14:21:57.104] [INF] [ArtemisBankingPro.WebApp] [Correlacion: eb382533981a4ac78ca8a38abbdd8aa5] AuthenticationScheme: Identity.TwoFactorUserId signed out.
+[2026-08-04 14:21:57.105] [INF] [ArtemisBankingPro.WebApp] [Correlacion: eb382533981a4ac78ca8a38abbdd8aa5] Executing RedirectResult, redirecting to /Account/Login.
+[2026-08-04 14:21:57.106] [INF] [ArtemisBankingPro.WebApp] [Correlacion: eb382533981a4ac78ca8a38abbdd8aa5] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Logout (ArtemisBankingPro.Presentation.WebApp) in 6.057ms
+[2026-08-04 14:21:57.106] [INF] [ArtemisBankingPro.WebApp] [Correlacion: eb382533981a4ac78ca8a38abbdd8aa5] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Logout (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:57.107] [INF] [ArtemisBankingPro.WebApp] [Correlacion: eb382533981a4ac78ca8a38abbdd8aa5] HTTP GET /Account/Logout responded 302 in 12.3205 ms
+[2026-08-04 14:21:57.108] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Logout - 302 0 null 16.3441ms
+[2026-08-04 14:21:57.111] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Login - null null
+[2026-08-04 14:21:57.113] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 11f3a7859aba4c629cf64ff630693cb0] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:57.114] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 11f3a7859aba4c629cf64ff630693cb0] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Login() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:57.116] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 11f3a7859aba4c629cf64ff630693cb0] Executing ViewResult, running view Login.
+[2026-08-04 14:21:57.118] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 11f3a7859aba4c629cf64ff630693cb0] Executed ViewResult - view Login executed in 1.9863ms.
+[2026-08-04 14:21:57.119] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 11f3a7859aba4c629cf64ff630693cb0] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 3.2065ms
+[2026-08-04 14:21:57.120] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 11f3a7859aba4c629cf64ff630693cb0] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:57.121] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 11f3a7859aba4c629cf64ff630693cb0] HTTP GET /Account/Login responded 200 in 7.4782 ms
+[2026-08-04 14:21:57.122] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Login - 200 null text/html; charset=utf-8 10.7346ms
+[2026-08-04 14:21:57.145] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:21:57.145] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:21:57.148] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 3.2518ms
+[2026-08-04 14:21:57.150] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 4.6758ms
+[2026-08-04 14:21:59.105] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Login - null null
+[2026-08-04 14:21:59.110] [INF] [ArtemisBankingPro.WebApp] [Correlacion: dea383d5fa6a45f6b67db88f3136846d] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:59.111] [INF] [ArtemisBankingPro.WebApp] [Correlacion: dea383d5fa6a45f6b67db88f3136846d] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Login() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:59.114] [INF] [ArtemisBankingPro.WebApp] [Correlacion: dea383d5fa6a45f6b67db88f3136846d] Executing ViewResult, running view Login.
+[2026-08-04 14:21:59.117] [INF] [ArtemisBankingPro.WebApp] [Correlacion: dea383d5fa6a45f6b67db88f3136846d] Executed ViewResult - view Login executed in 3.3661ms.
+[2026-08-04 14:21:59.119] [INF] [ArtemisBankingPro.WebApp] [Correlacion: dea383d5fa6a45f6b67db88f3136846d] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 5.4261ms
+[2026-08-04 14:21:59.120] [INF] [ArtemisBankingPro.WebApp] [Correlacion: dea383d5fa6a45f6b67db88f3136846d] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:59.122] [INF] [ArtemisBankingPro.WebApp] [Correlacion: dea383d5fa6a45f6b67db88f3136846d] HTTP GET /Account/Login responded 200 in 12.7550 ms
+[2026-08-04 14:21:59.124] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Login - 200 null text/html; charset=utf-8 18.6704ms
+[2026-08-04 14:21:59.153] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:21:59.153] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:21:59.159] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 5.2527ms
+[2026-08-04 14:21:59.160] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 6.5162ms
+[2026-08-04 14:21:59.181] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 14:21:59.185] [INF] [ArtemisBankingPro.WebApp] [Correlacion: c0c8716bad564498b710f009c34e583f] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:21:59.186] [INF] [ArtemisBankingPro.WebApp] [Correlacion: c0c8716bad564498b710f009c34e583f] AuthenticationScheme: Identity.Application was challenged.
+[2026-08-04 14:21:59.188] [INF] [ArtemisBankingPro.WebApp] [Correlacion: c0c8716bad564498b710f009c34e583f] HTTP GET /favicon.ico responded 302 in 4.1305 ms
+[2026-08-04 14:21:59.191] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 302 0 null 9.9296ms
+[2026-08-04 14:21:59.196] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Login?denied=true - null null
+[2026-08-04 14:21:59.199] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9e5aba34c03846609d23760b1d72674f] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:59.201] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9e5aba34c03846609d23760b1d72674f] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Login() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:21:59.204] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9e5aba34c03846609d23760b1d72674f] Executing ViewResult, running view Login.
+[2026-08-04 14:21:59.207] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9e5aba34c03846609d23760b1d72674f] Executed ViewResult - view Login executed in 3.1933ms.
+[2026-08-04 14:21:59.209] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9e5aba34c03846609d23760b1d72674f] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 5.5118ms
+[2026-08-04 14:21:59.210] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9e5aba34c03846609d23760b1d72674f] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:21:59.212] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9e5aba34c03846609d23760b1d72674f] HTTP GET /Account/Login responded 200 in 12.9705 ms
+[2026-08-04 14:21:59.214] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Login?denied=true - 200 null text/html; charset=utf-8 18.163ms
+[2026-08-04 14:22:01.245] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 POST https://localhost:7124/Account/Login - application/x-www-form-urlencoded 234
+[2026-08-04 14:22:01.248] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2cde08017cd9411daada0441555032ab] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:01.250] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2cde08017cd9411daada0441555032ab] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(ArtemisBankingPro.Core.Application.Dtos.Account.AuthenticationRequest) on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:22:01.268] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2cde08017cd9411daada0441555032ab] Executing ViewResult, running view Login.
+[2026-08-04 14:22:01.271] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2cde08017cd9411daada0441555032ab] Executed ViewResult - view Login executed in 2.3627ms.
+[2026-08-04 14:22:01.272] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2cde08017cd9411daada0441555032ab] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 19.7931ms
+[2026-08-04 14:22:01.274] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2cde08017cd9411daada0441555032ab] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:01.275] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2cde08017cd9411daada0441555032ab] HTTP POST /Account/Login responded 200 in 26.7736 ms
+[2026-08-04 14:22:01.277] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 POST https://localhost:7124/Account/Login - 200 null text/html; charset=utf-8 31.9944ms
+[2026-08-04 14:22:01.305] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:22:01.305] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:22:01.313] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 7.3644ms
+[2026-08-04 14:22:01.314] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 8.4866ms
+[2026-08-04 14:22:01.332] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 14:22:01.335] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9ef419eb29e04e899a30c62af81d83d3] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 14:22:01.337] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9ef419eb29e04e899a30c62af81d83d3] AuthenticationScheme: Identity.Application was challenged.
+[2026-08-04 14:22:01.339] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9ef419eb29e04e899a30c62af81d83d3] HTTP GET /favicon.ico responded 302 in 4.1593 ms
+[2026-08-04 14:22:01.342] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 302 0 null 9.4246ms
+[2026-08-04 14:22:01.348] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Login?denied=true - null null
+[2026-08-04 14:22:01.351] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2b008d0b28bf40da9d5e4815cb3e1784] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:01.352] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2b008d0b28bf40da9d5e4815cb3e1784] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Login() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:22:01.355] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2b008d0b28bf40da9d5e4815cb3e1784] Executing ViewResult, running view Login.
+[2026-08-04 14:22:01.357] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2b008d0b28bf40da9d5e4815cb3e1784] Executed ViewResult - view Login executed in 2.1613ms.
+[2026-08-04 14:22:01.359] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2b008d0b28bf40da9d5e4815cb3e1784] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 4.3532ms
+[2026-08-04 14:22:01.361] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2b008d0b28bf40da9d5e4815cb3e1784] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:01.362] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2b008d0b28bf40da9d5e4815cb3e1784] HTTP GET /Account/Login responded 200 in 11.6863 ms
+[2026-08-04 14:22:01.365] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Login?denied=true - 200 null text/html; charset=utf-8 16.6685ms
+[2026-08-04 14:22:06.498] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 POST https://localhost:7124/Account/Login - application/x-www-form-urlencoded 222
+[2026-08-04 14:22:06.501] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0b0632bb8dd74f5e849f6b4f074df5fa] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:06.502] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0b0632bb8dd74f5e849f6b4f074df5fa] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(ArtemisBankingPro.Core.Application.Dtos.Account.AuthenticationRequest) on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:22:06.556] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0b0632bb8dd74f5e849f6b4f074df5fa] AuthenticationScheme: Identity.Application signed in.
+[2026-08-04 14:22:06.557] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0b0632bb8dd74f5e849f6b4f074df5fa] Executing RedirectResult, redirecting to /CashierHome.
+[2026-08-04 14:22:06.558] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0b0632bb8dd74f5e849f6b4f074df5fa] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 54.8687ms
+[2026-08-04 14:22:06.559] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0b0632bb8dd74f5e849f6b4f074df5fa] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:06.560] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 0b0632bb8dd74f5e849f6b4f074df5fa] HTTP POST /Account/Login responded 302 in 59.1158 ms
+[2026-08-04 14:22:06.561] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 POST https://localhost:7124/Account/Login - 302 0 null 62.7967ms
+[2026-08-04 14:22:06.564] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/CashierHome - null null
+[2026-08-04 14:22:06.567] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bf098fd810db4b018344b56afe7be0e1] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:06.568] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bf098fd810db4b018344b56afe7be0e1] Route matched with {action = "Index", controller = "CashierHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:22:06.570] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bf098fd810db4b018344b56afe7be0e1] Executing ViewResult, running view Index.
+[2026-08-04 14:22:06.574] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bf098fd810db4b018344b56afe7be0e1] Executed ViewResult - view Index executed in 4.34ms.
+[2026-08-04 14:22:06.575] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bf098fd810db4b018344b56afe7be0e1] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 5.7294ms
+[2026-08-04 14:22:06.576] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bf098fd810db4b018344b56afe7be0e1] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:06.577] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bf098fd810db4b018344b56afe7be0e1] HTTP GET /CashierHome responded 200 in 10.6175 ms
+[2026-08-04 14:22:06.578] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/CashierHome - 200 null text/html; charset=utf-8 14.4186ms
+[2026-08-04 14:22:06.598] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:22:06.598] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:22:06.603] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 4.8909ms
+[2026-08-04 14:22:06.604] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 6.236ms
+[2026-08-04 14:22:06.618] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 14:22:06.622] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7267b64e693645e9998465be0c0af51e] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:22:06.624] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7267b64e693645e9998465be0c0af51e] Sending file. Request path: 'favicon.ico'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\oxxof40yni-61n19gt1b8.gz'
+[2026-08-04 14:22:06.626] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7267b64e693645e9998465be0c0af51e] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:22:06.627] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7267b64e693645e9998465be0c0af51e] HTTP GET /favicon.ico responded 200 in 5.7180 ms
+[2026-08-04 14:22:06.628] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 200 5463 image/x-icon 10.1196ms
+[2026-08-04 14:22:08.699] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:22:08.702] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 3.0977ms
+[2026-08-04 14:22:10.142] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/CashierHome - null null
+[2026-08-04 14:22:10.146] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4e5716b0ec5b4ba6996a5d83e7faf6bf] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:10.146] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4e5716b0ec5b4ba6996a5d83e7faf6bf] Route matched with {action = "Index", controller = "CashierHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:22:10.148] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4e5716b0ec5b4ba6996a5d83e7faf6bf] Executing ViewResult, running view Index.
+[2026-08-04 14:22:10.149] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4e5716b0ec5b4ba6996a5d83e7faf6bf] Executed ViewResult - view Index executed in 1.0619ms.
+[2026-08-04 14:22:10.150] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4e5716b0ec5b4ba6996a5d83e7faf6bf] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 2.2954ms
+[2026-08-04 14:22:10.151] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4e5716b0ec5b4ba6996a5d83e7faf6bf] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:10.152] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4e5716b0ec5b4ba6996a5d83e7faf6bf] HTTP GET /CashierHome responded 200 in 6.8325 ms
+[2026-08-04 14:22:10.153] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/CashierHome - 200 null text/html; charset=utf-8 11.0615ms
+[2026-08-04 14:22:10.168] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:22:10.168] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:22:10.170] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 1.7899ms
+[2026-08-04 14:22:10.175] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 6.3933ms
+[2026-08-04 14:22:10.183] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 14:22:10.186] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ad648bb3d6fd4ac498f93b2370571576] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:22:10.188] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ad648bb3d6fd4ac498f93b2370571576] Sending file. Request path: 'favicon.ico'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\oxxof40yni-61n19gt1b8.gz'
+[2026-08-04 14:22:10.189] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ad648bb3d6fd4ac498f93b2370571576] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:22:10.190] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ad648bb3d6fd4ac498f93b2370571576] HTTP GET /favicon.ico responded 200 in 5.3968 ms
+[2026-08-04 14:22:10.192] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 200 5463 image/x-icon 9.6332ms
+[2026-08-04 14:22:10.315] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/CashierHome - null null
+[2026-08-04 14:22:10.318] [INF] [ArtemisBankingPro.WebApp] [Correlacion: acc1ccfee5a24b8093682c17d8dfd387] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:10.319] [INF] [ArtemisBankingPro.WebApp] [Correlacion: acc1ccfee5a24b8093682c17d8dfd387] Route matched with {action = "Index", controller = "CashierHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:22:10.320] [INF] [ArtemisBankingPro.WebApp] [Correlacion: acc1ccfee5a24b8093682c17d8dfd387] Executing ViewResult, running view Index.
+[2026-08-04 14:22:10.321] [INF] [ArtemisBankingPro.WebApp] [Correlacion: acc1ccfee5a24b8093682c17d8dfd387] Executed ViewResult - view Index executed in 0.8557ms.
+[2026-08-04 14:22:10.321] [INF] [ArtemisBankingPro.WebApp] [Correlacion: acc1ccfee5a24b8093682c17d8dfd387] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 1.878ms
+[2026-08-04 14:22:10.322] [INF] [ArtemisBankingPro.WebApp] [Correlacion: acc1ccfee5a24b8093682c17d8dfd387] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:10.323] [INF] [ArtemisBankingPro.WebApp] [Correlacion: acc1ccfee5a24b8093682c17d8dfd387] HTTP GET /CashierHome responded 200 in 6.0628 ms
+[2026-08-04 14:22:10.325] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/CashierHome - 200 null text/html; charset=utf-8 10.4034ms
+[2026-08-04 14:22:10.346] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:22:10.346] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:22:10.348] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 1.7646ms
+[2026-08-04 14:22:10.354] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 8.4022ms
+[2026-08-04 14:22:10.363] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 14:22:10.365] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b478a130f25c4d2b894b039da0a7665a] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:22:10.367] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b478a130f25c4d2b894b039da0a7665a] Sending file. Request path: 'favicon.ico'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\oxxof40yni-61n19gt1b8.gz'
+[2026-08-04 14:22:10.368] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b478a130f25c4d2b894b039da0a7665a] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:22:10.369] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b478a130f25c4d2b894b039da0a7665a] HTTP GET /favicon.ico responded 200 in 4.6897 ms
+[2026-08-04 14:22:10.370] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 200 5463 image/x-icon 7.5067ms
+[2026-08-04 14:22:10.479] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/CashierHome - null null
+[2026-08-04 14:22:10.482] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4406d63db45148018c9136fd9f2fcab6] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:10.483] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4406d63db45148018c9136fd9f2fcab6] Route matched with {action = "Index", controller = "CashierHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:22:10.485] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4406d63db45148018c9136fd9f2fcab6] Executing ViewResult, running view Index.
+[2026-08-04 14:22:10.486] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4406d63db45148018c9136fd9f2fcab6] Executed ViewResult - view Index executed in 0.9066ms.
+[2026-08-04 14:22:10.487] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4406d63db45148018c9136fd9f2fcab6] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 1.9137ms
+[2026-08-04 14:22:10.487] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4406d63db45148018c9136fd9f2fcab6] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:10.488] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 4406d63db45148018c9136fd9f2fcab6] HTTP GET /CashierHome responded 200 in 6.8028 ms
+[2026-08-04 14:22:10.490] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/CashierHome - 200 null text/html; charset=utf-8 11.6325ms
+[2026-08-04 14:22:10.507] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:22:10.507] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:22:10.510] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 3.26ms
+[2026-08-04 14:22:10.511] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 4.6752ms
+[2026-08-04 14:22:10.521] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 14:22:10.523] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 60ad853f17c0417a974920cf92ab701c] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:22:10.525] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 60ad853f17c0417a974920cf92ab701c] Sending file. Request path: 'favicon.ico'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\oxxof40yni-61n19gt1b8.gz'
+[2026-08-04 14:22:10.526] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 60ad853f17c0417a974920cf92ab701c] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:22:10.527] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 60ad853f17c0417a974920cf92ab701c] HTTP GET /favicon.ico responded 200 in 4.7004 ms
+[2026-08-04 14:22:10.528] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 200 5463 image/x-icon 7.2418ms
+[2026-08-04 14:22:10.736] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/CashierHome - null null
+[2026-08-04 14:22:10.739] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 943de87d44d84ce293f65f063e6bb120] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:10.740] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 943de87d44d84ce293f65f063e6bb120] Route matched with {action = "Index", controller = "CashierHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:22:10.741] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 943de87d44d84ce293f65f063e6bb120] Executing ViewResult, running view Index.
+[2026-08-04 14:22:10.742] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 943de87d44d84ce293f65f063e6bb120] Executed ViewResult - view Index executed in 1.1622ms.
+[2026-08-04 14:22:10.744] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 943de87d44d84ce293f65f063e6bb120] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 2.4432ms
+[2026-08-04 14:22:10.745] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 943de87d44d84ce293f65f063e6bb120] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:10.746] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 943de87d44d84ce293f65f063e6bb120] HTTP GET /CashierHome responded 200 in 7.0154 ms
+[2026-08-04 14:22:10.748] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/CashierHome - 200 null text/html; charset=utf-8 11.399ms
+[2026-08-04 14:22:10.764] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:22:10.764] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:22:10.768] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 3.6525ms
+[2026-08-04 14:22:10.769] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 5.3426ms
+[2026-08-04 14:22:10.778] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 14:22:10.781] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6bb59bf3191748818767fbe31fd06183] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:22:10.783] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6bb59bf3191748818767fbe31fd06183] Sending file. Request path: 'favicon.ico'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\oxxof40yni-61n19gt1b8.gz'
+[2026-08-04 14:22:10.784] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6bb59bf3191748818767fbe31fd06183] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:22:10.785] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 6bb59bf3191748818767fbe31fd06183] HTTP GET /favicon.ico responded 200 in 5.2556 ms
+[2026-08-04 14:22:10.787] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 200 5463 image/x-icon 8.5973ms
+[2026-08-04 14:22:10.880] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/CashierHome - null null
+[2026-08-04 14:22:10.883] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 32e14b0c83ff43078ad2bfff42c865b6] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:10.884] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 32e14b0c83ff43078ad2bfff42c865b6] Route matched with {action = "Index", controller = "CashierHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 14:22:10.885] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 32e14b0c83ff43078ad2bfff42c865b6] Executing ViewResult, running view Index.
+[2026-08-04 14:22:10.886] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 32e14b0c83ff43078ad2bfff42c865b6] Executed ViewResult - view Index executed in 0.7868ms.
+[2026-08-04 14:22:10.887] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 32e14b0c83ff43078ad2bfff42c865b6] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 1.8019ms
+[2026-08-04 14:22:10.888] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 32e14b0c83ff43078ad2bfff42c865b6] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.CashierHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 14:22:10.889] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 32e14b0c83ff43078ad2bfff42c865b6] HTTP GET /CashierHome responded 200 in 5.9694 ms
+[2026-08-04 14:22:10.890] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/CashierHome - 200 null text/html; charset=utf-8 10.3323ms
+[2026-08-04 14:22:10.908] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 14:22:10.908] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 14:22:10.911] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 3.1402ms
+[2026-08-04 14:22:10.913] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 5.021ms
+[2026-08-04 14:22:10.922] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/favicon.ico - null null
+[2026-08-04 14:22:10.925] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ccb65d7438f74eb1a870bdbc4eb9fe57] Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:22:10.927] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ccb65d7438f74eb1a870bdbc4eb9fe57] Sending file. Request path: 'favicon.ico'. Physical path: 'C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp\obj\Debug\net9.0\compressed\oxxof40yni-61n19gt1b8.gz'
+[2026-08-04 14:22:10.928] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ccb65d7438f74eb1a870bdbc4eb9fe57] Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+[2026-08-04 14:22:10.929] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ccb65d7438f74eb1a870bdbc4eb9fe57] HTTP GET /favicon.ico responded 200 in 5.0043 ms
+[2026-08-04 14:22:10.931] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/favicon.ico - 200 5463 image/x-icon 9.2238ms
+[2026-08-04 15:16:35.090] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] User profile is available. Using 'C:\Users\hxdes\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2026-08-04 15:16:35.629] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 15:16:35.639] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 15:16:35.641] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 15:16:35.642] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 15:16:35.775] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 15:16:35.808] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 15:16:35.861] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 15:16:35.864] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 15:16:35.917] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 15:16:35.919] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 15:16:35.982] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 15:16:35.985] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 15:16:36.037] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 1 entities to in-memory store.
+[2026-08-04 15:16:36.039] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Saved 2 entities to in-memory store.
+[2026-08-04 15:16:36.514] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Now listening on: https://localhost:7124
+[2026-08-04 15:16:36.517] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Now listening on: http://localhost:5235
+[2026-08-04 15:16:36.582] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Application started. Press Ctrl+C to shut down.
+[2026-08-04 15:16:36.583] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Hosting environment: Development
+[2026-08-04 15:16:36.584] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Content root path: C:\Adrian\ITLA_Materias ETC\Leonardo\ArtemisBankingPro\Source\Presentation\ArtemisBankingPro.Presentation.WebApp
+[2026-08-04 15:16:37.075] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/ - null null
+[2026-08-04 15:16:37.232] [INF] [ArtemisBankingPro.WebApp] [Correlacion: cd929ab1814e4dd9b79864638ac4e7ad] Identity.Application was not authenticated. Failure message: Ticket expired
+[2026-08-04 15:16:37.238] [INF] [ArtemisBankingPro.WebApp] [Correlacion: cd929ab1814e4dd9b79864638ac4e7ad] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+[2026-08-04 15:16:37.243] [INF] [ArtemisBankingPro.WebApp] [Correlacion: cd929ab1814e4dd9b79864638ac4e7ad] AuthenticationScheme: Identity.Application was challenged.
+[2026-08-04 15:16:37.246] [INF] [ArtemisBankingPro.WebApp] [Correlacion: cd929ab1814e4dd9b79864638ac4e7ad] HTTP GET / responded 302 in 76.5808 ms
+[2026-08-04 15:16:37.253] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/ - 302 0 null 186.2514ms
+[2026-08-04 15:16:37.259] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Login?expired=true - null null
+[2026-08-04 15:16:37.268] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ce6a31917ad341e0a2800c54d53fc4a5] Identity.Application was not authenticated. Failure message: Ticket expired
+[2026-08-04 15:16:37.271] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ce6a31917ad341e0a2800c54d53fc4a5] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:16:37.289] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ce6a31917ad341e0a2800c54d53fc4a5] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Login() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 15:16:37.310] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ce6a31917ad341e0a2800c54d53fc4a5] Executing ViewResult, running view Login.
+[2026-08-04 15:16:37.376] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ce6a31917ad341e0a2800c54d53fc4a5] Executed ViewResult - view Login executed in 67.1033ms.
+[2026-08-04 15:16:37.379] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ce6a31917ad341e0a2800c54d53fc4a5] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 87.9157ms
+[2026-08-04 15:16:37.380] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ce6a31917ad341e0a2800c54d53fc4a5] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:16:37.382] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ce6a31917ad341e0a2800c54d53fc4a5] HTTP GET /Account/Login responded 200 in 117.8764 ms
+[2026-08-04 15:16:37.386] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Login?expired=true - 200 null text/html; charset=utf-8 126.6198ms
+[2026-08-04 15:16:37.401] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 15:16:37.401] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 15:16:37.406] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 5.47ms
+[2026-08-04 15:16:37.431] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 29.5733ms
+[2026-08-04 15:16:46.088] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/ForgotPassword - null null
+[2026-08-04 15:16:46.097] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f53cc47f2281412eb27f6c3efc3b2b9e] Identity.Application was not authenticated. Failure message: Ticket expired
+[2026-08-04 15:16:46.099] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f53cc47f2281412eb27f6c3efc3b2b9e] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.ForgotPassword (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:16:46.101] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f53cc47f2281412eb27f6c3efc3b2b9e] Route matched with {action = "ForgotPassword", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult ForgotPassword() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 15:16:46.105] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f53cc47f2281412eb27f6c3efc3b2b9e] Executing ViewResult, running view ForgotPassword.
+[2026-08-04 15:16:46.173] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f53cc47f2281412eb27f6c3efc3b2b9e] Executed ViewResult - view ForgotPassword executed in 68.8193ms.
+[2026-08-04 15:16:46.175] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f53cc47f2281412eb27f6c3efc3b2b9e] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.ForgotPassword (ArtemisBankingPro.Presentation.WebApp) in 72.1913ms
+[2026-08-04 15:16:46.176] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f53cc47f2281412eb27f6c3efc3b2b9e] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.ForgotPassword (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:16:46.176] [INF] [ArtemisBankingPro.WebApp] [Correlacion: f53cc47f2281412eb27f6c3efc3b2b9e] HTTP GET /Account/ForgotPassword responded 200 in 84.7168 ms
+[2026-08-04 15:16:46.178] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/ForgotPassword - 200 null text/html; charset=utf-8 89.956ms
+[2026-08-04 15:16:46.205] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 15:16:46.205] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 15:16:46.209] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 4.1537ms
+[2026-08-04 15:16:46.217] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 12.0923ms
+[2026-08-04 15:16:53.177] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 POST https://localhost:7124/Account/ForgotPassword - application/x-www-form-urlencoded 201
+[2026-08-04 15:16:53.181] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b85f761fb3724fa9a01a7dff52ca6642] Identity.Application was not authenticated. Failure message: Ticket expired
+[2026-08-04 15:16:53.182] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b85f761fb3724fa9a01a7dff52ca6642] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.ForgotPassword (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:16:53.192] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b85f761fb3724fa9a01a7dff52ca6642] Route matched with {action = "ForgotPassword", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] ForgotPassword(ArtemisBankingPro.Core.Application.Dtos.Account.ForgotPasswordRequest) on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 15:16:53.243] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b85f761fb3724fa9a01a7dff52ca6642] Saved 1 entities to in-memory store.
+[2026-08-04 15:16:53.246] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b85f761fb3724fa9a01a7dff52ca6642] Saved 1 entities to in-memory store.
+[2026-08-04 15:16:53.264] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b85f761fb3724fa9a01a7dff52ca6642] Saved 2 entities to in-memory store.
+[2026-08-04 15:16:53.266] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b85f761fb3724fa9a01a7dff52ca6642] Saved 2 entities to in-memory store.
+[2026-08-04 15:16:54.684] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b85f761fb3724fa9a01a7dff52ca6642] Executing ViewResult, running view ForgotPassword.
+[2026-08-04 15:16:54.693] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b85f761fb3724fa9a01a7dff52ca6642] Executed ViewResult - view ForgotPassword executed in 9.381ms.
+[2026-08-04 15:16:54.694] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b85f761fb3724fa9a01a7dff52ca6642] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.ForgotPassword (ArtemisBankingPro.Presentation.WebApp) in 1500.9454ms
+[2026-08-04 15:16:54.695] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b85f761fb3724fa9a01a7dff52ca6642] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.ForgotPassword (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:16:54.696] [INF] [ArtemisBankingPro.WebApp] [Correlacion: b85f761fb3724fa9a01a7dff52ca6642] HTTP POST /Account/ForgotPassword responded 200 in 1515.9515 ms
+[2026-08-04 15:16:54.697] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 POST https://localhost:7124/Account/ForgotPassword - 200 null text/html; charset=utf-8 1520.6315ms
+[2026-08-04 15:16:54.722] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 15:16:54.722] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 15:16:54.725] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 2.8083ms
+[2026-08-04 15:16:54.730] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 7.9891ms
+[2026-08-04 15:18:01.109] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/ResetPassword?token=CfDJ8ADTVVq2s8RMnKL%2fjRTD%2bwOzzKTg2tRl%2fU%2baNZrot%2blMvheWPErUBz%2bSnWVg3biPye4q4jOTsUbMYT%2bboNUZo7cydGqXo5GMdTYq4vuqHus2tSqG6%2bwIHumEMpqlmfXWfwfYSxQ0PqQz74heFoiK1JR5QbzyTsNaWsfcBqbPpkBTOFMqqefuiSxQV%2fcnKDFnbIEx8s5CCJFi697949ZpgOae1ELRvq1O2LFO6T%2bt3AiM&email=adrixndeveloper29@gmail.com - null null
+[2026-08-04 15:18:01.116] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9f4516112eba497bbf3f28059a13c075] Identity.Application was not authenticated. Failure message: Ticket expired
+[2026-08-04 15:18:01.116] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9f4516112eba497bbf3f28059a13c075] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.ResetPassword (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:18:01.119] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9f4516112eba497bbf3f28059a13c075] Route matched with {action = "ResetPassword", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult ResetPassword(System.String, System.String) on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 15:18:01.123] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9f4516112eba497bbf3f28059a13c075] Executing ViewResult, running view ResetPassword.
+[2026-08-04 15:18:01.140] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9f4516112eba497bbf3f28059a13c075] Executed ViewResult - view ResetPassword executed in 18.0254ms.
+[2026-08-04 15:18:01.146] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9f4516112eba497bbf3f28059a13c075] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.ResetPassword (ArtemisBankingPro.Presentation.WebApp) in 25.5772ms
+[2026-08-04 15:18:01.147] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9f4516112eba497bbf3f28059a13c075] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.ResetPassword (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:18:01.148] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 9f4516112eba497bbf3f28059a13c075] HTTP GET /Account/ResetPassword responded 200 in 32.7203 ms
+[2026-08-04 15:18:01.150] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/ResetPassword?token=CfDJ8ADTVVq2s8RMnKL%2fjRTD%2bwOzzKTg2tRl%2fU%2baNZrot%2blMvheWPErUBz%2bSnWVg3biPye4q4jOTsUbMYT%2bboNUZo7cydGqXo5GMdTYq4vuqHus2tSqG6%2bwIHumEMpqlmfXWfwfYSxQ0PqQz74heFoiK1JR5QbzyTsNaWsfcBqbPpkBTOFMqqefuiSxQV%2fcnKDFnbIEx8s5CCJFi697949ZpgOae1ELRvq1O2LFO6T%2bt3AiM&email=adrixndeveloper29@gmail.com - 200 null text/html; charset=utf-8 40.9342ms
+[2026-08-04 15:18:01.166] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 15:18:01.166] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 15:18:01.170] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 3.9153ms
+[2026-08-04 15:18:01.176] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 10.6286ms
+[2026-08-04 15:18:10.994] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 POST https://localhost:7124/Account/ResetPassword - application/x-www-form-urlencoded 528
+[2026-08-04 15:18:10.998] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bb7397d1c0f4449598f901b4850846b5] Identity.Application was not authenticated. Failure message: Ticket expired
+[2026-08-04 15:18:10.999] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bb7397d1c0f4449598f901b4850846b5] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.ResetPassword (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:18:11.003] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bb7397d1c0f4449598f901b4850846b5] Route matched with {action = "ResetPassword", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] ResetPassword(ArtemisBankingPro.Core.Application.Dtos.Account.ResetPasswordRequest) on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 15:18:11.092] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bb7397d1c0f4449598f901b4850846b5] Saved 1 entities to in-memory store.
+[2026-08-04 15:18:11.095] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bb7397d1c0f4449598f901b4850846b5] Saved 2 entities to in-memory store.
+[2026-08-04 15:18:11.098] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bb7397d1c0f4449598f901b4850846b5] Saved 1 entities to in-memory store.
+[2026-08-04 15:18:11.099] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bb7397d1c0f4449598f901b4850846b5] Saved 1 entities to in-memory store.
+[2026-08-04 15:18:11.101] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bb7397d1c0f4449598f901b4850846b5] Executing ViewResult, running view ResetPassword.
+[2026-08-04 15:18:11.105] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bb7397d1c0f4449598f901b4850846b5] Executed ViewResult - view ResetPassword executed in 3.6744ms.
+[2026-08-04 15:18:11.106] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bb7397d1c0f4449598f901b4850846b5] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.ResetPassword (ArtemisBankingPro.Presentation.WebApp) in 101.7082ms
+[2026-08-04 15:18:11.107] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bb7397d1c0f4449598f901b4850846b5] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.ResetPassword (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:18:11.108] [INF] [ArtemisBankingPro.WebApp] [Correlacion: bb7397d1c0f4449598f901b4850846b5] HTTP POST /Account/ResetPassword responded 200 in 110.8867 ms
+[2026-08-04 15:18:11.110] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 POST https://localhost:7124/Account/ResetPassword - 200 null text/html; charset=utf-8 116.0156ms
+[2026-08-04 15:18:11.131] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 15:18:11.131] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 15:18:11.133] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 2.4419ms
+[2026-08-04 15:18:11.141] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 10.1122ms
+[2026-08-04 15:18:16.741] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/Account/Login - null null
+[2026-08-04 15:18:16.744] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d734539fc1144daabc148ac16dc7e94c] Identity.Application was not authenticated. Failure message: Ticket expired
+[2026-08-04 15:18:16.745] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d734539fc1144daabc148ac16dc7e94c] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:18:16.745] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d734539fc1144daabc148ac16dc7e94c] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Login() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 15:18:16.747] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d734539fc1144daabc148ac16dc7e94c] Executing ViewResult, running view Login.
+[2026-08-04 15:18:16.749] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d734539fc1144daabc148ac16dc7e94c] Executed ViewResult - view Login executed in 1.6918ms.
+[2026-08-04 15:18:16.750] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d734539fc1144daabc148ac16dc7e94c] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 2.9994ms
+[2026-08-04 15:18:16.751] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d734539fc1144daabc148ac16dc7e94c] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:18:16.752] [INF] [ArtemisBankingPro.WebApp] [Correlacion: d734539fc1144daabc148ac16dc7e94c] HTTP GET /Account/Login responded 200 in 8.2866 ms
+[2026-08-04 15:18:16.754] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/Account/Login - 200 null text/html; charset=utf-8 12.6061ms
+[2026-08-04 15:18:16.774] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 15:18:16.774] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 15:18:16.776] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 2.6265ms
+[2026-08-04 15:18:16.782] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 8.127ms
+[2026-08-04 15:18:20.860] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 POST https://localhost:7124/Account/Login - application/x-www-form-urlencoded 220
+[2026-08-04 15:18:20.863] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2f248fad4c034e34ba06123ae84eeb05] Identity.Application was not authenticated. Failure message: Ticket expired
+[2026-08-04 15:18:20.865] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2f248fad4c034e34ba06123ae84eeb05] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:18:20.868] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2f248fad4c034e34ba06123ae84eeb05] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(ArtemisBankingPro.Core.Application.Dtos.Account.AuthenticationRequest) on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 15:18:20.958] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2f248fad4c034e34ba06123ae84eeb05] Executing ViewResult, running view Login.
+[2026-08-04 15:18:20.961] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2f248fad4c034e34ba06123ae84eeb05] Executed ViewResult - view Login executed in 3.0712ms.
+[2026-08-04 15:18:20.962] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2f248fad4c034e34ba06123ae84eeb05] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 92.1296ms
+[2026-08-04 15:18:20.963] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2f248fad4c034e34ba06123ae84eeb05] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:18:20.964] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2f248fad4c034e34ba06123ae84eeb05] HTTP POST /Account/Login responded 200 in 100.8263 ms
+[2026-08-04 15:18:20.965] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 POST https://localhost:7124/Account/Login - 200 null text/html; charset=utf-8 105.2603ms
+[2026-08-04 15:18:20.988] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 15:18:20.988] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 15:18:20.992] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 3.9831ms
+[2026-08-04 15:18:20.998] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 9.4154ms
+[2026-08-04 15:18:27.137] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 POST https://localhost:7124/Account/Login - application/x-www-form-urlencoded 219
+[2026-08-04 15:18:27.140] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7f18e00cfa974b1d84d8a9e329b3e989] Identity.Application was not authenticated. Failure message: Ticket expired
+[2026-08-04 15:18:27.141] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7f18e00cfa974b1d84d8a9e329b3e989] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:18:27.142] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7f18e00cfa974b1d84d8a9e329b3e989] Route matched with {action = "Login", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(ArtemisBankingPro.Core.Application.Dtos.Account.AuthenticationRequest) on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 15:18:27.221] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7f18e00cfa974b1d84d8a9e329b3e989] AuthenticationScheme: Identity.Application signed in.
+[2026-08-04 15:18:27.224] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7f18e00cfa974b1d84d8a9e329b3e989] Executing RedirectResult, redirecting to /AdminHome.
+[2026-08-04 15:18:27.225] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7f18e00cfa974b1d84d8a9e329b3e989] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp) in 82.2639ms
+[2026-08-04 15:18:27.226] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7f18e00cfa974b1d84d8a9e329b3e989] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AccountController.Login (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:18:27.227] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 7f18e00cfa974b1d84d8a9e329b3e989] HTTP POST /Account/Login responded 302 in 87.4222 ms
+[2026-08-04 15:18:27.229] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 POST https://localhost:7124/Account/Login - 302 0 null 92.2881ms
+[2026-08-04 15:18:27.232] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/AdminHome - null null
+[2026-08-04 15:18:27.244] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2afb8193895f4e319243a3c5d35d943b] Executing endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:18:27.246] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2afb8193895f4e319243a3c5d35d943b] Route matched with {action = "Index", controller = "AdminHome"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController (ArtemisBankingPro.Presentation.WebApp).
+[2026-08-04 15:18:27.248] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2afb8193895f4e319243a3c5d35d943b] Executing ViewResult, running view Index.
+[2026-08-04 15:18:27.254] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2afb8193895f4e319243a3c5d35d943b] Executed ViewResult - view Index executed in 5.9155ms.
+[2026-08-04 15:18:27.255] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2afb8193895f4e319243a3c5d35d943b] Executed action ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp) in 7.8895ms
+[2026-08-04 15:18:27.256] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2afb8193895f4e319243a3c5d35d943b] Executed endpoint 'ArtemisBankingPro.Presentation.WebApp.Controllers.AdminHomeController.Index (ArtemisBankingPro.Presentation.WebApp)'
+[2026-08-04 15:18:27.258] [INF] [ArtemisBankingPro.WebApp] [Correlacion: 2afb8193895f4e319243a3c5d35d943b] HTTP GET /AdminHome responded 200 in 19.1504 ms
+[2026-08-04 15:18:27.260] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/AdminHome - 200 null text/html; charset=utf-8 27.8066ms
+[2026-08-04 15:18:27.282] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 15:18:27.282] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_vs/browserLink - null null
+[2026-08-04 15:18:27.285] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 2.7743ms
+[2026-08-04 15:18:27.292] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_vs/browserLink - 200 null text/javascript; charset=UTF-8 10.4005ms
+[2026-08-04 20:53:04.424] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request starting HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - null null
+[2026-08-04 20:53:04.428] [INF] [ArtemisBankingPro.WebApp] [Correlacion: ] Request finished HTTP/2 GET https://localhost:7124/_framework/aspnetcore-browser-refresh.js - 200 16559 application/javascript; charset=utf-8 3.7102ms

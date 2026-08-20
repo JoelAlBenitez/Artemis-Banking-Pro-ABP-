@@ -1,0 +1,16 @@
+.vs/
+docs/
+bin/
+obj/
+.claudes/
+.claude/
+.gemini/
+Logs/
+.agents/
+/.agents
+*.user
+*.suo
+.idea/
+
+# Archivos Seed de Base de Datos locales
+seed*.sql

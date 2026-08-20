@@ -1,0 +1,202 @@
+@model string
+@{
+    Layout = null;
+    ViewData["Title"] = "Confirmación de Cuenta - Artemis";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-primary: #1E293B; 
+            --brand-secondary: #5684D8;
+            --brand-accent: #8FAFF0;
+            --text-dark: #1F2937;
+            --text-light: #F9FAFB;
+            --bg-color: #FFFFFF;
+            --input-bg: #F4F6F8;
+            --border-radius: 8px; 
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden; 
+        }
+
+        .split-layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        .brand-panel {
+            flex: 0 0 30%;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.70) 0%, rgba(15, 23, 42, 0.85) 100%), 
+                        url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-light);
+            position: relative;
+        }
+
+        .login-panel {
+            flex: 1;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: 7vw;
+            align-items: center;
+            background-color: var(--bg-color);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 2.5rem;
+            animation: fadeIn 0.8s ease-out;
+            text-align: center;
+        }
+
+        .brand-logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            margin-bottom: 2rem;
+        }
+
+        .brand-logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 900;
+            color: #0F172A; 
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .icon-container {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #FEF2F2;
+            color: #DC2626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .status-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--brand-primary);
+            margin-bottom: 1rem;
+        }
+
+        .status-message {
+            color: #4B5563;
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn-premium {
+            background-color: var(--brand-primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.9rem;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            width: 100%;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-premium:hover {
+            background-color: var(--brand-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(11, 36, 71, 0.2);
+            color: white;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @@media (max-width: 768px) {
+            .split-layout {
+                flex-direction: column;
+            }
+            .brand-panel {
+                flex: 0 0 20%;
+            }
+            .login-panel {
+                padding-left: 0;
+                justify-content: center;
+                padding: 2rem;
+            }
+            .login-card {
+                padding: 1.5rem;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="split-layout">
+        <div class="brand-panel">
+        </div>
+
+        <div class="login-panel">
+            <div class="login-card">
+                <div class="brand-logo-container">
+                    <h1 class="brand-logo-text">ARTEMIS<span style="color: var(--brand-secondary);">.</span></h1>
+                </div>
+
+                <div class="icon-container shadow-sm">
+                    <i class="bi bi-x-circle-fill"></i>
+                </div>
+
+                <h2 class="status-title">Error de Confirmación</h2>
+                
+                <p class="status-message">
+                    @if (Model != null)
+                    {
+                        @Model
+                    }
+                    else
+                    {
+                        <text>El enlace de confirmación es inválido o ha expirado. Por favor, solicita uno nuevo o contacta con soporte.</text>
+                    }
+                </p>
+
+                <a asp-action="Login" class="btn btn-premium shadow-sm">
+                    Volver al Inicio de Sesión
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
