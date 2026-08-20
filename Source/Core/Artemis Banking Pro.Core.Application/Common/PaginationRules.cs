@@ -16,5 +16,15 @@ namespace Artemis_Banking_Pro.Core.Application.Common
                    .WithMessage("La cantidad de registros por página debe ser mayor que cero.")
                    .LessThanOrEqualTo(DomainConstants.MaxPageSize)
                    .WithMessage($"La cantidad máxima de registros por página es {DomainConstants.MaxPageSize}.");
+
+        //Los endpoints por identificador comparten la misma regla estructural: la ruta acepta
+        //cualquier entero, pero cero o negativo nunca puede corresponder a un registro.
+        public static IRuleBuilderOptions<T, int> ValidIdentifier<T>(this IRuleBuilder<T, int> rule)
+            => rule.GreaterThan(0)
+                   .WithMessage("El identificador debe ser mayor que cero.");
+
+        public static IRuleBuilderOptions<T, string> ValidIdentifier<T>(this IRuleBuilder<T, string> rule)
+            => rule.NotEmpty()
+                   .WithMessage("El identificador es requerido.");
     }
 }

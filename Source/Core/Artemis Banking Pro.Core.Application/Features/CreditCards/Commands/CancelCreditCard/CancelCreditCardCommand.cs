@@ -1,3 +1,4 @@
+using FluentValidation;
 using Artemis_Banking_Pro.Core.Application.Common;
 using Artemis_Banking_Pro.Core.Application.Contracts.CreditCards;
 using ArtemisBankingPro.Core.Domain.CodeErrors.CreditCardsErrors;
@@ -14,6 +15,14 @@ namespace Artemis_Banking_Pro.Core.Application.Features.CreditCards.Commands.Can
     {
         [SwaggerParameter(Description = "Identificador único de la tarjeta que se desea cancelar")]
         public int Id { get; set; }
+    }
+
+    public class CancelCreditCardCommandValidator : AbstractValidator<CancelCreditCardCommand>
+    {
+        public CancelCreditCardCommandValidator()
+        {
+            RuleFor(command => command.Id).ValidIdentifier();
+        }
     }
 
     public class CancelCreditCardCommandHandler : IRequestHandler<CancelCreditCardCommand>

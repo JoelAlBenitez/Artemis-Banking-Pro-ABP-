@@ -26,6 +26,14 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguratio
                     {
                         sql.MigrationsAssembly(typeof(IdentityContext).Assembly.FullName);
                         sql.MigrationsHistoryTable("__EFMigrationsHistory_Identity");
+
+                        //Mismo criterio que el contexto de negocio: el login es lo primero que
+                        //toca la base y no debe fallar por una lentitud momentánea del servidor.
+                        sql.EnableRetryOnFailure(
+                            maxRetryCount: 3,
+                            maxRetryDelay: TimeSpan.FromSeconds(5),
+                            errorNumbersToAdd: null);
+                        sql.CommandTimeout(60);
                     })
             );
 

@@ -1,4 +1,4 @@
-using Artemis_Banking_Pro.Core.Application.Contracts.Generic;
+ï»¿using Artemis_Banking_Pro.Core.Application.Contracts.Generic;
 using ArtemisBankingPro.Core.Domain.CodeErrors.GeneralErrors;
 using ArtemisBankingPro.Core.Domain.Common.Pagination;
 using ArtemisBankingPro.Core.Domain.Common.ValidationResult;
@@ -60,7 +60,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Generic
                 typeof(TEntity).Name, typeof(TDto).Name);
                 var map = _mapper.Map<IReadOnlyCollection<TDto>>(result.Items);
 
-                _logger.LogInformation("Paginación de los datos recuperados de la entidad {entity}", typeof(TEntity).Name);
+                _logger.LogInformation("PaginaciÃ³n de los datos recuperados de la entidad {entity}", typeof(TEntity).Name);
                 var paged = new PagedResult<TDto>(map, result.Page, result.PageSize, result.TotalRecords);
                 return ValidationResult<PagedResult<TDto>>.Success(paged);
             }
@@ -111,7 +111,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Generic
                     typeof(TSaveDto).Name, typeof(TEntity).Name);
                 _mapper.Map(dto, entitie);
 
-                _logger.LogInformation("Edición del registro de la entidad {entitie} con ID {ID}", typeof(TEntity).Name,
+                _logger.LogInformation("EdiciÃ³n del registro de la entidad {entitie} con ID {ID}", typeof(TEntity).Name,
                     tkey);
                 await _genericRepository.UpdateAsync(entitie);
                 await _genericRepository.SaveChangesAsync();

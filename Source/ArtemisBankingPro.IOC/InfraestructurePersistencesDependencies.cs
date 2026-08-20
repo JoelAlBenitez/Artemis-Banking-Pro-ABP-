@@ -33,6 +33,15 @@ namespace ArtemisBankingPro.IOC
                     {
                         sql.MigrationsAssembly(typeof(DbContextArtemisBanking).Assembly.FullName);
                         sql.MigrationsHistoryTable("__EFMigrationsHistory_Persistence");
+
+                        //Un servidor local lento agota el tiempo de espera y varios módulos
+                        //muestran error a la vez, como si el sistema estuviera caído. El reintento
+                        //solo cubre fallos transitorios: un error de negocio nunca se reintenta.
+                        sql.EnableRetryOnFailure(
+                            maxRetryCount: 3,
+                            maxRetryDelay: TimeSpan.FromSeconds(5),
+                            errorNumbersToAdd: null);
+                        sql.CommandTimeout(60);
                     })
             );
 

@@ -1,4 +1,4 @@
-using ArtemisBankingPro.Core.Domain.Common.Constants;
+ï»¿using ArtemisBankingPro.Core.Domain.Common.Constants;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +13,7 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.SavingsAc
             builder.ToTable("SavingsAccounts");
             builder.HasKey(a => a.Id);
 
-            //Texto y no numérico para no perder los ceros iniciales del número de 9 dígitos
+            //Texto y no numÃ©rico para no perder los ceros iniciales del nÃºmero de 9 dÃ­gitos
             builder.Property(a => a.AccountNumber)
                 .IsRequired()
                 .HasMaxLength(DomainConstants.AccountNumberLength)
@@ -43,13 +43,13 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.SavingsAc
             builder.Property(a => a.LastModifiedByIdUser)
                 .HasMaxLength(DomainConstants.IdentityUserIdLength);
 
-            //Búsqueda de todas las cuentas de un cliente
+            //BÃºsqueda de todas las cuentas de un cliente
             builder.HasIndex(a => a.CustomerId)
                 .HasDatabaseName("IX_SavingsAccounts_CustomerId");
 
             //Una sola cuenta principal activa por cliente. Va con nombre propio porque dos
-            //HasIndex sin nombre sobre la misma propiedad reconfiguran el mismo índice en vez
-            //de crear uno nuevo, y el filtrado terminaría reemplazando al de búsqueda.
+            //HasIndex sin nombre sobre la misma propiedad reconfiguran el mismo Ã­ndice en vez
+            //de crear uno nuevo, y el filtrado terminarÃ­a reemplazando al de bÃºsqueda.
             builder.HasIndex(a => a.CustomerId)
                 .HasDatabaseName("UX_SavingsAccounts_ActivePrimaryPerCustomer")
                 .IsUnique()
@@ -60,7 +60,7 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Configurations.SavingsAc
             builder.Ignore(a => a.IsActive);
 
             //El extremo inverso del historial de transacciones lo configura
-            //TransactionConfiguration (OnDelete Restrict, sin borrado físico).
+            //TransactionConfiguration (OnDelete Restrict, sin borrado fÃ­sico).
         }
     }
 }

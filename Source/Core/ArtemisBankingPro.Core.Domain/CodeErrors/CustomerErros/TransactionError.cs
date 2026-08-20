@@ -1,4 +1,4 @@
-using ArtemisBankingPro.Core.Domain.Common.Errors;
+﻿using ArtemisBankingPro.Core.Domain.Common.Errors;
 
 namespace ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros
 {
@@ -56,7 +56,7 @@ namespace ArtemisBankingPro.Core.Domain.CodeErrors.CustomerErros
 
         public static readonly Error NoPendingInstallments = new(
             "Transaction.NoPendingInstallments", 
-            "El pr�stamo seleccionado no posee cuotas pendientes por pagar."
+            "El préstamo seleccionado no posee cuotas pendientes por pagar."
         );
 
         public static readonly Error LoanOverpayment = new(

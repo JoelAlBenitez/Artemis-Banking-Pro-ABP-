@@ -344,17 +344,8 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Transactions
         private async Task PopulateBeneficiariesAsync(string clientId)
         {
             var result = await _beneficiaryServices.GetClientBeneficiariesAsync(clientId);
-            if (result.IsValid && result.Value != null)
-            {
-                ViewBag.Beneficiaries = _mapper.Map<List<BeneficiaryListViewModel>>(result.Value);
-            }
-            else
-            {
-                ViewBag.Beneficiaries = new List<BeneficiaryListViewModel>();
-            }
 
-
-            ViewBag.Beneficiaries = result.IsValid
+            ViewBag.Beneficiaries = result.IsValid && result.Value is not null
                 ? _mapper.Map<List<BeneficiaryListViewModel>>(result.Value)
                 : new List<BeneficiaryListViewModel>();
         }

@@ -74,7 +74,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             try
             {
                 var (originAccount, destAccount) = validation.Value;
-                var result = await ExecuteApprovedExpressTransferAsync(originAccount, destAccount, dto.Amount, clientId);
+                var result = await ExecuteApprovedTransferAsync(originAccount, destAccount, dto.Amount, OperationType.TransaccionExpress, clientId);
                 if (!result.IsValid)
                 {
                     return result;
@@ -118,7 +118,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             try
             {
                 var (originAccount, destAccount) = validation.Value;
-                var result = await ExecuteApprovedBeneficiaryTransferAsync(originAccount, destAccount, dto.Amount, clientId);
+                var result = await ExecuteApprovedTransferAsync(originAccount, destAccount, dto.Amount, OperationType.TransaccionBeneficiario, clientId);
                 if (!result.IsValid)
                 {
                     return result;
@@ -305,7 +305,10 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             }
         }
 
-        private async Task<ValidationResult<TransactionResultDto>> ExecuteApprovedExpressTransferAsync(SavingsAccount origin, SavingsAccount dest, decimal amount, string clientId)
+        //Express, beneficiario y transferencia entre cuentas propias solo se diferencian en el
+        //tipo de operación: el movimiento de dinero y el par de asientos son idénticos.
+        private async Task<ValidationResult<TransactionResultDto>> ExecuteApprovedTransferAsync(
+            SavingsAccount origin, SavingsAccount dest, decimal amount, OperationType operationType, string clientId)
         {
             origin.Balance -= amount;
             dest.Balance += amount;
@@ -313,74 +316,23 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             await _savingsAccountRepository.UpdateAsync(origin);
             await _savingsAccountRepository.UpdateAsync(dest);
 
-            var debitTx = CreateApprovedTransactionEntity(origin.Id, amount, TransactionType.Debito, OperationType.TransaccionExpress, origin.AccountNumber, dest.AccountNumber, clientId);
-            var creditTx = CreateApprovedTransactionEntity(dest.Id, amount, TransactionType.Credito, OperationType.TransaccionExpress, origin.AccountNumber, dest.AccountNumber, clientId);
+            var debitTx = CreateApprovedTransactionEntity(origin.Id, amount, TransactionType.Debito, operationType, origin.AccountNumber, dest.AccountNumber, clientId);
+            var creditTx = CreateApprovedTransactionEntity(dest.Id, amount, TransactionType.Credito, operationType, origin.AccountNumber, dest.AccountNumber, clientId);
+
+            //Se enlazan por navegación y no por identificador: los Id todavía no existen. Como la
+            //clave foránea admite nulos, EF inserta los dos asientos y luego actualiza el enlace
+            //dentro del mismo SaveChangesAsync, así que el balance y el par viajan en una sola
+            //transacción. Guardar dos veces dejaría el dinero movido si la segunda fallara.
+            debitTx.RelatedTransaction = creditTx;
+            creditTx.RelatedTransaction = debitTx;
 
             await _transactionRepository.AddAsync(debitTx);
             await _transactionRepository.AddAsync(creditTx);
 
-            var saveResult1 = await _transactionRepository.SaveChangesAsync();
-            if (saveResult1 <= 0)
+            var saveResult = await _transactionRepository.SaveChangesAsync();
+            if (saveResult <= 0)
             {
-                _logger.LogWarning("Error de persistencia: no fue posible guardar los registros de transferencia express.");
-                return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
-            }
-
-            debitTx.RelatedTransactionId = creditTx.Id;
-            creditTx.RelatedTransactionId = debitTx.Id;
-
-            await _transactionRepository.UpdateAsync(debitTx);
-            await _transactionRepository.UpdateAsync(creditTx);
-
-            var saveResult2 = await _transactionRepository.SaveChangesAsync();
-            if (saveResult2 <= 0)
-            {
-                _logger.LogWarning("Error de persistencia: no fue posible vincular las transacciones relacionadas.");
-                return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
-            }
-
-            var resultDto = new TransactionResultDto
-            {
-                EffectiveAmount = amount,
-                TransactionType = TransactionType.Debito,
-                Status = TransactionStatus.Aprobada,
-                CreatedAt = debitTx.CreatedAt
-            };
-
-            return ValidationResult<TransactionResultDto>.Success(resultDto);
-        }
-
-        private async Task<ValidationResult<TransactionResultDto>> ExecuteApprovedBeneficiaryTransferAsync(SavingsAccount origin, SavingsAccount dest, decimal amount, string clientId)
-        {
-            origin.Balance -= amount;
-            dest.Balance += amount;
-
-            await _savingsAccountRepository.UpdateAsync(origin);
-            await _savingsAccountRepository.UpdateAsync(dest);
-
-            var debitTx = CreateApprovedTransactionEntity(origin.Id, amount, TransactionType.Debito, OperationType.TransaccionBeneficiario, origin.AccountNumber, dest.AccountNumber, clientId);
-            var creditTx = CreateApprovedTransactionEntity(dest.Id, amount, TransactionType.Credito, OperationType.TransaccionBeneficiario, origin.AccountNumber, dest.AccountNumber, clientId);
-
-            await _transactionRepository.AddAsync(debitTx);
-            await _transactionRepository.AddAsync(creditTx);
-
-            var saveResult1 = await _transactionRepository.SaveChangesAsync();
-            if (saveResult1 <= 0)
-            {
-                _logger.LogWarning("Error de persistencia: no fue posible guardar los registros de transferencia a beneficiario.");
-                return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
-            }
-
-            debitTx.RelatedTransactionId = creditTx.Id;
-            creditTx.RelatedTransactionId = debitTx.Id;
-
-            await _transactionRepository.UpdateAsync(debitTx);
-            await _transactionRepository.UpdateAsync(creditTx);
-
-            var saveResult2 = await _transactionRepository.SaveChangesAsync();
-            if (saveResult2 <= 0)
-            {
-                _logger.LogWarning("Error de persistencia: no fue posible vincular las transacciones relacionadas.");
+                _logger.LogWarning("Error de persistencia: no fue posible registrar la transferencia {Operacion}. No se aplicó ningún cambio.", operationType);
                 return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
             }
 
@@ -571,7 +523,7 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             {
                 var (sourceAccount, destAccount) = validation.Value;
 
-                var result = await ExecuteApprovedAccountTransferAsync(sourceAccount, destAccount, dto.Amount, clientId);
+                var result = await ExecuteApprovedTransferAsync(sourceAccount, destAccount, dto.Amount, OperationType.TransferenciaEntreCuentas, clientId);
                 if (!result.IsValid)
                 {
                     return result;
@@ -622,78 +574,6 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             {
                 _logger.LogError(ex, "Error al registrar el intento de transferencia rechazada.");
             }
-        }
-
-        private async Task<ValidationResult<TransactionResultDto>> ExecuteApprovedAccountTransferAsync(SavingsAccount source, SavingsAccount dest, decimal amount, string clientId)
-        {
-            source.Balance -= amount;
-            dest.Balance += amount;
-
-            await _savingsAccountRepository.UpdateAsync(source);
-            await _savingsAccountRepository.UpdateAsync(dest);
-
-            var debitTx = new Transaction
-            {
-                SavingsAccountId = source.Id,
-                Amount = amount,
-                TransactionType = TransactionType.Debito,
-                OperationType = OperationType.TransferenciaEntreCuentas,
-                Origin = source.AccountNumber,
-                Beneficiary = dest.AccountNumber,
-                Status = TransactionStatus.Aprobada,
-                PerformedByUserId = clientId,
-                Channel = ChannelPayment.Cliente,
-                CreatedAt = DateTimeOffset.UtcNow,
-                CreateByUserId = clientId
-            };
-
-            var creditTx = new Transaction
-            {
-                SavingsAccountId = dest.Id,
-                Amount = amount,
-                TransactionType = TransactionType.Credito,
-                OperationType = OperationType.TransferenciaEntreCuentas,
-                Origin = source.AccountNumber,
-                Beneficiary = dest.AccountNumber,
-                Status = TransactionStatus.Aprobada,
-                PerformedByUserId = clientId,
-                Channel = ChannelPayment.Cliente,
-                CreatedAt = DateTimeOffset.UtcNow,
-                CreateByUserId = clientId
-            };
-
-            await _transactionRepository.AddAsync(debitTx);
-            await _transactionRepository.AddAsync(creditTx);
-
-            var saveResult1 = await _transactionRepository.SaveChangesAsync();
-            if (saveResult1 <= 0)
-            {
-                _logger.LogWarning("Error de persistencia: no fue posible guardar los registros de transferencia entre cuentas.");
-                return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
-            }
-
-            debitTx.RelatedTransactionId = creditTx.Id;
-            creditTx.RelatedTransactionId = debitTx.Id;
-
-            await _transactionRepository.UpdateAsync(debitTx);
-            await _transactionRepository.UpdateAsync(creditTx);
-
-            var saveResult2 = await _transactionRepository.SaveChangesAsync();
-            if (saveResult2 <= 0)
-            {
-                _logger.LogWarning("Error de persistencia: no fue posible vincular las transacciones relacionadas.");
-                return ValidationResult<TransactionResultDto>.Failure(GeneralError.UnexpectedError);
-            }
-
-            var resultDto = new TransactionResultDto
-            {
-                EffectiveAmount = amount,
-                TransactionType = TransactionType.Debito,
-                Status = TransactionStatus.Aprobada,
-                CreatedAt = debitTx.CreatedAt
-            };
-
-            return ValidationResult<TransactionResultDto>.Success(resultDto);
         }
 
         private async Task<bool> SendAccountTransferEmailAsync(SavingsAccount source, SavingsAccount dest, decimal amount, string clientId)
@@ -1180,9 +1060,14 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                     CreatedAt = DateTimeOffset.UtcNow
                 };
 
+                //Mismo criterio que las transferencias del cliente: el par queda enlazado por
+                //navegación y se confirma junto a los balances en un único SaveChangesAsync.
+                debitTransaction.RelatedTransaction = creditTransaction;
+                creditTransaction.RelatedTransaction = debitTransaction;
+
                 await _transactionRepository.AddAsync(debitTransaction);
                 await _transactionRepository.AddAsync(creditTransaction);
-                
+
                 await _transactionRepository.SaveChangesAsync();
 
                 // Enviar correos

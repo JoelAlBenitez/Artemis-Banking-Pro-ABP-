@@ -93,8 +93,13 @@ namespace ArtemisBankingPro.IOC
 
             #region transactions 
             services.AddScoped<IDashboardService, DashboardService>();
-            services.AddScoped<ITransactionService, TransactionService>();
-            services.AddScoped<IAtmTransactionService, TransactionService>();
+
+            //TransactionService cubre las operaciones del cliente y las del cajero. Registrarlo
+            //una vez por interfaz construiría dos instancias por petición, cada una con su propio
+            //grafo de dependencias: se registra la clase y ambas interfaces la resuelven.
+            services.AddScoped<TransactionService>();
+            services.AddScoped<ITransactionService>(sp => sp.GetRequiredService<TransactionService>());
+            services.AddScoped<IAtmTransactionService>(sp => sp.GetRequiredService<TransactionService>());
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<ITransactionsValidationServices, TransactionsValidationServices>();
             #endregion

@@ -28,6 +28,9 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguratio
         private const string ForbiddenTitle = "Acceso denegado";
         private const string ForbiddenDetail = "Acceso denegado. No tiene permisos para utilizar este recurso.";
 
+        //HMAC-SHA256 exige una clave de al menos 256 bits.
+        private const int MinimumJwtKeyBytes = 32;
+
         public static void AddWebApiIdentity(this IServiceCollection services, IConfiguration configuration)
         {
             GeneralConfiguration.AddGeneralConfiguration(services, configuration);
@@ -38,7 +41,19 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.RegistrationAndConfiguratio
             services.AddHttpContextAccessor();
             services.AddScoped<ArtemisBankingPro.Core.Application.Contracts.Users.Session.ICurrentUserService, ArtemisBankingPro.Infraestructrue.Identity.Services.Session.CurrentUserService>();
 
-            services.Configure<ArtemisBankingPro.Core.Domain.Settings.JwtSettings>(configuration.GetSection("JwtSettings"));
+            //La clave no se versiona: llega por User Secrets, variable de entorno o el
+            //appsettings del ambiente. Si falta, la API arrancaba igual y el primer login moría
+            //con una excepción de criptografía; validarla al arranque falla temprano y explica
+            //qué configurar.
+            services.AddOptions<ArtemisBankingPro.Core.Domain.Settings.JwtSettings>()
+                .Bind(configuration.GetSection("JwtSettings"))
+                .Validate(settings => !string.IsNullOrWhiteSpace(settings.Key),
+                    "Falta la clave de firma del JWT. Configure JwtSettings:Key mediante User Secrets, " +
+                    "una variable de entorno o el appsettings del ambiente.")
+                .Validate(settings => string.IsNullOrWhiteSpace(settings.Key)
+                        || Encoding.UTF8.GetByteCount(settings.Key) >= MinimumJwtKeyBytes,
+                    $"La clave de firma del JWT debe tener al menos {MinimumJwtKeyBytes} bytes para HMAC-SHA256.")
+                .ValidateOnStart();
 
             #region Identity Options
 
