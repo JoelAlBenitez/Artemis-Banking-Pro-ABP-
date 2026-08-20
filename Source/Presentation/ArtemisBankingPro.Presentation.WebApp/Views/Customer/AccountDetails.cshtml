@@ -41,20 +41,10 @@
                             foreach (var txn in Model.OrderByDescending(x => x.CreatedAt))
                             {
                                 <tr>
-<<<<<<< HEAD
                                     <td class="ps-4 py-3 text-dark">@txn.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")</td>
-                                    <td class="py-3">@txn.TransactionType</td>
-                                    <td class="py-3 text-dark">
-                                        @if (txn.TransactionType.ToString() == "Debito")
-=======
-                                    <td class="ps-4 py-3">@txn.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")</td>
                                     <td class="py-3 fw-bold">@txn.TransactionType</td>
-                                    <td class="py-3 fw-bold @(txn.TransactionType == TransactionType.Credito ? "text-success" : "text-dark")">
-                                        @(txn.TransactionType == TransactionType.Credito ? "+" : "-") RD$ @txn.EffectiveAmount.ToString("N2")
-                                    </td>
-                                    <td class="pe-4 py-3 text-end">
-                                        @if (txn.Status == TransactionStatus.Aprobada)
->>>>>>> origin/development
+                                    <td class="py-3 text-dark">
+                                        @if (txn.TransactionType == TransactionType.Debito)
                                         {
                                             <span>Hacia: @(string.IsNullOrEmpty(txn.Beneficiary) ? "N/A" : txn.Beneficiary)</span>
                                         }
@@ -63,11 +53,11 @@
                                             <span>Desde: @(string.IsNullOrEmpty(txn.Origin) ? "N/A" : txn.Origin)</span>
                                         }
                                     </td>
-                                    <td class="py-3 text-dark">
-                                        @(txn.TransactionType.ToString() == "Deposito" || txn.TransactionType.ToString() == "Credito" ? "+" : "-") RD$ @txn.EffectiveAmount.ToString("N2")
+                                    <td class="py-3 fw-bold @(txn.TransactionType == TransactionType.Credito ? "text-success" : "text-dark")">
+                                        @(txn.TransactionType == TransactionType.Credito ? "+" : "-") RD$ @txn.EffectiveAmount.ToString("N2")
                                     </td>
                                     <td class="pe-4 py-3 text-end">
-                                        @if (txn.Status.ToString() == "Aprobada")
+                                        @if (txn.Status == TransactionStatus.Aprobada)
                                         {
                                             <div class="d-flex justify-content-end align-items-center">
                                                 <span class="status-dot bg-success me-2" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
