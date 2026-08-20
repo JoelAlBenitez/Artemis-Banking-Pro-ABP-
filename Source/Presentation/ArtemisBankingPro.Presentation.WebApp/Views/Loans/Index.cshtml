@@ -96,29 +96,29 @@
                                     <td>
                                         @if (loan.StateLoans == "Completado")
                                         {
-                                            <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-secondary small me-1"></i> @loan.StateLoans</span>
+                                            <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-secondary me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @loan.StateLoans</span>
                                         }
                                         else
                                         {
-                                            <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-success small me-1"></i> @loan.StateLoans</span>
+                                            <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @loan.StateLoans</span>
                                         }
                                     </td>
                                     <td>
                                         @if (loan.StateCustomer == "Al día")
                                         {
-                                            <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-success small me-1"></i> @loan.StateCustomer</span>
+                                            <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @loan.StateCustomer</span>
                                         }
                                         else
                                         {
-                                            <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-danger small me-1"></i> @loan.StateCustomer</span>
+                                            <span class="text-dark fw-bold"><i class="bi bi-circle-fill text-danger me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> @loan.StateCustomer</span>
                                         }
                                     </td>
                                     <td class="text-end pe-4">
                                         <a asp-action="Details" asp-route-id="@loan.Id" class="btn btn-sm btn-outline-info me-2" title="Ver detalles y tabla de amortización">
-                                            Detalles
+                                            <i class="bi bi-eye"></i>
                                         </a>
-                                        <a asp-action="Edit" asp-route-id="@loan.Id" class="btn btn-sm btn-outline-primary fw-bold">
-                                            Editar Tasa
+                                        <a asp-action="Edit" asp-route-id="@loan.Id" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
                                         </a>
                                     </td>
                                 </tr>
