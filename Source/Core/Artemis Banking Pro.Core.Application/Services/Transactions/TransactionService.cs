@@ -777,7 +777,10 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                         CreatedAt = DateTimeOffset.UtcNow,
                         RejectionReason = "Fondos insuficientes"
                     };
+                    //Sin este guardado el intento rechazado se quedaba solo en memoria: la regla
+                    //exige registrarlo, y los otros tres rechazos del cajero sí lo persisten.
                     await _transactionRepository.AddAsync(rejected);
+                    await _transactionRepository.SaveChangesAsync();
                     return ValidationResult.Failure(new ArtemisBankingPro.Core.Domain.Common.Errors.Error("Atm.InsufficientFunds", "Fondos insuficientes en la cuenta origen."));
                 }
 

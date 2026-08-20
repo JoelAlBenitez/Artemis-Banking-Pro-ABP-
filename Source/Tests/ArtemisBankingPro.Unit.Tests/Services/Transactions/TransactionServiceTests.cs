@@ -37,6 +37,10 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
         private readonly Mock<IUserManagementService> _userManagementServiceMock;
         private readonly TransactionService _transactionService;
 
+        //Captura los asientos que el servicio manda a persistir, para poder afirmar sobre el par
+        //cruzado sin depender de identificadores que solo existen después de guardar.
+        private readonly List<Transaction> _transaccionesRegistradas = new();
+
         public TransactionServiceTests()
         {
             _savingsAccountRepositoryMock = new Mock<ISavingsAccountsRepository>();
@@ -100,7 +104,8 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
                 .ReturnsAsync(ValidationResult<(SavingsAccount, SavingsAccount)>.Success((originAccount, destAccount)));
 
             _transactionRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Transaction>()))
-                .ReturnsAsync((Transaction t) => t);
+                .ReturnsAsync((Transaction t) => t)
+                .Callback((Transaction t) => _transaccionesRegistradas.Add(t));
 
             _transactionRepositoryMock.Setup(r => r.SaveChangesAsync())
                 .ReturnsAsync(1);
@@ -117,7 +122,15 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
 
             _savingsAccountRepositoryMock.Verify(r => r.UpdateAsync(originAccount), Times.Once);
             _savingsAccountRepositoryMock.Verify(r => r.UpdateAsync(destAccount), Times.Once);
-            _transactionRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Exactly(2));
+
+            //Balances y par de asientos viajan en una sola confirmación: si se guardara dos veces,
+            //un fallo en la segunda dejaría el dinero movido y la operación reportada como fallida.
+            _transactionRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Once);
+
+            var registradas = _transaccionesRegistradas;
+            registradas.Should().HaveCount(2);
+            registradas[0].RelatedTransaction.Should().BeSameAs(registradas[1]);
+            registradas[1].RelatedTransaction.Should().BeSameAs(registradas[0]);
         }
 
         [Fact]

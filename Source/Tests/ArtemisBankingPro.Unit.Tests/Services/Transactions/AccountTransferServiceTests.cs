@@ -187,7 +187,8 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
 
             _savingsAccountRepositoryMock.Verify(r => r.UpdateAsync(sourceAccount), Times.Once);
             _savingsAccountRepositoryMock.Verify(r => r.UpdateAsync(destAccount), Times.Once);
-            _transactionRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Exactly(2));
+            //Una sola confirmación: balances y par de asientos son atómicos.
+            _transactionRepositoryMock.Verify(r => r.SaveChangesAsync(), Times.Once);
             _emailServicesMock.Verify(e => e.SendNotification(It.Is<MessageDto>(m =>
                 m.To == "carlos@artemis.com" &&
                 m.Subject == "Transferencia entre cuentas realizada"
