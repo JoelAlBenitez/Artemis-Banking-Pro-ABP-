@@ -5,6 +5,7 @@ using Artemis_Banking_Pro.Core.Application.Services.Transactions;
 using ArtemisBankingPro.Core.Application.Contracts.Users.Management;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Entities.CreditCards;
+using ArtemisBankingPro.Core.Domain.Entities.Loans;
 using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
 using ArtemisBankingPro.Core.Domain.Entities.Transactions;
 using ArtemisBankingPro.Core.Domain.Interfaces.Beneficiaries;
@@ -32,6 +33,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
         private readonly Mock<ISavingsAccountsRepository> _savingsAccountRepositoryMock = new();
         private readonly Mock<ITransactionRepository> _transactionRepositoryMock = new();
         private readonly Mock<ICreditCardsRepository> _creditCardRepositoryMock = new();
+        private readonly Mock<ILoansRepository> _loansRepositoryMock = new();
         private readonly Mock<IEmailServices> _emailServicesMock = new();
 
         private readonly List<Transaction> _asientos = new();
@@ -53,7 +55,7 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
                 _transactionRepositoryMock.Object,
                 new Mock<IBeneficiaryRepository>().Object,
                 _creditCardRepositoryMock.Object,
-                new Mock<ILoansRepository>().Object,
+                _loansRepositoryMock.Object,
                 new Mock<ITransactionsValidationServices>().Object,
                 _emailServicesMock.Object,
                 new Mock<IMapper>().Object,
@@ -121,6 +123,52 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
                     It.IsAny<Expression<Func<CreditCard, bool>>>(),
                     It.IsAny<Expression<Func<CreditCard, object>>[]>()))
                 .ReturnsAsync(tarjeta);
+
+        private static Loan Prestamo(string numero, decimal pendiente, int cuotas, decimal valorCuota)
+        {
+            var prestamo = new Loan
+            {
+                Id = 1,
+                LoanNumber = numero,
+                CustomerId = CustomerId,
+                ApprovedCapital = valorCuota * cuotas,
+                termMonths = TermMonths.Meses12,
+                AnnualInterestRate = 12m,
+                MonthlyInstallment = valorCuota,
+                TotalPayable = valorCuota * cuotas,
+                PendingAmount = pendiente,
+                Status = LoanStatus.Activo,
+                CreatedAt = DateTimeOffset.UtcNow,
+                CreateByUserId = "admin"
+            };
+
+            for (var numeroCuota = 1; numeroCuota <= cuotas; numeroCuota++)
+            {
+                prestamo.loanInstallments.Add(new LoanInstallment
+                {
+                    Id = numeroCuota,
+                    LoanId = prestamo.Id,
+                    InstallmentNumber = numeroCuota,
+                    DueDate = DateTimeOffset.UtcNow.AddMonths(numeroCuota),
+                    InstallmentValue = valorCuota,
+                    InterestAmount = 0m,
+                    CapitalAmount = valorCuota,
+                    PendingBalance = valorCuota,
+                    paymentStatus = PaymentStatus.Pendiente,
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    CreateByUserId = "admin"
+                });
+            }
+
+            return prestamo;
+        }
+
+        private void RegistrarPrestamo(Loan prestamo)
+            => _loansRepositoryMock
+                .Setup(r => r.GetFirstAsync(
+                    It.IsAny<Expression<Func<Loan, bool>>>(),
+                    It.IsAny<Expression<Func<Loan, object>>[]>()))
+                .ReturnsAsync(prestamo);
 
         #endregion
 
@@ -372,6 +420,116 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
                 SourceAccountNumber = "500000001",
                 CreditCardNumber = "4111111111111111",
                 Amount = 100m,
+                CashierId = CashierId
+            });
+
+            resultado.IsValid.Should().BeFalse();
+            cuenta.Balance.Should().Be(10_000m);
+            _asientos.Should().BeEmpty();
+        }
+
+        #endregion
+
+        #region pago de préstamo
+
+        [Fact]
+        public async Task ProcessAtmLoanPaymentAsync_AplicaLasCuotasEnOrdenDeAntiguedad()
+        {
+            var cuenta = Cuenta(1, "500000001", 10_000m);
+            RegistrarCuentas(cuenta);
+
+            var prestamo = Prestamo("100000001", 3_000m, cuotas: 3, valorCuota: 1_000m);
+            RegistrarPrestamo(prestamo);
+
+            var resultado = await _service.ProcessAtmLoanPaymentAsync(new AtmLoanPaymentDto
+            {
+                SourceAccountNumber = "500000001",
+                LoanNumber = "100000001",
+                Amount = 2_000m,
+                CashierId = CashierId
+            });
+
+            resultado.IsValid.Should().BeTrue();
+            cuenta.Balance.Should().Be(8_000m);
+            prestamo.PendingAmount.Should().Be(1_000m);
+
+            var cuotasOrdenadas = prestamo.loanInstallments.OrderBy(c => c.InstallmentNumber).ToList();
+            cuotasOrdenadas[0].paymentStatus.Should().Be(PaymentStatus.Pagada);
+            cuotasOrdenadas[1].paymentStatus.Should().Be(PaymentStatus.Pagada);
+            cuotasOrdenadas[2].paymentStatus.Should().NotBe(PaymentStatus.Pagada);
+
+            var asiento = _asientos.Should().ContainSingle().Subject;
+            asiento.TransactionType.Should().Be(TransactionType.Debito);
+            asiento.OperationType.Should().Be(OperationType.PagoPrestamo);
+            asiento.PerformedByUserId.Should().Be(CashierId);
+        }
+
+        [Fact]
+        public async Task ProcessAtmLoanPaymentAsync_ConMontoMayorAlPendiente_NoPermiteSobrepago()
+        {
+            var cuenta = Cuenta(1, "500000001", 20_000m);
+            RegistrarCuentas(cuenta);
+
+            var prestamo = Prestamo("100000001", 1_500m, cuotas: 2, valorCuota: 750m);
+            RegistrarPrestamo(prestamo);
+
+            var resultado = await _service.ProcessAtmLoanPaymentAsync(new AtmLoanPaymentDto
+            {
+                SourceAccountNumber = "500000001",
+                LoanNumber = "100000001",
+                Amount = 9_999m,
+                CashierId = CashierId
+            });
+
+            resultado.IsValid.Should().BeTrue();
+
+            //Solo se cobra el pendiente real: el préstamo nunca queda en negativo.
+            prestamo.PendingAmount.Should().Be(0m);
+            cuenta.Balance.Should().Be(18_500m);
+            _asientos.Should().ContainSingle().Which.Amount.Should().Be(1_500m);
+        }
+
+        [Fact]
+        public async Task ProcessAtmLoanPaymentAsync_SinFondos_RegistraElRechazoYNoMueveNada()
+        {
+            var cuenta = Cuenta(1, "500000001", 100m);
+            RegistrarCuentas(cuenta);
+
+            var prestamo = Prestamo("100000001", 2_000m, cuotas: 2, valorCuota: 1_000m);
+            RegistrarPrestamo(prestamo);
+
+            var resultado = await _service.ProcessAtmLoanPaymentAsync(new AtmLoanPaymentDto
+            {
+                SourceAccountNumber = "500000001",
+                LoanNumber = "100000001",
+                Amount = 2_000m,
+                CashierId = CashierId
+            });
+
+            resultado.IsValid.Should().BeFalse();
+            cuenta.Balance.Should().Be(100m);
+            prestamo.PendingAmount.Should().Be(2_000m);
+            prestamo.loanInstallments.Should().OnlyContain(c => c.paymentStatus != PaymentStatus.Pagada);
+
+            _asientos.Should().ContainSingle()
+                .Which.Status.Should().Be(TransactionStatus.Rechazada);
+        }
+
+        [Fact]
+        public async Task ProcessAtmLoanPaymentAsync_ConPrestamoCompletado_Rechaza()
+        {
+            var cuenta = Cuenta(1, "500000001", 10_000m);
+            RegistrarCuentas(cuenta);
+
+            var prestamo = Prestamo("100000001", 0m, cuotas: 1, valorCuota: 1_000m);
+            prestamo.Status = LoanStatus.Completado;
+            RegistrarPrestamo(prestamo);
+
+            var resultado = await _service.ProcessAtmLoanPaymentAsync(new AtmLoanPaymentDto
+            {
+                SourceAccountNumber = "500000001",
+                LoanNumber = "100000001",
+                Amount = 500m,
                 CashierId = CashierId
             });
 
