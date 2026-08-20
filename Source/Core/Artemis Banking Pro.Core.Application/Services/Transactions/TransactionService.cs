@@ -319,11 +319,11 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
             var debitTx = CreateApprovedTransactionEntity(origin.Id, amount, TransactionType.Debito, operationType, origin.AccountNumber, dest.AccountNumber, clientId);
             var creditTx = CreateApprovedTransactionEntity(dest.Id, amount, TransactionType.Credito, operationType, origin.AccountNumber, dest.AccountNumber, clientId);
 
-            //Se enlazan por navegación y no por identificador: los Id todavía no existen. Como la
-            //clave foránea admite nulos, EF inserta los dos asientos y luego actualiza el enlace
-            //dentro del mismo SaveChangesAsync, así que el balance y el par viajan en una sola
-            //transacción. Guardar dos veces dejaría el dinero movido si la segunda fallara.
-            debitTx.RelatedTransaction = creditTx;
+            //El enlace se declara por navegación y en un solo sentido: los Id todavía no existen y
+            //EF los resuelve al insertar. Apuntarse mutuamente formaría un ciclo entre dos filas
+            //nuevas de la misma tabla que EF no puede ordenar, y abortaría todo el SaveChangesAsync.
+            //Con un único sentido el balance y el par siguen viajando en una sola transacción; el
+            //asiento contrario se localiza buscando por RelatedTransactionId.
             creditTx.RelatedTransaction = debitTx;
 
             await _transactionRepository.AddAsync(debitTx);
@@ -1064,8 +1064,8 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Transactions
                 };
 
                 //Mismo criterio que las transferencias del cliente: el par queda enlazado por
-                //navegación y se confirma junto a los balances en un único SaveChangesAsync.
-                debitTransaction.RelatedTransaction = creditTransaction;
+                //navegación en un solo sentido y se confirma junto a los balances en un único
+                //SaveChangesAsync. El enlace recíproco formaría un ciclo irresoluble para EF.
                 creditTransaction.RelatedTransaction = debitTransaction;
 
                 await _transactionRepository.AddAsync(debitTransaction);

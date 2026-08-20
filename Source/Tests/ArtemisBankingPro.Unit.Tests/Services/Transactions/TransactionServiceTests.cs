@@ -129,8 +129,13 @@ namespace ArtemisBankingPro.Unit.Tests.Services.Transactions
 
             var registradas = _transaccionesRegistradas;
             registradas.Should().HaveCount(2);
-            registradas[0].RelatedTransaction.Should().BeSameAs(registradas[1]);
-            registradas[1].RelatedTransaction.Should().BeSameAs(registradas[0]);
+
+            //El enlace va solo del crédito al débito: el recíproco formaría un ciclo entre dos filas
+            //nuevas de la misma tabla y EF abortaría el SaveChangesAsync completo.
+            var debito = registradas.Single(t => t.TransactionType == TransactionType.Debito);
+            var credito = registradas.Single(t => t.TransactionType == TransactionType.Credito);
+            credito.RelatedTransaction.Should().BeSameAs(debito);
+            debito.RelatedTransaction.Should().BeNull();
         }
 
         [Fact]
