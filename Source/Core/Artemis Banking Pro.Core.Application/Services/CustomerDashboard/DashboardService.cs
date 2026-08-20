@@ -112,7 +112,32 @@ namespace Artemis_Banking_Pro.Core.Application.Services.Dashboard
                 var transactions = await _transactionRepository.GetAllFindAsync(t => t.SavingsAccountId == accountId);
                 var sortedTransactions = transactions.OrderByDescending(t => t.CreatedAt).ToList();
 
-                var mapped = _mapper.Map<IReadOnlyCollection<TransactionResultDto>>(sortedTransactions);
+                var mapped = _mapper.Map<List<TransactionResultDto>>(sortedTransactions);
+                
+                foreach(var txn in mapped)
+                {
+                    if (txn.TransactionType == TransactionType.Debito && !string.IsNullOrEmpty(txn.Beneficiary))
+                    {
+                        var destAccount = await _savingsAccountRepository.GetFirstAsync(a => a.AccountNumber == txn.Beneficiary);
+                        if (destAccount != null) {
+                            var clientData = await _userManagementService.GetFullNameByIdAsync(destAccount.CustomerId);
+                            if (!string.IsNullOrEmpty(clientData)) {
+                                txn.Beneficiary = clientData;
+                            }
+                        }
+                    }
+                    else if (txn.TransactionType == TransactionType.Credito && !string.IsNullOrEmpty(txn.Origin))
+                    {
+                        var originAccount = await _savingsAccountRepository.GetFirstAsync(a => a.AccountNumber == txn.Origin);
+                        if (originAccount != null) {
+                            var clientData = await _userManagementService.GetFullNameByIdAsync(originAccount.CustomerId);
+                            if (!string.IsNullOrEmpty(clientData)) {
+                                txn.Origin = clientData;
+                            }
+                        }
+                    }
+                }
+
                 return ValidationResult<IReadOnlyCollection<TransactionResultDto>>.Success(mapped);
             }
             catch (Exception)

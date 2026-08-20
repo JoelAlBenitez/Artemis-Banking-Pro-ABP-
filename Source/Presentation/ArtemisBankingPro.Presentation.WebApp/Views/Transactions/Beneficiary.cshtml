@@ -8,7 +8,7 @@
 
 <div class="container-fluid py-5" style="font-family: 'Montserrat', sans-serif;">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="col-md-8 col-lg-5 col-xl-5">
             
             <div class="mb-4 text-center">
                 <h2 class="fw-bold mb-2" style="color: #0F172A;">
@@ -17,8 +17,8 @@
                 <p class="text-muted mb-0">Envía dinero de forma rápida a tus beneficiarios registrados.</p>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4 p-md-5">
+            <div class="card border-0 shadow-sm rounded-2">
+                <div class="card-body p-4 p-4">
                     @if (!ViewData.ModelState.IsValid)
                     {
                         <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4">
@@ -30,45 +30,47 @@
 
                     <form asp-action="Beneficiary" method="post">
                         
-                        <div class="mb-4">
-                            <label asp-for="SourceAccountNumber" class="form-label fw-bold text-secondary">Cuenta de Origen <span class="text-danger">*</span></label>
-                            <select asp-for="SourceAccountNumber" class="form-select">
-                                <option value="">-- Seleccione una cuenta origen --</option>
-                                @foreach(var account in savingsAccounts)
-                                {
-                                    <option value="@account.AccountNumber">@account.AccountNumber - RD$ @account.Balance.ToString("N2")</option>
-                                }
-                            </select>
-                            <span asp-validation-for="SourceAccountNumber" class="text-danger small mt-1 d-block"></span>
-                        </div>
-
-                        <div class="mb-4">
-                            <label asp-for="BeneficiaryId" class="form-label fw-bold text-secondary">Beneficiario Destino <span class="text-danger">*</span></label>
-                            <select asp-for="BeneficiaryId" class="form-select">
-                                <option value="">-- Seleccione un beneficiario --</option>
-                                @if (ViewBag.Beneficiaries != null)
-                                {
-                                    foreach(var b in ViewBag.Beneficiaries)
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-6">
+                                <label asp-for="SourceAccountNumber" class="form-label fw-bold text-secondary">Cuenta de Origen <span class="text-danger">*</span></label>
+                                <select asp-for="SourceAccountNumber" class="form-select">
+                                    <option value="">-- Seleccione una cuenta origen --</option>
+                                    @foreach(var account in savingsAccounts)
                                     {
-                                        <option value="@b.Id">@b.Name @b.LastName - @b.AccountNumber</option>
+                                        <option value="@account.AccountNumber">@account.AccountNumber - RD$ @account.Balance.ToString("N2")</option>
                                     }
-                                }
-                            </select>
-                            <span asp-validation-for="BeneficiaryId" class="text-danger small mt-1 d-block"></span>
-                        </div>
-
-                        <div class="mb-5">
-                            <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto a Transferir <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light fw-bold text-secondary border-end-0">RD$</span>
-                                <input asp-for="Amount" type="number" step="0.01" min="0.01" class="form-control border-start-0 fw-bold" placeholder="0.00" />
+                                </select>
+                                <span asp-validation-for="SourceAccountNumber" class="text-danger small mt-1 d-block"></span>
                             </div>
-                            <span asp-validation-for="Amount" class="text-danger small mt-1 d-block"></span>
+
+                            <div class="col-md-6">
+                                <label asp-for="BeneficiaryId" class="form-label fw-bold text-secondary">Beneficiario Destino <span class="text-danger">*</span></label>
+                                <select asp-for="BeneficiaryId" class="form-select">
+                                    <option value="">-- Seleccione un beneficiario --</option>
+                                    @if (ViewBag.Beneficiaries != null)
+                                    {
+                                        foreach(var b in ViewBag.Beneficiaries)
+                                        {
+                                            <option value="@b.Id">@b.Name @b.LastName - @b.AccountNumber</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="BeneficiaryId" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto a Transferir <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light fw-bold text-secondary border-end-0">RD$</span>
+                                    <input asp-for="Amount" type="number" step="0.01" min="0.01" class="form-control border-start-0 fw-bold" placeholder="0.00" />
+                                </div>
+                                <span asp-validation-for="Amount" class="text-danger small mt-1 d-block"></span>
+                            </div>
                         </div>
 
                         <div class="d-flex gap-3 justify-content-end pt-4 mt-2 border-top">
                             <a asp-controller="Customer" asp-action="Index" class="btn btn-light px-4">Cancelar</a>
-                            <button type="submit" class="btn btn-dark px-5">Transferir Ahora</button>
+                            <button type="submit" class="btn btn-dark px-5">Continuar</button>
                         </div>
                     </form>
                 </div>
@@ -80,3 +82,4 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+

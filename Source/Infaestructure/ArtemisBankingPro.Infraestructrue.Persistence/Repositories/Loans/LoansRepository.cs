@@ -22,9 +22,13 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans
         //largo exigido. El PadLeft solo protege el formato de texto del contrato.
         public async Task<string> GetNextLoanNumberAsync()
         {
-            var nextValue = await _context.Database
-                .SqlQueryRaw<int>($"SELECT NEXT VALUE FOR [{LoanNumberSequence}] AS [Value]")
-                .FirstAsync();
+            var connection = _context.Database.GetDbConnection();
+            if (connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            using var command = connection.CreateCommand();
+            command.CommandText = $"SELECT NEXT VALUE FOR [{LoanNumberSequence}]";
+            var nextValue = (int)await command.ExecuteScalarAsync();
 
             return nextValue
                 .ToString(CultureInfo.InvariantCulture)

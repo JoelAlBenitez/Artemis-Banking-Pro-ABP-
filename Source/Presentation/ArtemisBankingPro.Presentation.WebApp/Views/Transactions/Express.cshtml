@@ -8,17 +8,17 @@
 
 <div class="container-fluid py-5" style="font-family: 'Montserrat', sans-serif;">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="col-md-8 col-lg-5 col-xl-5">
             
             <div class="mb-4 text-center">
                 <h2 class="fw-bold mb-2" style="color: #0F172A;">
-                    <i class="bi bi-lightning-charge text-warning me-2"></i> Transferencia Exprés
+                    <i class="bi bi-arrow-left-right text-dark me-2"></i> Transferencia Exprés
                 </h2>
                 <p class="text-muted mb-0">Transfiere fondos entre tus propias cuentas de ahorro o a cuentas de terceros en nuestro banco.</p>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4 p-md-5">
+            <div class="card border-0 shadow-sm rounded-2">
+                <div class="card-body p-4 p-4">
                     @if (!ViewData.ModelState.IsValid)
                     {
                         <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4">
@@ -44,7 +44,7 @@
 
                         <div class="mb-4">
                             <label asp-for="DestinationAccountNumber" class="form-label fw-bold text-secondary">Cuenta de Destino <span class="text-danger">*</span></label>
-                            <input asp-for="DestinationAccountNumber" type="text" class="form-control font-monospace" placeholder="Ej: 123456789" autocomplete="off" />
+                            <input asp-for="DestinationAccountNumber" type="text" class="form-control " placeholder="Ej: 123456789" autocomplete="off" />
                             <span asp-validation-for="DestinationAccountNumber" class="text-danger small mt-1 d-block"></span>
                             <div class="form-text small text-muted">Ingrese los 9 dígitos de la cuenta destino.</div>
                         </div>
@@ -55,12 +55,11 @@
                                 <span class="input-group-text bg-light fw-bold text-secondary border-end-0">RD$</span>
                                 <input asp-for="Amount" type="number" step="0.01" min="0.01" class="form-control border-start-0 fw-bold" placeholder="0.00" />
                             </div>
-                            <span asp-validation-for="Amount" class="text-danger small mt-1 d-block"></span>
                         </div>
 
                         <div class="d-flex gap-3 justify-content-end pt-4 mt-2 border-top">
                             <a asp-controller="Customer" asp-action="Index" class="btn btn-light px-4">Cancelar</a>
-                            <button type="submit" class="btn btn-dark px-5">Realizar Transferencia</button>
+                            <button type="submit" class="btn btn-dark px-5">Continuar</button>
                         </div>
                     </form>
                 </div>

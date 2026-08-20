@@ -19,93 +19,125 @@
         </div>
     }
 
-    <h4 class="fw-bold mb-3 text-secondary"><i class="bi bi-piggy-bank me-2"></i> Cuentas de Ahorro</h4>
-    <div class="row g-4 mb-5">
-        @if (Model.SavingsAccounts == null || !Model.SavingsAccounts.Any())
-        {
-            <div class="col-12"><p class="text-muted">No tienes cuentas de ahorro activas.</p></div>
-        }
-        else
-        {
-            foreach (var account in Model.SavingsAccounts)
-            {
-                <div class="col-md-6 col-xl-4">
-                    <div class="card border rounded-3 h-100 hover-elevate transition-all">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex justify-content-center align-items-center" style="width: 48px; height: 48px;">
-                                    <i class="bi bi-wallet2 fs-4"></i>
-                                </div>
-                                <span class="badge bg-light text-dark border">@account.TypeSavingsAccount</span>
-                            </div>
-                            <h6 class="text-muted mb-1">Cuenta @account.AccountNumber</h6>
-                            <h3 class="fw-bold mb-3">RD$ @account.Balance.ToString("N2")</h3>
-                            <a asp-action="AccountDetails" asp-route-id="@account.Id" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-bold">Ver Movimientos</a>
-                        </div>
-                    </div>
-                </div>
-            }
-        }
-    </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success shadow-sm border-0 rounded-3 mb-4">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+        </div>
+    }
 
-    <h4 class="fw-bold mb-3 text-secondary"><i class="bi bi-credit-card me-2"></i> Tarjetas de Crédito</h4>
-    <div class="row g-4 mb-5">
-        @if (Model.CreditCards == null || !Model.CreditCards.Any())
-        {
-            <div class="col-12"><p class="text-muted">No tienes tarjetas de crédito activas.</p></div>
-        }
-        else
-        {
-            foreach (var card in Model.CreditCards)
-            {
-                <div class="col-md-6 col-xl-4">
-                    <div class="card border rounded-3 h-100 hover-elevate transition-all">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex justify-content-center align-items-center" style="width: 48px; height: 48px;">
-                                    <i class="bi bi-credit-card-fill fs-4"></i>
+    <div class="row g-4 align-items-start mb-5">
+        <!-- Cuentas de Ahorro -->
+        <div class="col-xl-4 col-lg-6 col-md-12">
+            <h4 class="fw-bold mb-3 text-secondary"><i class="bi bi-piggy-bank me-2"></i> Cuentas de Ahorro</h4>
+            <div class="row g-3">
+                @if (Model.SavingsAccounts == null || !Model.SavingsAccounts.Any())
+                {
+                    <div class="col-12"><p class="text-muted">No tienes cuentas de ahorro activas.</p></div>
+                }
+                else
+                {
+                    foreach (var account in Model.SavingsAccounts)
+                    {
+                        <div class="col-12">
+                            <div class="card border rounded-2 h-100 hover-elevate transition-all">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-flex justify-content-center align-items-center" style="width: 54px; height: 54px;">
+                                            <i class="bi bi-wallet2 fs-3"></i>
+                                        </div>
+                                        @if (account.TypeSavingsAccount.ToString() == "Principal")
+                                        {
+                                            <span class="badge bg-light text-dark border">Principal</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light text-dark border">Secundaria</span>
+                                        }
+                                    </div>
+                                    <div>
+                                        <h6 class="text-secondary fw-bold mb-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">CUENTA @account.AccountNumber</h6>
+                                        <h3 class="fw-bold text-dark mb-1">RD$ @account.Balance.ToString("N2")</h3>
+                                    </div>
+                                    <p class="small text-muted mb-3" style="visibility: hidden;">Espacio</p>
+                                    <a asp-action="AccountDetails" asp-route-id="@account.Id" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-bold">Ver Movimientos</a>
                                 </div>
-                                <span class="badge bg-light text-dark border">@card.MaskedCardNumber</span>
                             </div>
-                            <h6 class="text-muted mb-1">Deuda Actual</h6>
-                            <h3 class="fw-bold mb-1 text-danger">RD$ @card.OwedAmount.ToString("N2")</h3>
-                            <p class="small text-muted mb-3">Disponible: RD$ @card.AvailableCredit.ToString("N2")</p>
-                            <a asp-action="CardDetails" asp-route-id="@card.Id" class="btn btn-outline-success btn-sm rounded-pill w-100 fw-bold">Ver Consumos</a>
                         </div>
-                    </div>
-                </div>
-            }
-        }
-    </div>
+                    }
+                }
+            </div>
+        </div>
 
-    <h4 class="fw-bold mb-3 text-secondary"><i class="bi bi-cash-stack me-2"></i> Préstamos</h4>
-    <div class="row g-4 mb-5">
-        @if (Model.Loans == null || !Model.Loans.Any())
-        {
-            <div class="col-12"><p class="text-muted">No tienes préstamos activos.</p></div>
-        }
-        else
-        {
-            foreach (var loan in Model.Loans)
-            {
-                <div class="col-md-6 col-xl-4">
-                    <div class="card border rounded-3 h-100 hover-elevate transition-all">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex justify-content-center align-items-center" style="width: 48px; height: 48px;">
-                                    <i class="bi bi-bank fs-4"></i>
+        <!-- Tarjetas de Crédito -->
+        <div class="col-xl-4 col-lg-6 col-md-12">
+            <h4 class="fw-bold mb-3 text-secondary"><i class="bi bi-credit-card me-2"></i> Tarjetas de Crédito</h4>
+            <div class="row g-3">
+                @if (Model.CreditCards == null || !Model.CreditCards.Any())
+                {
+                    <div class="col-12"><p class="text-muted">No tienes tarjetas de crédito activas.</p></div>
+                }
+                else
+                {
+                    foreach (var card in Model.CreditCards)
+                    {
+                        <div class="col-12">
+                            <div class="card border rounded-2 h-100 hover-elevate transition-all">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="bg-success bg-opacity-10 text-success rounded-3 d-flex justify-content-center align-items-center" style="width: 54px; height: 54px;">
+                                            <i class="bi bi-credit-card-fill fs-3"></i>
+                                        </div>
+                                        <span class="badge bg-light text-dark border">@card.MaskedCardNumber</span>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-secondary fw-bold mb-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">DEUDA ACTUAL</h6>
+                                        <h3 class="fw-bold text-dark mb-1">RD$ @card.OwedAmount.ToString("N2")</h3>
+                                    </div>
+                                    <p class="small text-muted mb-3">Disponible: RD$ @card.AvailableCredit.ToString("N2")</p>
+                                    <a asp-action="CardDetails" asp-route-id="@card.Id" class="btn btn-outline-success btn-sm rounded-pill w-100 fw-bold">Ver Consumos</a>
                                 </div>
-                                <span class="badge bg-light text-dark border">Préstamo @loan.LoanNumber</span>
                             </div>
-                            <h6 class="text-muted mb-1">Monto Pendiente</h6>
-                            <h3 class="fw-bold mb-1 text-warning">RD$ @loan.PendientAmount.ToString("N2")</h3>
-                            <p class="small text-muted mb-3">Cuota: RD$ @loan.InstallmentPay.ToString("N2")</p>
-                            <a asp-action="LoanDetails" asp-route-id="@loan.Id" class="btn btn-outline-warning btn-sm rounded-pill w-100 fw-bold text-dark">Ver Amortización</a>
                         </div>
-                    </div>
-                </div>
-            }
-        }
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- Préstamos -->
+        <div class="col-xl-4 col-lg-6 col-md-12">
+            <h4 class="fw-bold mb-3 text-secondary"><i class="bi bi-cash-stack me-2"></i> Préstamos</h4>
+            <div class="row g-3">
+                @if (Model.Loans == null || !Model.Loans.Any())
+                {
+                    <div class="col-12"><p class="text-muted">No tienes préstamos activos.</p></div>
+                }
+                else
+                {
+                    foreach (var loan in Model.Loans)
+                    {
+                        <div class="col-12">
+                            <div class="card border rounded-2 h-100 hover-elevate transition-all">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="bg-warning bg-opacity-10 text-warning rounded-3 d-flex justify-content-center align-items-center" style="width: 54px; height: 54px;">
+                                            <i class="bi bi-bank fs-3"></i>
+                                        </div>
+                                        <span class="badge bg-light text-dark border">Préstamo @loan.LoanNumber</span>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-secondary fw-bold mb-1" style="font-size: 0.85rem; letter-spacing: 0.5px;">MONTO PENDIENTE</h6>
+                                        <h3 class="fw-bold text-dark mb-1">RD$ @loan.PendientAmount.ToString("N2")</h3>
+                                    </div>
+                                    <p class="small text-muted mb-3">Cuota: RD$ @loan.InstallmentPay.ToString("N2")</p>
+                                    <a asp-action="LoanDetails" asp-route-id="@loan.Id" class="btn btn-outline-warning btn-sm rounded-pill w-100 fw-bold text-dark">Ver Amortización</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
     </div>
 </div>
 

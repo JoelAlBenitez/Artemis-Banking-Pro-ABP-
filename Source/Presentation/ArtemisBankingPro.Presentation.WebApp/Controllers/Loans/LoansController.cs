@@ -52,6 +52,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
             if (!result.IsValid)
             {
                 _logger.LogWarning("No fue posible mostrar los detalles del prestamo con ID {ID}", id);
+                TempData["ErrorMessage"] = "No fue posible mostrar los detalles del préstamo. Esto suele ocurrir con préstamos creados manualmente que carecen de cuotas.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -178,6 +179,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.Loans
             if (!result.IsValid)
             {
                 _logger.LogWarning("No fue posible cargar la edicion de tasa del prestamo con ID {ID}", id);
+                TempData["ErrorMessage"] = "No fue posible cargar la edición de tasa del préstamo. Esto suele ocurrir con préstamos creados manualmente que carecen de cuotas.";
                 return RedirectToAction(nameof(Index));
             }
 
