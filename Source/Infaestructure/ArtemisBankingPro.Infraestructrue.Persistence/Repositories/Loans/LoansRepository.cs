@@ -20,19 +20,26 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Loans
 
         //El rango de la secuencia arranca en 9 dígitos, así que el valor emitido ya tiene el
         //largo exigido. El PadLeft solo protege el formato de texto del contrato.
+        //NEXT VALUE FOR debe ejecutarse como comando directo: SQL Server lo rechaza dentro de
+        //una tabla derivada, que es en lo que se traduce una consulta LINQ sobre SqlQueryRaw.
         public async Task<string> GetNextLoanNumberAsync()
         {
-            var connection = _context.Database.GetDbConnection();
-            if (connection.State != System.Data.ConnectionState.Open)
-                await connection.OpenAsync();
+            await _context.Database.OpenConnectionAsync();
+            try
+            {
+                using var command = _context.Database.GetDbConnection().CreateCommand();
+                command.CommandText = $"SELECT NEXT VALUE FOR [{LoanNumberSequence}]";
+                var result = await command.ExecuteScalarAsync();
+                var nextValue = Convert.ToInt32(result);
 
-            using var command = connection.CreateCommand();
-            command.CommandText = $"SELECT NEXT VALUE FOR [{LoanNumberSequence}]";
-            var nextValue = (int)await command.ExecuteScalarAsync();
-
-            return nextValue
-                .ToString(CultureInfo.InvariantCulture)
-                .PadLeft(DomainConstants.LoanNumberLength, '0');
+                return nextValue
+                    .ToString(CultureInfo.InvariantCulture)
+                    .PadLeft(DomainConstants.LoanNumberLength, '0');
+            }
+            finally
+            {
+                await _context.Database.CloseConnectionAsync();
+            }
         }
 
         public async Task<PagedResult<Loan>> GetPagedLoansAsync(

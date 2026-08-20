@@ -167,7 +167,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
         [HttpGet]
         public IActionResult CreditCardPayment()
         {
-            return View(new CreditCardPaymentViewModel());
+            return View(new CreditCardPaymentViewModel { SourceAccountNumber = string.Empty, CreditCardNumber = string.Empty });
         }
 
         [HttpPost]
@@ -262,7 +262,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
         [HttpGet]
         public IActionResult LoanPayment()
         {
-            return View(new LoanPaymentViewModel());
+            return View(new LoanPaymentViewModel { OriginAccountNumber = string.Empty, LoanNumber = string.Empty });
         }
 
         [HttpPost]
@@ -352,7 +352,7 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers
         [HttpGet]
         public IActionResult ThirdPartyTransfer()
         {
-            return View(new ThirdPartyTransferViewModel());
+            return View(new ThirdPartyTransferViewModel { OriginAccountNumber = string.Empty, DestinationAccountNumber = string.Empty });
         }
 
         [HttpPost]

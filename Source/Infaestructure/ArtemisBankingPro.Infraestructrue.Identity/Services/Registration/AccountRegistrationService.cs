@@ -1,6 +1,7 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.EmailSerives;
 using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
 using ArtemisBankingPro.Core.Application.Contracts.Users.Registration;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Session;
 using ArtemisBankingPro.Core.Application.DTOs.Account;
 using ArtemisBankingPro.Core.Domain.Common.Constants;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
@@ -24,6 +25,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Registration
         private readonly ISavingsAccountsRepository _savingsAccountsRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly ILogger<AccountRegistrationService> _logger;
+        private readonly ICurrentUserService _currentUserService;
 
         public AccountRegistrationService(
             UserManager<ApplicationUser> userManager,
@@ -31,7 +33,8 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Registration
             IEmailServices emailServices,
             ISavingsAccountsRepository savingsAccountsRepository,
             ITransactionRepository transactionRepository,
-            ILogger<AccountRegistrationService> logger)
+            ILogger<AccountRegistrationService> logger,
+            ICurrentUserService currentUserService)
         {
             _userManager = userManager;
             _generateTokens = generateTokens;
@@ -39,6 +42,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Registration
             _savingsAccountsRepository = savingsAccountsRepository;
             _transactionRepository = transactionRepository;
             _logger = logger;
+            _currentUserService = currentUserService;
         }
 
         public async Task<RegisterResponse> RegisterUserAsync(RegisterRequest request)
@@ -206,6 +210,10 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Registration
         //módulo de cuentas, estado Activa y balance igual al monto inicial indicado.
         private async Task<bool> CreatePrimaryAccountAsync(string customerId, decimal initialAmount)
         {
+            //Responsable de la apertura: el administrador que registra al cliente. En un
+            //autorregistro no hay sesión, y ahí sí la apertura la origina el sistema.
+            var performedByUserId = _currentUserService.UserId ?? DomainConstants.SystemUserId;
+
             try
             {
                 var accountNumber = await _savingsAccountsRepository.GetNextAccountNumberAsync();
@@ -223,7 +231,7 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Registration
                     AccountType = SavingsAccountType.Principal,
                     Status = SavingsAccountStatus.Activa,
                     CreatedAt = DateTimeOffset.UtcNow,
-                    CreateByUserId = DomainConstants.SystemUserId
+                    CreateByUserId = performedByUserId
                 });
                 await _savingsAccountsRepository.SaveChangesAsync();
 
@@ -239,10 +247,10 @@ namespace ArtemisBankingPro.Infraestructrue.Identity.Services.Registration
                         Origin = "Apertura de cuenta",
                         Beneficiary = account.AccountNumber,
                         Status = TransactionStatus.Aprobada,
-                        PerformedByUserId = DomainConstants.SystemUserId,
+                        PerformedByUserId = performedByUserId,
                         Channel = ChannelPayment.Administrador,
                         CreatedAt = DateTimeOffset.UtcNow,
-                        CreateByUserId = DomainConstants.SystemUserId
+                        CreateByUserId = performedByUserId
                     });
                     await _transactionRepository.SaveChangesAsync();
                 }

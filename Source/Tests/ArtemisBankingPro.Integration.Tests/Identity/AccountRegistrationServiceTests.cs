@@ -1,5 +1,6 @@
 using Artemis_Banking_Pro.Core.Application.Contracts.EmailSerives;
 using Artemis_Banking_Pro.Core.Application.DTOs.Messages;
+using ArtemisBankingPro.Core.Application.Contracts.Users.Session;
 using ArtemisBankingPro.Core.Application.DTOs.Account;
 using ArtemisBankingPro.Core.Domain.Common.Enum;
 using ArtemisBankingPro.Core.Domain.Entities.SavingsAccounts;
@@ -27,6 +28,7 @@ namespace ArtemisBankingPro.Integration.Tests.Identity
         private readonly Mock<IEmailServices> _emailServices;
         private readonly Mock<ISavingsAccountsRepository> _savingsAccountsRepository;
         private readonly Mock<ITransactionRepository> _transactionRepository;
+        private readonly Mock<ICurrentUserService> _currentUserService;
         private readonly AccountRegistrationService _service;
 
         private readonly List<SavingsAccount> _createdAccounts = new();
@@ -40,6 +42,7 @@ namespace ArtemisBankingPro.Integration.Tests.Identity
             _emailServices = new Mock<IEmailServices>();
             _savingsAccountsRepository = new Mock<ISavingsAccountsRepository>();
             _transactionRepository = new Mock<ITransactionRepository>();
+            _currentUserService = new Mock<ICurrentUserService>();
 
             _generateTokens
                 .Setup(g => g.GenerateTokenConfirmEmailAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
@@ -76,7 +79,8 @@ namespace ArtemisBankingPro.Integration.Tests.Identity
                 _emailServices.Object,
                 _savingsAccountsRepository.Object,
                 _transactionRepository.Object,
-                NullLogger<AccountRegistrationService>.Instance);
+                NullLogger<AccountRegistrationService>.Instance,
+                _currentUserService.Object);
         }
 
         // ─── Validaciones ────────────────────────────────────────────────────

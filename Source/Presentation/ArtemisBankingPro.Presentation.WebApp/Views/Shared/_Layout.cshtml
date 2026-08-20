@@ -164,6 +164,23 @@
 
         <main role="main" class="flex-grow-1 w-100" style="background-color: #F8FAFC; height: 100vh; overflow-y: auto;">
             <div class="container-fluid p-3 p-md-4">
+                @* Los mensajes se consumen aquí, en cada pantalla: si los leyera solo la vista que
+                   los origina, un mensaje sin lector se quedaría en TempData y saldría en la
+                   siguiente pantalla que sí lo lee, incluso tras cambiar de usuario. *@
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 js-auto-dismiss" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 js-auto-dismiss" role="alert">
+                        <i class="bi bi-exclamation-octagon-fill me-2"></i>@TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
+                }
                 @RenderBody()
             </div>
         </main>
@@ -172,6 +189,12 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Los avisos se ocultan solos a los 6 segundos; el botón de cierre sigue disponible antes.
+        document.querySelectorAll('.js-auto-dismiss').forEach(function (alerta) {
+            setTimeout(function () { bootstrap.Alert.getOrCreateInstance(alerta).close(); }, 6000);
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
