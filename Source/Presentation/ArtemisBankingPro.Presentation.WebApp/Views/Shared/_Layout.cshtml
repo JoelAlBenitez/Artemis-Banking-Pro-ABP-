@@ -107,6 +107,11 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @(currentController == "Transactions" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "bg-white bg-opacity-10 text-white" : "text-white opacity-75 sidebar-link")" style="font-size: 0.9rem;" asp-area="" asp-controller="Transactions" asp-action="Index">
+                                    <i class="bi bi-wallet2 me-3 fs-5"></i> Pagos y Transferencias
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link rounded d-flex align-items-center py-2 px-3 fw-medium @(currentController == "Transactions" && ViewContext.RouteData.Values["Action"]?.ToString() == "Express" ? "bg-white bg-opacity-10 text-white" : "text-white opacity-75 sidebar-link")" style="font-size: 0.9rem;" asp-area="" asp-controller="Transactions" asp-action="Express">
                                     <i class="bi bi-arrow-left-right me-3 fs-5"></i> Transferencia Exprés
                                 </a>
