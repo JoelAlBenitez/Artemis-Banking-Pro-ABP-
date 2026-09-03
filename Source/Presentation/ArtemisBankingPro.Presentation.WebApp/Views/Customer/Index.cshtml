@@ -54,19 +54,19 @@
 
                         <div class="d-flex gap-2">
                             <a asp-controller="Transactions" asp-action="Index" class="quick-action-btn text-decoration-none text-center">
-                                <div class="icon-box bg-light rounded-4 mb-1 d-flex justify-content-center align-items-center text-dark transition-all shadow-sm" style="width: 55px; height: 55px;">
+                                <div class="icon-box bg-light rounded-4 mb-1 d-flex justify-content-center align-items-center text-dark transition-all" style="width: 55px; height: 55px;">
                                     <i class="bi bi-arrow-left-right fs-4"></i>
                                 </div>
                                 <span class="text-dark fw-bold" style="font-size: 0.75rem;">Transferir</span>
                             </a>
                             <a asp-controller="Transactions" asp-action="PayCard" class="quick-action-btn text-decoration-none text-center">
-                                <div class="icon-box bg-light rounded-4 mb-1 d-flex justify-content-center align-items-center text-dark transition-all shadow-sm" style="width: 55px; height: 55px;">
+                                <div class="icon-box bg-light rounded-4 mb-1 d-flex justify-content-center align-items-center text-dark transition-all" style="width: 55px; height: 55px;">
                                     <i class="bi bi-credit-card-fill fs-4"></i>
                                 </div>
                                 <span class="text-dark fw-bold" style="font-size: 0.75rem;">Pagar</span>
                             </a>
                             <a asp-controller="CashAdvance" asp-action="Index" class="quick-action-btn text-decoration-none text-center">
-                                <div class="icon-box bg-light rounded-4 mb-1 d-flex justify-content-center align-items-center text-dark transition-all shadow-sm" style="width: 55px; height: 55px;">
+                                <div class="icon-box bg-light rounded-4 mb-1 d-flex justify-content-center align-items-center text-dark transition-all" style="width: 55px; height: 55px;">
                                     <i class="bi bi-cash-coin fs-4"></i>
                                 </div>
                                 <span class="text-dark fw-bold" style="font-size: 0.75rem;">Avance</span>
@@ -130,7 +130,7 @@
                                 <div class="card border-0 rounded-4 shadow-sm h-100 bg-white hover-elevate transition-all">
                                     <div class="card-body p-4 d-flex flex-column">
                                         <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <div class="text-primary bg-primary bg-opacity-10 rounded-3 d-flex justify-content-center align-items-center" style="width: 50px; height: 50px;">
+                                            <div class="text-primary d-flex justify-content-center align-items-center" style="width: 50px; height: 50px;">
                                                 <i class="bi bi-piggy-bank fs-4"></i>
                                             </div>
                                             <span class="text-muted fw-bold" style="font-size: 1rem;">
@@ -164,24 +164,24 @@
                     <div class="card-body p-4">
                         @if (Model.Loans != null && Model.Loans.Any())
                         {
-                            <div class="table-responsive">
+                            <div>
                                 <table class="table table-borderless align-middle mb-0">
                                     <tbody>
                                         @foreach (var loan in Model.Loans)
                                         {
                                             <tr class="border-bottom">
                                                 <td class="py-4 ps-0" style="width: 60px;">
-                                                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px;">
-                                                        <i class="bi bi-bank fs-3"></i>
+                                                    <div class="text-warning d-flex justify-content-center align-items-center" style="width: 50px; height: 50px;">
+                                                        <i class="bi bi-bank fs-4"></i>
                                                     </div>
                                                 </td>
                                                 <td class="py-4">
-                                                    <p class="fw-bold text-dark mb-1" style="font-size: 1.1rem;">Préstamo</p>
-                                                    <span class="text-muted" style="font-size: 0.95rem;">ID: @loan.LoanNumber</span>
+                                                    <p class="fw-bold text-dark mb-1" style="font-size: 1rem;">Préstamo</p>
+                                                    <span class="text-muted text-nowrap" style="font-size: 0.85rem;">ID: @loan.LoanNumber</span>
                                                 </td>
                                                 <td class="py-4 pe-0 text-end">
-                                                    <p class="fw-bold text-danger mb-2" style="font-size: 1.15rem; letter-spacing: -0.5px;">- RD$ @loan.PendientAmount.ToString("N2")</p>
-                                                    <a asp-action="LoanDetails" asp-route-id="@loan.Id" class="text-warning text-decoration-none fw-bold" style="font-size: 0.95rem;">
+                                                    <p class="fw-bold text-danger mb-2 text-nowrap" style="font-size: 1rem; letter-spacing: -0.5px;">- RD$ @loan.PendientAmount.ToString("N2")</p>
+                                                    <a asp-action="LoanDetails" asp-route-id="@loan.Id" class="text-warning text-decoration-none fw-bold text-nowrap" style="font-size: 0.85rem;">
                                                         Ver amortización <i class="bi bi-chevron-right ms-1"></i>
                                                     </a>
                                                 </td>
