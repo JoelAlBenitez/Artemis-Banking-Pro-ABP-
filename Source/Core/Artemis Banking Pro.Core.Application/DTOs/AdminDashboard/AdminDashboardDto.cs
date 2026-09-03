@@ -16,5 +16,9 @@ namespace Artemis_Banking_Pro.Core.Application.DTOs.AdminDashboard
 
         //Monto, no conteo: se muestra como RD$0.00 y necesita los dos decimales.
         public required decimal AverageDebtAmountPerCustomer { get; set; }
+
+        public List<string> Last7DaysLabels { get; set; } = new();
+        public List<int> Last7DaysTransactions { get; set; } = new();
+        public List<int> Last7DaysPayments { get; set; } = new();
     }
 }

@@ -13,5 +13,9 @@ namespace Artemis_Banking_Pro.Core.Application.ViewModels.AdminDashboard
         public required int CreditCardActive { get; set; }
         public required int SavingAccountActive { get; set; }
         public required decimal AverageDebtAmountPerCustomer { get; set; }
+
+        public List<string> Last7DaysLabels { get; set; } = new();
+        public List<int> Last7DaysTransactions { get; set; } = new();
+        public List<int> Last7DaysPayments { get; set; } = new();
     }
 }

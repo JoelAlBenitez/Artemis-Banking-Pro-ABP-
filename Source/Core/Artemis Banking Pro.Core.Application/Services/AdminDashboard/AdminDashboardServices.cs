@@ -90,6 +90,35 @@ namespace Artemis_Banking_Pro.Core.Application.Services.AdminDashboard
                 var activeClientIds = activeClients.Select(client => client.Id).ToList();
                 var averageDebt = await _debtCalculator.GetAverageDebtAsync(activeClientIds);
 
+                // Volumen de los últimos 7 días
+                var today = DateTimeOffset.UtcNow.Date;
+                var startDate = today.AddDays(-6); // Hace 6 días + hoy = 7 días
+                var last7DaysTxs = await _transactionRepository.GetTransactionsFromDateAsync(startDate);
+
+                var labels = new List<string>();
+                var txCounts = new List<int>();
+                var pyCounts = new List<int>();
+
+                // Asegurar que los 7 días existan aunque no tengan transacciones
+                for (int i = 0; i < 7; i++)
+                {
+                    var currentDate = startDate.AddDays(i);
+                    // Etiqueta como "Lun 18"
+                    var label = currentDate.ToString("ddd dd", new System.Globalization.CultureInfo("es-ES"));
+                    // Capitalizar primera letra: "Lun 18" en lugar de "lun 18"
+                    label = char.ToUpper(label[0]) + label.Substring(1);
+
+                    var txsInDay = last7DaysTxs.Where(t => t.CreatedAt.Date == currentDate).ToList();
+                    var txCount = txsInDay.Count;
+                    var pyCount = txsInDay.Count(t => 
+                        (t.OperationType == OperationType.PagoTarjeta || t.OperationType == OperationType.PagoPrestamo) 
+                        && t.Status == TransactionStatus.Aprobada);
+
+                    labels.Add(label);
+                    txCounts.Add(txCount);
+                    pyCounts.Add(pyCount);
+                }
+
                 var indicators = new AdminDashboardDto
                 {
                     TotalHistoricalTransactions = totalHistoricalTransactions,
@@ -102,7 +131,10 @@ namespace Artemis_Banking_Pro.Core.Application.Services.AdminDashboard
                     OutstandingLoans = outstandingLoans,
                     CreditCardActive = creditCardActive,
                     SavingAccountActive = savingAccountActive,
-                    AverageDebtAmountPerCustomer = averageDebt
+                    AverageDebtAmountPerCustomer = averageDebt,
+                    Last7DaysLabels = labels,
+                    Last7DaysTransactions = txCounts,
+                    Last7DaysPayments = pyCounts
                 };
 
                 _logger.LogInformation(

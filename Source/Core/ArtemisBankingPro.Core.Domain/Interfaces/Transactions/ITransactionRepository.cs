@@ -9,5 +9,6 @@ namespace ArtemisBankingPro.Core.Domain.Interfaces.Transactions
         Task<int> GetTotalHistoricalAsync();
         Task<int> GetTotalTodayAsync();
         Task<IReadOnlyList<Transaction>> GetPaymentsAsync(ChannelPayment? channel, DateTimeOffset? date);
+        Task<IReadOnlyList<Transaction>> GetTransactionsFromDateAsync(DateTimeOffset fromDate);
     }
 }

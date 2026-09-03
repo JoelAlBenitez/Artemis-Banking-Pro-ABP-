@@ -180,3 +180,140 @@
         </div>
     </div>
 </div>
+
+<div class="row mt-1 mb-4">
+    <div class="col-12">
+        <div class="metric-card border p-4 shadow-sm rounded-4 bg-white position-relative">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h5 class="fw-bold mb-1 text-dark" style="font-family: 'Montserrat', sans-serif;">Volumen de Transacciones</h5>
+                    <p class="text-muted small mb-0">Últimos 7 días</p>
+                </div>
+                <div class="d-flex gap-4">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle me-2" style="width: 10px; height: 10px; background-color: #06b6d4;"></div>
+                        <span class="text-muted small">Transacciones</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle me-2" style="width: 10px; height: 10px; background-color: #10b981;"></div>
+                        <span class="text-muted small">Pagos</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="height: 300px; width: 100%;">
+                <canvas id="transactionsVolumeChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('transactionsVolumeChart').getContext('2d');
+            
+            const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Last7DaysLabels));
+            const transactionsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Last7DaysTransactions));
+            const paymentsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Last7DaysPayments));
+
+            const gradientBlue = ctx.createLinearGradient(0, 0, 0, 300);
+            gradientBlue.addColorStop(0, 'rgba(6, 182, 212, 0.2)');
+            gradientBlue.addColorStop(1, 'rgba(6, 182, 212, 0)');
+
+            const gradientGreen = ctx.createLinearGradient(0, 0, 0, 300);
+            gradientGreen.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+            gradientGreen.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Transacciones',
+                            data: transactionsData,
+                            borderColor: '#06b6d4',
+                            backgroundColor: gradientBlue,
+                            borderWidth: 2,
+                            pointBackgroundColor: '#06b6d4',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#06b6d4',
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Pagos',
+                            data: paymentsData,
+                            borderColor: '#10b981',
+                            backgroundColor: gradientGreen,
+                            borderWidth: 2,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#10b981',
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false // Usamos la leyenda personalizada en HTML
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { size: 13, family: "'Montserrat', sans-serif" },
+                            bodyFont: { size: 13, family: "'Montserrat', sans-serif" },
+                            padding: 10,
+                            cornerRadius: 4,
+                            displayColors: true
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: { size: 12, family: "'Montserrat', sans-serif" },
+                                color: '#64748b'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#f1f5f9',
+                                drawBorder: false,
+                                borderDash: [5, 5]
+                            },
+                            ticks: {
+                                font: { size: 12, family: "'Montserrat', sans-serif" },
+                                color: '#64748b',
+                                padding: 10,
+                                stepSize: 3 // Ajustar paso como en la imagen
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        });
+    </script>
+}

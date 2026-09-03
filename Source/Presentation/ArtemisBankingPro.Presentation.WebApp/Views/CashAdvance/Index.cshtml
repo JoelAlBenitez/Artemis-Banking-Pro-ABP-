@@ -4,19 +4,23 @@
     ViewData["Title"] = "Avance de Efectivo";
 }
 
-<div class="container-fluid py-5" style="font-family: 'Montserrat', sans-serif;">
+<div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-5">
-            <div class="card border-0 shadow-lg rounded-2 overflow-hidden">
-                <div class="card-header bg-dark text-white p-4 border-0">
-                    <h3 class="fw-bold mb-1"><i class="bi bi-cash-stack me-2 text-success"></i> Avance de Efectivo</h3>
-                    <p class="mb-0 opacity-75 small">Transfiere fondos desde tu tarjeta de crédito a tu cuenta de ahorro.</p>
+        <div class="col-md-8 col-lg-8 col-xl-7">
+            
+            <div class="mb-4 text-center">
+                <div class="mb-2">
+                    <i class="bi bi-cash-stack fs-4 text-success"></i>
                 </div>
-                
-                <div class="card-body p-4 p-4">
+                <h2 class="fw-normal mb-1" style="color: #0F172A; font-family: 'Montserrat', sans-serif;">Avance de Efectivo</h2>
+                <p class="text-muted mb-0 fs-6 fw-bold">Transfiere fondos desde tu tarjeta de crédito a tu cuenta de ahorro.</p>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
                     @if (!ViewData.ModelState.IsValid)
                     {
-                        <div class="alert alert-danger shadow-sm border-0 rounded-2 mb-4">
+                        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-3">
                             <i class="bi bi-exclamation-circle-fill me-2"></i>
                             <strong>¡Atención!</strong>
                             <div asp-validation-summary="All" class="mt-2 mb-0 small"></div>
@@ -25,7 +29,7 @@
 
                     @if (Model.AvailableCards == null || !Model.AvailableCards.Any())
                     {
-                        <div class="alert alert-warning border-0 rounded-2 shadow-sm p-4 text-center">
+                        <div class="alert alert-warning border-0 rounded-3 shadow-sm p-4 text-center mb-0">
                             <i class="bi bi-exclamation-triangle-fill fs-1 text-warning mb-3 d-block"></i>
                             <h5 class="fw-bold">Sin tarjetas disponibles</h5>
                             <p class="mb-0">No posees tarjetas de crédito activas para realizar avances.</p>
@@ -33,7 +37,7 @@
                     }
                     else if (Model.AvailableAccounts == null || !Model.AvailableAccounts.Any())
                     {
-                        <div class="alert alert-warning border-0 rounded-2 shadow-sm p-4 text-center">
+                        <div class="alert alert-warning border-0 rounded-3 shadow-sm p-4 text-center mb-0">
                             <i class="bi bi-exclamation-triangle-fill fs-1 text-warning mb-3 d-block"></i>
                             <h5 class="fw-bold">Sin cuentas disponibles</h5>
                             <p class="mb-0">No posees cuentas de ahorro activas para recibir el avance.</p>
@@ -43,55 +47,64 @@
                     {
                         <form asp-controller="CashAdvance" asp-action="Index" method="post" id="cashAdvanceForm">
                             
-                            <div class="mb-4">
-                                <label asp-for="CreditCardId" class="form-label fw-bold text-secondary">Tarjeta de crédito origen <span class="text-danger">*</span></label>
-                                <select asp-for="CreditCardId" class="form-select form-select border-0 bg-light shadow-sm rounded-2" id="cardSelect" onchange="updateAvailableCredit()">
-                                    <option value="">Seleccione una tarjeta</option>
-                                    @foreach(var card in Model.AvailableCards)
-                                    {
-                                        <option value="@card.Id" data-credit="@(card.CreditLimit - card.OwedAmount)">**** @card.LastFourDigits (Disponible: RD$ @((card.CreditLimit - card.OwedAmount).ToString("N2")))</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="CreditCardId" class="text-danger small mt-2 d-block fw-bold"></span>
-                            </div>
-
-                            <div class="mb-4">
-                                <label asp-for="SavingsAccountId" class="form-label fw-bold text-secondary">Cuenta de ahorro destino <span class="text-danger">*</span></label>
-                                <select asp-for="SavingsAccountId" class="form-select form-select border-0 bg-light shadow-sm rounded-2">
-                                    <option value="">Seleccione cuenta a depositar</option>
-                                    @foreach(var account in Model.AvailableAccounts)
-                                    {
-                                        <option value="@account.Id">@account.AccountNumber - (RD$ @account.Balance.ToString("N2"))</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="SavingsAccountId" class="text-danger small mt-2 d-block fw-bold"></span>
-                            </div>
-
-                            <div class="mb-5">
-                                <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto del avance de efectivo <span class="text-danger">*</span></label>
-                                <div class="input-group input-group shadow-sm rounded-2 overflow-hidden">
-                                    <span class="input-group-text bg-light border-0 text-success fw-bold">RD$</span>
-                                    <input asp-for="Amount" type="number" step="0.01" class="form-control border-0 bg-light text-dark fw-bold" placeholder="0.00" autocomplete="off" oninput="calculateInterest()" />
+                            <div class="row g-4 mb-3">
+                                <div class="col-md-12">
+                                    <label asp-for="CreditCardId" class="form-label fw-bold text-dark mb-1" style="font-size: 0.85rem;">Tarjeta de crédito origen <span class="text-danger">*</span></label>
+                                    <select asp-for="CreditCardId" class="form-select rounded-3 py-2" id="cardSelect" onchange="updateAvailableCredit()">
+                                        <option value="">Seleccione una tarjeta</option>
+                                        @foreach(var card in Model.AvailableCards)
+                                        {
+                                            <option value="@card.Id" data-credit="@(card.CreditLimit - card.OwedAmount)">**** @card.LastFourDigits (Disponible: RD$ @((card.CreditLimit - card.OwedAmount).ToString("N2")))</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="CreditCardId" class="text-danger small mt-1 d-block"></span>
                                 </div>
-                                <span asp-validation-for="Amount" class="text-danger small mt-2 d-block fw-bold"></span>
+                            </div>
+
+                            <div class="row g-4 mb-3">
+                                <div class="col-md-12">
+                                    <label asp-for="SavingsAccountId" class="form-label fw-bold text-dark mb-1" style="font-size: 0.85rem;">Cuenta de ahorro destino <span class="text-danger">*</span></label>
+                                    <select asp-for="SavingsAccountId" class="form-select rounded-3 py-2">
+                                        <option value="">Seleccione cuenta a depositar</option>
+                                        @foreach(var account in Model.AvailableAccounts)
+                                        {
+                                            <option value="@account.Id">@account.AccountNumber - (RD$ @account.Balance.ToString("N2"))</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="SavingsAccountId" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <p class="small text-muted mb-0" style="font-size: 0.75rem;">Verifica los datos antes de continuar.</p>
+                            </div>
+
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-12">
+                                    <label asp-for="Amount" class="form-label fw-bold text-dark mb-1" style="font-size: 0.85rem;">Monto del avance de efectivo <span class="text-danger">*</span></label>
+                                    <input asp-for="Amount" type="number" step="0.01" class="form-control rounded-3 py-2 fw-bold text-secondary" placeholder="Ej: 1500.00" autocomplete="off" oninput="calculateInterest()" />
+                                    <span asp-validation-for="Amount" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
                                 
-                                <div class="alert alert-secondary mt-3 mb-0 rounded-3 border-0 d-flex justify-content-between align-items-center">
-                                    <span class="small fw-bold text-secondary"><i class="bi bi-info-circle me-1"></i> Interés (6.25%):</span>
-                                    <span class="small fw-bold text-dark" id="interestDisplay">RD$ 0.00</span>
+                            <div class="row g-2 mb-4">
+                                <div class="col-6">
+                                    <div class="alert alert-secondary m-0 py-2 px-3 rounded-3 border-0 d-flex justify-content-between align-items-center h-100">
+                                        <span class="small fw-bold text-secondary"><i class="bi bi-info-circle me-1"></i> Interés (6.25%):</span>
+                                        <span class="small fw-bold text-dark" id="interestDisplay">RD$ 0.00</span>
+                                    </div>
                                 </div>
-                                <div class="alert alert-info mt-2 mb-0 rounded-3 border-0 d-flex justify-content-between align-items-center">
-                                    <span class="small fw-bold text-info"><i class="bi bi-calculator me-1"></i> Total a cargar:</span>
-                                    <span class="small fw-bold text-dark" id="totalDisplay">RD$ 0.00</span>
+                                <div class="col-6">
+                                    <div class="alert alert-info m-0 py-2 px-3 rounded-3 border-0 d-flex justify-content-between align-items-center h-100">
+                                        <span class="small fw-bold text-info"><i class="bi bi-calculator me-1"></i> Total:</span>
+                                        <span class="small fw-bold text-dark" id="totalDisplay">RD$ 0.00</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="d-flex gap-3 justify-content-end border-top border-secondary border-opacity-25 pt-4">
-                                <a asp-controller="Customer" asp-action="Index" class="btn btn-light rounded-2 fw-bold px-4 shadow-sm text-secondary">
-                                    Cancelar
-                                </a>
-                                <button type="submit" class="btn btn-dark rounded-2 fw-bold px-5 shadow-sm">
-                                    Realizar avance
-                                </button>
+                            <div class="d-flex gap-2 justify-content-end pt-3 mt-3 border-top">
+                                <a asp-controller="Customer" asp-action="Index" class="btn btn-outline-secondary rounded-3 px-4 fw-bold">Cancelar</a>
+                                <button type="submit" class="btn btn-dark rounded-3 px-4 fw-bold" style="background-color: #0F172A;">Continuar <i class="bi bi-arrow-left-right ms-2"></i></button>
                             </div>
                         </form>
                     }

@@ -6,22 +6,23 @@
     var savingsAccounts = ViewBag.SavingsAccounts as List<SavingsAccountDto> ?? new List<SavingsAccountDto>();
 }
 
-<div class="container-fluid py-5" style="font-family: 'Montserrat', sans-serif;">
+<div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-5 col-xl-5">
+        <div class="col-md-8 col-lg-8 col-xl-7">
             
-            <div class="mb-4 text-center">
-                <h2 class="fw-bold mb-2" style="color: #0F172A;">
-                    <i class="bi bi-arrow-left-right text-dark me-2"></i> Transferencia Exprés
-                </h2>
-                <p class="text-muted mb-0">Transfiere fondos entre tus propias cuentas de ahorro o a cuentas de terceros en nuestro banco.</p>
+            <div class="text-center mb-4">
+                <div class="d-inline-flex justify-content-center align-items-center mb-2">
+                    <i class="bi bi-arrow-left-right fs-4 text-warning"></i>
+                </div>
+                <h2 class="fw-normal mb-1" style="color: #0F172A; font-family: 'Montserrat', sans-serif;">Transferencia Exprés</h2>
+                <p class="text-muted mb-0 fs-6 fw-bold">Transfiere rápidamente a cualquier cuenta en nuestro banco.</p>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-2">
-                <div class="card-body p-4 p-4">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
                     @if (!ViewData.ModelState.IsValid)
                     {
-                        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4">
+                        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-3">
                             <i class="bi bi-exclamation-circle-fill me-2"></i>
                             <strong>¡Atención!</strong>
                             <div asp-validation-summary="All" class="mt-2 mb-0 small"></div>
@@ -30,36 +31,41 @@
 
                     <form asp-action="Express" method="post">
                         
-                        <div class="mb-4">
-                            <label asp-for="SourceAccountNumber" class="form-label fw-bold text-secondary">Cuenta de Origen <span class="text-danger">*</span></label>
-                            <select asp-for="SourceAccountNumber" class="form-select">
-                                <option value="">-- Seleccione una cuenta origen --</option>
-                                @foreach(var account in savingsAccounts)
-                                {
-                                    <option value="@account.AccountNumber">@account.AccountNumber - RD$ @account.Balance.ToString("N2")</option>
-                                }
-                            </select>
-                            <span asp-validation-for="SourceAccountNumber" class="text-danger small mt-1 d-block"></span>
+                        <div class="row g-4 mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="SourceAccountNumber" class="form-label fw-bold text-dark mb-1" style="font-size: 0.85rem;">Cuenta de origen <span class="text-danger">*</span></label>
+                                <select asp-for="SourceAccountNumber" class="form-select rounded-3 py-2">
+                                    <option value="">Seleccione una cuenta origen</option>
+                                    @foreach(var account in savingsAccounts)
+                                    {
+                                        <option value="@account.AccountNumber">@account.AccountNumber (RD$ @account.Balance.ToString("N2"))</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="SourceAccountNumber" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="DestinationAccountNumber" class="form-label fw-bold text-dark mb-1" style="font-size: 0.85rem;">Cuenta de destino <span class="text-danger">*</span></label>
+                                <input asp-for="DestinationAccountNumber" type="text" class="form-control rounded-3 py-2" placeholder="Ej: 100000000 (9 dígitos)" autocomplete="off" />
+                                <span asp-validation-for="DestinationAccountNumber" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <p class="small text-muted mb-0" style="font-size: 0.75rem;">Verifica los datos antes de continuar.</p>
                         </div>
 
-                        <div class="mb-4">
-                            <label asp-for="DestinationAccountNumber" class="form-label fw-bold text-secondary">Cuenta de Destino <span class="text-danger">*</span></label>
-                            <input asp-for="DestinationAccountNumber" type="text" class="form-control " placeholder="Ej: 123456789" autocomplete="off" />
-                            <span asp-validation-for="DestinationAccountNumber" class="text-danger small mt-1 d-block"></span>
-                            <div class="form-text small text-muted">Ingrese los 9 dígitos de la cuenta destino.</div>
-                        </div>
-
-                        <div class="mb-5">
-                            <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto a Transferir <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light fw-bold text-secondary border-end-0">RD$</span>
-                                <input asp-for="Amount" type="number" step="0.01" min="0.01" class="form-control border-start-0 fw-bold" placeholder="0.00" />
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-12">
+                                <label asp-for="Amount" class="form-label fw-bold text-dark mb-1" style="font-size: 0.85rem;">Monto a transferir <span class="text-danger">*</span></label>
+                                <input asp-for="Amount" type="number" step="0.01" min="0.01" class="form-control rounded-3 py-2 fw-bold text-secondary" placeholder="Ej: 1500.00" autocomplete="off" />
+                                <span asp-validation-for="Amount" class="text-danger small mt-1 d-block"></span>
                             </div>
                         </div>
 
-                        <div class="d-flex gap-3 justify-content-end pt-4 mt-2 border-top">
-                            <a asp-controller="Customer" asp-action="Index" class="btn btn-light px-4">Cancelar</a>
-                            <button type="submit" class="btn btn-dark px-5">Continuar</button>
+                        <div class="d-flex gap-2 justify-content-end pt-3 mt-3 border-top">
+                            <a asp-controller="Customer" asp-action="Index" class="btn btn-outline-secondary rounded-3 px-4 fw-bold">Cancelar</a>
+                            <button type="submit" class="btn btn-dark rounded-3 px-4 fw-bold" style="background-color: #0F172A;">Continuar <i class="bi bi-arrow-left-right ms-2"></i></button>
                         </div>
                     </form>
                 </div>

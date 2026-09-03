@@ -44,5 +44,14 @@ namespace ArtemisBankingPro.Infraestructrue.Persistence.Repositories.Transaction
 
             return await query.ToListAsync();
         }
+
+        public async Task<IReadOnlyList<Transaction>> GetTransactionsFromDateAsync(DateTimeOffset fromDate)
+        {
+            var targetDate = fromDate.Date;
+            return await _context.Transactions
+                .AsNoTracking()
+                .Where(t => t.CreatedAt.Date >= targetDate)
+                .ToListAsync();
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Artemis_Banking_Pro.Core.Application.Contracts.AdminDashboard;
+using Artemis_Banking_Pro.Core.Application.Contracts.AdminDashboard;
 using Artemis_Banking_Pro.Core.Application.ViewModels.AdminDashboard;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -58,7 +58,10 @@ namespace ArtemisBankingPro.Presentation.WebApp.Controllers.AdminDashboard
                 OutstandingLoans = 0,
                 CreditCardActive = 0,
                 SavingAccountActive = 0,
-                AverageDebtAmountPerCustomer = 0m
+                AverageDebtAmountPerCustomer = 0m,
+                Last7DaysLabels = new(),
+                Last7DaysTransactions = new(),
+                Last7DaysPayments = new()
             };
     }
 }

@@ -8,22 +8,23 @@
     var loans = ViewBag.Loans as List<LoansDto> ?? new List<LoansDto>();
 }
 
-<div class="container-fluid py-5" style="font-family: 'Montserrat', sans-serif;">
+<div class="container-fluid py-4" style="font-family: 'Montserrat', sans-serif;">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-5 col-xl-5">
+        <div class="col-md-8 col-lg-8 col-xl-7">
             
             <div class="mb-4 text-center">
-                <h2 class="fw-bold mb-2" style="color: #0F172A;">
-                    <i class="bi bi-cash-coin text-info me-2"></i> Pago de Préstamo
-                </h2>
-                <p class="text-muted mb-0">Abone cuotas a su préstamo activo desde sus cuentas.</p>
+                <div class="mb-2">
+                    <i class="bi bi-cash-coin fs-4 text-info"></i>
+                </div>
+                <h2 class="fw-normal mb-1" style="color: #0F172A; font-family: 'Montserrat', sans-serif;">Pago de Préstamo</h2>
+                <p class="text-muted mb-0 fs-6 fw-bold">Abone cuotas a su préstamo activo desde sus cuentas.</p>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-2">
-                <div class="card-body p-4 p-4">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
                     @if (!ViewData.ModelState.IsValid)
                     {
-                        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4">
+                        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-3">
                             <i class="bi bi-exclamation-circle-fill me-2"></i>
                             <strong>¡Atención!</strong>
                             <div asp-validation-summary="All" class="mt-2 mb-0 small"></div>
@@ -32,44 +33,47 @@
 
                     <form asp-action="PayLoan" method="post">
                         
-                        <div class="row g-4 mb-5">
+                        <div class="row g-4 mb-3">
                             <div class="col-md-6">
-                                <label asp-for="SourceAccountNumber" class="form-label fw-bold text-secondary">Cuenta de Origen <span class="text-danger">*</span></label>
-                                <select asp-for="SourceAccountNumber" class="form-select">
-                                    <option value="">-- Seleccione una cuenta origen --</option>
+                                <label asp-for="SourceAccountNumber" class="form-label fw-bold text-dark mb-1" style="font-size: 0.85rem;">Cuenta de origen <span class="text-danger">*</span></label>
+                                <select asp-for="SourceAccountNumber" class="form-select rounded-3 py-2">
+                                    <option value="">Seleccione una cuenta origen</option>
                                     @foreach(var account in savingsAccounts)
                                     {
-                                        <option value="@account.AccountNumber">@account.AccountNumber - RD$ @account.Balance.ToString("N2")</option>
+                                        <option value="@account.AccountNumber">@account.AccountNumber (RD$ @account.Balance.ToString("N2"))</option>
                                     }
                                 </select>
                                 <span asp-validation-for="SourceAccountNumber" class="text-danger small mt-1 d-block"></span>
                             </div>
 
                             <div class="col-md-6">
-                                <label asp-for="LoanId" class="form-label fw-bold text-secondary">Préstamo a Pagar <span class="text-danger">*</span></label>
-                                <select asp-for="LoanId" class="form-select">
-                                    <option value="">-- Seleccione un préstamo --</option>
+                                <label asp-for="LoanId" class="form-label fw-bold text-dark mb-1" style="font-size: 0.85rem;">Préstamo a pagar <span class="text-danger">*</span></label>
+                                <select asp-for="LoanId" class="form-select rounded-3 py-2">
+                                    <option value="">Seleccione un préstamo</option>
                                     @foreach(var loan in loans)
                                     {
-                                        <option value="@loan.Id">Préstamo #@loan.Id - Deuda: RD$ @loan.PendientAmount.ToString("N2")</option>
+                                        <option value="@loan.Id">Préstamo #@loan.Id (Deuda: RD$ @loan.PendientAmount.ToString("N2"))</option>
                                     }
                                 </select>
                                 <span asp-validation-for="LoanId" class="text-danger small mt-1 d-block"></span>
                             </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <p class="small text-muted mb-0" style="font-size: 0.75rem;">Verifica los datos antes de continuar.</p>
+                        </div>
 
-                            <div class="col-12">
-                                <label asp-for="Amount" class="form-label fw-bold text-secondary">Monto a Pagar <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light fw-bold text-secondary border-end-0">RD$</span>
-                                    <input asp-for="Amount" type="number" step="0.01" min="0.01" class="form-control border-start-0 fw-bold" placeholder="0.00" />
-                                </div>
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-12">
+                                <label asp-for="Amount" class="form-label fw-bold text-dark mb-1" style="font-size: 0.85rem;">Monto a pagar <span class="text-danger">*</span></label>
+                                <input asp-for="Amount" type="number" step="0.01" min="0.01" class="form-control rounded-3 py-2 fw-bold text-secondary" placeholder="Ej: 1500.00" autocomplete="off" />
                                 <span asp-validation-for="Amount" class="text-danger small mt-1 d-block"></span>
                             </div>
                         </div>
 
-                        <div class="d-flex gap-3 justify-content-end pt-4 mt-2 border-top">
-                            <a asp-controller="Customer" asp-action="Index" class="btn btn-light px-4">Cancelar</a>
-                            <button type="submit" class="btn btn-dark px-5">Continuar</button>
+                        <div class="d-flex gap-2 justify-content-end pt-3 mt-3 border-top">
+                            <a asp-controller="Customer" asp-action="Index" class="btn btn-outline-secondary rounded-3 px-4 fw-bold">Cancelar</a>
+                            <button type="submit" class="btn btn-dark rounded-3 px-4 fw-bold" style="background-color: #0F172A;">Continuar <i class="bi bi-arrow-left-right ms-2"></i></button>
                         </div>
                     </form>
                 </div>
